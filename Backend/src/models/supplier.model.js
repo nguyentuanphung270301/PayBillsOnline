@@ -16,7 +16,7 @@ Supplier.getAll = function (callback) {
                 callback(null, results)
             }
             if (results.length == 0) {
-                callback('Not Found Data')
+                callback('Không tìm thấy dữ liệu')
             }
         }
     })
@@ -55,6 +55,26 @@ Supplier.createSupplier = function (supplierData, callback) {
 // Cập nhật thông tin của nhà cung cấp
 Supplier.updateSupplier = function (id, supplierData, callback) {
     const { name, email, phone } = supplierData;
+    const query = 'UPDATE suppliers SET name =?, email =?, phone =? WHERE id =?';
+    db.query(query, [name, email, phone, id], (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            this.getById(id, callback);
+        }
+    })
+}
+
+// Xóa nhà cung cấp
+Supplier.deleteSupplier = function (id, callback) {
+    const query = 'DELETE FROM suppliers WHERE id =?';
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    })
 }
 
 module.exports = Supplier;
