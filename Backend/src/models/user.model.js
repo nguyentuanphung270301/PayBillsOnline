@@ -1,4 +1,8 @@
 const db = require('../configs/connect');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+const salt = bcrypt.genSaltSync(saltRounds);
+
 const User = function (user) {
     this.id = user.id
     this.firstname = user.firstname
@@ -42,24 +46,32 @@ User.getById = function (id, callback) {
     })
 }
 
+
 User.createUser = function (userData, callback) {
-    const { firstname, lastname, email, phone, username, password } = userData
-    db.query('INSERT INTO users (firstname, lastname, email, phone, username, password) VALUES (?,?,?,?,?,?)',
-        [firstname, lastname, email, phone, username, password], (err, results) => {
+    const { firstname, lastname, email, phone, username, password } = userData;
+
+    // Mã hoá password với salt cố định
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    db.query(
+        'INSERT INTO users (firstname, lastname, email, phone, username, password) VALUES (?,?,?,?,?,?)',
+        [firstname, lastname, email, phone, username, hashedPassword],
+        (err, results) => {
             if (err) {
                 callback(err, null);
-            }
-            else {
+            } else {
                 const newUser = results.insertId;
-                this.getById(newUser, callback)
+                this.getById(newUser, callback);
             }
-        })
-}
+        }
+    );
+};
+
 
 User.updateUser = function (id, userData, callback) {
-    const { firstname, lastname, email, phone, dob, gender, address, username, password } = userData
-    db.query('UPDATE users SET firstname =?, lastname =?, email =?, phone =?, dob =?, gender =?, address =?, username =?, password =? WHERE id =?',
-        [firstname, lastname, email, phone, dob, gender, address, username, password, id], (err, results) => {
+    const { firstname, lastname, email, phone, dob, gender, address } = userData
+    db.query('UPDATE users SET firstname =?, lastname =?, email =?, phone =?, dob =?, gender =?, address =? WHERE id =?',
+        [firstname, lastname, email, phone, dob, gender, address, id], (err, results) => {
             if (err) {
                 callback(err, null);
             }
