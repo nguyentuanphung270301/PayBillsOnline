@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const userBankCardController = require('../controllers/userbankcard.controller');
+const authMiddleware = require('../middleware/auth.middleware')
 
-router.get('/all', userBankCardController.getAll);
-router.get('/:id', userBankCardController.getById);
-router.post('/create', userBankCardController.createCard);
-router.put('/update/:id', userBankCardController.updateCard);
-router.delete('/delete/:id', userBankCardController.deleteCard);
+
+router.get('/all', authMiddleware.authenticateToken, userBankCardController.getAll);
+router.get('/:id', authMiddleware.authenticateToken, userBankCardController.getById);
+router.post('/create', authMiddleware.authenticateToken, userBankCardController.createCard);
+router.put('/update/:id', authMiddleware.authenticateToken, userBankCardController.updateCard);
+router.delete('/delete/:id', authMiddleware.authenticateToken, userBankCardController.deleteCard);
 module.exports = router

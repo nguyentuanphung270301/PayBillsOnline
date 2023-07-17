@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Auth = require('../models/auth.model');
+const userAuth = require('../models/authorization.model')
 
 exports.login = function (req, res) {
     const { username, password } = req.body;
@@ -40,12 +41,24 @@ exports.register = function (req, res) {
         username: username,
         password: password
     }
-    User.createUser(newUser, function (err, data) {
+
+    Auth.register(newUser, function (err, data) {
         if (err) {
             res.status(500).send(err);
         }
         else {
-            res.status(200).send(data);
+                const newAuth = {
+                    user_id: data.insertId,
+                    role_id: 1
+                }
+                userAuth.createAuthorization(newAuth, function (error, data) {
+                    if (error) {
+                        res.status(500).send(error);
+                    }
+                    else {
+                       res.status(200).send(data);
+                    }
+                })
         }
     })
 }

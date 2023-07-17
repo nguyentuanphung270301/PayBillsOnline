@@ -57,8 +57,7 @@ Auth.register = function (registerData, callback) {
             if (err) {
                 callback(err, null);
             } else {
-                const newUser = results.insertId;
-                this.getById(newUser, callback);
+                callback(null, results);
             }
         }
     );
