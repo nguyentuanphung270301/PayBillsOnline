@@ -46,6 +46,37 @@ User.getById = function (id, callback) {
     })
 }
 
+User.getByUsername = function (username, callback) {
+    db.query('SELECT * FROM users WHERE username =?', [username], (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            if (results.length > 0) {
+                callback(null, results[0])
+            }
+            if (results.length == 0) {
+                callback('Không tìm thấy user với username:' + username)
+            }
+        }
+    })
+}
+
+User.getByEmail = function (email, callback) {
+    db.query('SELECT * FROM users WHERE email =?', [email], (err, results) => {
+        if (err) {
+            callback(err, null);
+        }
+        else {
+            if (results.length > 0) {
+                callback(null, results[0])
+            }
+            if (results.length == 0) {
+                callback('Không tìm thấy user với email: ' + email)
+            }
+        }
+    })
+}
+
 
 User.createUser = function (userData, callback) {
     const { firstname, lastname, email, phone, username, password } = userData;
@@ -79,6 +110,21 @@ User.updateUser = function (id, userData, callback) {
                 this.getById(id, callback);
             }
         })
+}
+
+User.updateUserByEmail = function (data, callback) {
+    const {email, password} = data;
+    // Mã hoá password với salt cố định
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    db.query('UPDATE users SET password =? WHERE email =?', [hashedPassword, email], (err, results) => {
+        if (err) {
+            callback(err, null);
+        }
+        else {
+            this.getByEmail(email,callback)
+        }
+    })
 }
 
 User.deleteUser = function (id, callback) {

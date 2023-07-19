@@ -7,22 +7,22 @@ exports.login = function (req, res) {
     const { username, password } = req.body;
     Auth.getByUsername(username, (err, login) => {
         if (err) {
-            return res.status(500).json({ message: 'Internal server error' });
+            return res.status(500).json({ message: 'Internal server error', success: false });
         }
         if (!login) {
-            return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu' });
+            return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu', success: false});
         }
         // So sánh mật khẩu
         const isPasswordValid = bcrypt.compareSync(password, login.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu' });
+            return res.status(401).json({ message: 'Sai tên đăng nhập hoặc mật khẩu', success: false });
         }
 
         // Tạo token truy cập
         const accessToken = jwt.sign({ userId: login.id }, 'your-secret-key', { expiresIn: '24h' });
 
         // Trả về token truy cập    
-        res.json({ accessToken });
+        res.status(200).json({ accessToken: accessToken , success: true});
     })
 }
 
@@ -44,21 +44,21 @@ exports.register = function (req, res) {
 
     Auth.register(newUser, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({ error: err, success: false });
         }
         else {
-                const newAuth = {
-                    user_id: data.insertId,
-                    role_id: 1
+            const newAuth = {
+                user_id: data.insertId,
+                role_id: 1
+            }
+            userAuth.createAuthorization(newAuth, function (error, data) {
+                if (error) {
+                    res.status(500).send({error: error, success: false});
                 }
-                userAuth.createAuthorization(newAuth, function (error, data) {
-                    if (error) {
-                        res.status(500).send(error);
-                    }
-                    else {
-                       res.status(200).send(data);
-                    }
-                })
+                else {
+                    res.status(200).send({data: data, success: true});
+                }
+            })
         }
     })
 }
