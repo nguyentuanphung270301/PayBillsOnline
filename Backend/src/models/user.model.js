@@ -112,8 +112,33 @@ User.updateUser = function (id, userData, callback) {
         })
 }
 
+User.changPassword = function (data, callback) {
+    const { username, password, newPassword } = data;
+
+    const hasedOldPassword = bcrypt.hashSync(password, salt)
+    const hasedNewPassword = bcrypt.hashSync(newPassword, salt)
+
+    db.query('SELECT * FROM users WHERE password = ? ', [hasedOldPassword], (err, result) => {
+        if (err) {
+            callback(err, null);
+        }
+        else {
+            db.query('UPDATE users SET password =? WHERE username=?', [hasedNewPassword, username], (err, result) => {
+                if (err) {
+                    callback(err, null);
+                }
+                else {
+                    this.getByUsername(username, callback)
+                }
+            })
+        }
+    })
+
+
+}
+
 User.updateUserByEmail = function (data, callback) {
-    const {email, password} = data;
+    const { email, password } = data;
     // Mã hoá password với salt cố định
     const hashedPassword = bcrypt.hashSync(password, salt);
 
@@ -122,7 +147,7 @@ User.updateUserByEmail = function (data, callback) {
             callback(err, null);
         }
         else {
-            this.getByEmail(email,callback)
+            this.getByEmail(email, callback)
         }
     })
 }

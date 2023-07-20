@@ -25,9 +25,9 @@ exports.getUserByUsername = (req, res) => {
     const username = req.params.username
     User.getByUsername(username, function (err, data) {
         if (err) {
-            res.status(500).send({err: err, success: false});
+            res.status(500).send({ err: err, success: false });
         } else {
-            res.status(200).send({data: data, success: true});
+            res.status(200).send({ data: data, success: true });
         }
     })
 }
@@ -36,9 +36,9 @@ exports.getUserByEmail = (req, res) => {
     const email = req.params.email
     User.getByEmail(email, function (err, data) {
         if (err) {
-            res.status(500).send({err: err, success: false});
+            res.status(500).send({ err: err, success: false });
         } else {
-            res.status(200).send({data: data, success: true});
+            res.status(200).send({ data: data, success: true });
         }
     })
 }
@@ -70,8 +70,8 @@ exports.createUser = (req, res) => {
 
 exports.updateUser = (req, res) => {
     const userId = req.params.id
-    const { firstname, lastname, email, phone, dob, gender, address} = req.body
-    if (!firstname || !lastname || !email || !phone ) {
+    const { firstname, lastname, email, phone, dob, gender, address } = req.body
+    if (!firstname || !lastname || !email || !phone) {
         res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin' })
     }
     const newUser = {
@@ -85,10 +85,28 @@ exports.updateUser = (req, res) => {
     }
     User.updateUser(userId, newUser, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         }
         else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
+        }
+    })
+}
+
+
+exports.changPassword = (req, res) => {
+    const { username, password, newPassword } = req.body;
+    const data = {
+        username: username,
+        password: password,
+        newPassword: newPassword
+    }
+    User.changPassword(data, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        }
+        else {
+            res.status(200).send({ data: data, success: true });
         }
     })
 }
@@ -101,10 +119,10 @@ exports.updateUserPassword = (req, res) => {
     }
     User.updateUserByEmail(newData, function (err, data) {
         if (err) {
-            res.status(500).send({error: err, success: false});
+            res.status(500).send({ error: err, success: false });
         }
         else {
-            res.status(200).send({data: data, success: true});
+            res.status(200).send({ data: data, success: true });
         }
     })
 }

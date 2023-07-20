@@ -82,6 +82,7 @@ const ResetPassword = () => {
                         placeholder="Nhập email của bạn"
                         className="input" type="email"
                         onChange={(e) => setEmail(e.target.value)}
+                        value={email || ''}
                     />
                 </div>
                 <button className="button-submit" type='submit'>Gửi</button>

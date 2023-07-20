@@ -1,0 +1,14 @@
+:root {
+    --width-menu: 60px
+}
+
+.main-bank-account {
+    position: absolute;
+    height: calc(100vh - 60px);
+    width: calc(100vw - var(--width-menu));
+    bottom: 0;
+    right: 0;
+    background-image: url(../images/main-background.jpg);
+    background-size: cover;
+    transition: width 0.3s ease;
+}

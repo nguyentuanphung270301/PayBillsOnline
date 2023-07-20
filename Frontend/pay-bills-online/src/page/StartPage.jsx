@@ -98,12 +98,12 @@ const StartPage = () => {
   }
 
   const handleStart = () => {
-    if (checkUser){
+    if (checkUser) {
       navigate('/mainpage/homepage')
     }
     else {
-          toast.error('Vui lòng đăng nhập để vào trang web')
-        }
+      toast.error('Vui lòng đăng nhập để vào trang web')
+    }
   }
 
   return (
@@ -159,12 +159,12 @@ const StartPage = () => {
         </nav>
       </header>
 
-      {openLogout && <div className='logout-form'>
+      <div className={`logout-form ${openLogout ? 'show' : ''}`}>
         <button className='btn-logout' onClick={handleLogout}>
           <FontAwesomeIcon icon={faArrowRightFromBracket} className='sign' />
           <div className='text'>Đăng xuất</div>
         </button>
-      </div>}
+      </div>
 
       <div className='main-home' style={{ display: isHomeVisible ? 'flex' : 'none' }}>
         <div className='home-text'>
@@ -188,7 +188,7 @@ const StartPage = () => {
             <span className="hover-underline-animation">
               Bắt đầu
             </span>
-            <FontAwesomeIcon icon={faArrowRightLong} className='icon-start'/>
+            <FontAwesomeIcon icon={faArrowRightLong} className='icon-start' />
           </button>
         </div>
         <img className='image-home' src={require('../images/image-home.png')} alt='Ảnh' />

@@ -4,7 +4,9 @@ import publicClient from '../axiosClient/publicClient'
 const userEndpoints = {
     getUserByUsername: (username) => `/user/username/${username}`,
     getUserByEmail: (email) => `/user/email/${email}`,
-    updatePassword: '/user/updatepassword'
+    updatePassword: '/user/updatepassword',
+    changPassword: '/user/changepassword',
+    updateUser: (id) => `/user/update/${id}`
 }
 
 const userApis = {
@@ -29,6 +31,24 @@ const userApis = {
     updatePassword: async (data) => {
         try {
             const response = await publicClient.put(userEndpoints.updatePassword, data)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    changPassword: async (data) => {
+        try {
+            const response = await privateClient.put(userEndpoints.changPassword, data)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    updateUser: async (id, data) => {
+        try {
+            const response = await privateClient.put(userEndpoints.updateUser(id), data)
             return response
         }
         catch (error) {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import '../style/LoginForm.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faLock, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'
@@ -12,6 +12,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -65,15 +66,27 @@ const LoginForm = () => {
           <FontAwesomeIcon icon={faLock} className='input-icon' />
           <input
             placeholder="Nhập mật khẩu của bạn"
-            className="input" type="password"
+            className="input" type={showPassword ? "text" : "password"}
             onChange={(e) => setPassword(e.target.value)
             } />
+          {password && (showPassword ? 
+          (<FontAwesomeIcon icon={faEyeSlash} onClick={() => setShowPassword(!showPassword)}
+            style={{
+              margin: '0 10px',
+            }}
+          />) :
+            (<FontAwesomeIcon icon={faEye} onClick={() => setShowPassword(!showPassword)}
+              style={{
+                margin: '0 10px',
+              }}
+            />)
+          )}
         </div>
 
         <div className="flex-row">
-        <Link to='/resetpassword' style={{ textDecoration: 'none' }}>
-          <span className="span">Quên mật khẩu ?</span>
-        </Link>
+          <Link to='/resetpassword' style={{ textDecoration: 'none' }}>
+            <span className="span">Quên mật khẩu ?</span>
+          </Link>
         </div>
         <button className="button-submit" type='submit'>Đăng nhập</button>
         <p className="p">Bạn chưa có tài khoản ?
