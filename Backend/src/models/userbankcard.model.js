@@ -40,6 +40,21 @@ UserBankCard.getById = function (id, callback) {
     })
 }
 
+UserBankCard.getByUserId = function (id, callback) {
+    db.query('SELECT * FROM userbankcard WHERE user_id =?', [id], (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            if (results.length > 0) {
+                callback(null, results)
+            }
+            if (results.length == 0) {
+                callback('Không tìm thấy thẻ với id:'+ id)
+            }
+        }
+    })
+}
+
 UserBankCard.createCard = function (cardData, callback) {
     const { card_number, expiry_date, holder_name, cvv, balance, user_id } = cardData;
     const query = 'INSERT INTO userbankcard (card_number, expiry_date, holder_name, cvv, balance, user_id) VALUES (?,?,?,?,?,?)';

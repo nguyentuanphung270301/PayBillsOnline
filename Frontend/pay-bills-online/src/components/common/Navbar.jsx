@@ -35,8 +35,8 @@ const Navbar = () => {
     return (
         <div className='main-nav'>
             <div className='header-nav'>
-                {openMenu ? <FontAwesomeIcon icon={faChevronRight} style={{ color: 'white', fontSize: '20px', fontWeight: '500', marginLeft: '10px' }} onClick={openMenuClick} /> :
-                    <FontAwesomeIcon icon={faChevronLeft} style={{ color: 'white', fontSize: '20px', fontWeight: '500', marginLeft: '10px' }} onClick={openMenuClick} />}
+                {!openMenu ? <FontAwesomeIcon icon={faChevronLeft} style={{ color: 'white', fontSize: '20px', fontWeight: '500', marginLeft: '10px' }} onClick={openMenuClick} /> :
+                    <FontAwesomeIcon icon={faChevronRight} style={{ color: 'white', fontSize: '20px', fontWeight: '500', marginLeft: '10px' }} onClick={openMenuClick} />}
                 <div className='header-user' onClick={() => setOpenForm(!openForm)}>
                     <Typography variant='h4'
                         sx={{
@@ -103,7 +103,7 @@ const Navbar = () => {
 
             <div className='menu-nav' style={{ alignItems: `${!openMenu ? '' : 'center'}` }}>
                 <div className='menu-title'>
-                    {!openMenu ? <span>BILL PAYMENT SYSTEM</span> : <span></span>}
+                    {!openMenu && <span>BILL PAYMENT SYSTEM</span>}
                 </div>
                 <div className='list-menu'>
                     <ul className={`${openMenu ? 'close' : ''}`}>
@@ -111,11 +111,11 @@ const Navbar = () => {
                             <FontAwesomeIcon icon={faHouse} className={`${openMenu ? '' : 'icon-close'}`} />
                             {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
                         </li>
-                        <Link to='/mainpage/bankaccount' style={{ textDecoration: 'none' , color:'white'}}>
-                                <li className={`li-menu ${openMenu ? 'close' : ''}`}>
-                                    <FontAwesomeIcon icon={faMoneyCheckDollar} className={`${openMenu ? '' : 'icon-close'}`} />
-                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Tài khoản ngân hàng</span> : <span></span>}
-                                </li>
+                        <Link to='/mainpage/bankaccount' style={{ textDecoration: 'none', color: 'white' }}>
+                            <li className={`li-menu ${openMenu ? 'close' : ''}`}>
+                                <FontAwesomeIcon icon={faMoneyCheckDollar} className={`${openMenu ? '' : 'icon-close'}`} />
+                                {!openMenu ? <span style={{ marginLeft: '10px' }}>Tài khoản ngân hàng</span> : <span></span>}
+                            </li>
                         </Link>
                         <li className={`li-menu ${openMenu ? 'close' : ''}`}>
                             <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />

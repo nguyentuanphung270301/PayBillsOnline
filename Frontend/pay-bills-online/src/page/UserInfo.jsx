@@ -3,6 +3,7 @@ import '../style/UserInfo.css'
 import { Typography } from '@mui/material'
 import userApis from '../api/modules/user.api'
 import {toast} from 'react-toastify'
+import { format, addDays } from 'date-fns';
 
 const UserInfo = () => {
     const username = localStorage.getItem('username');
@@ -21,13 +22,15 @@ const UserInfo = () => {
             const response = await userApis.getUserByUsername(username)
             if (response.success && response) {
                 console.log(response)
+                const increasedDate = addDays(new Date(response.data.dob), 0);
+                const formattedDate = format(increasedDate, 'yyyy-MM-dd');
                 setId(response.data.id)
                 setFirstname(response.data.firstname)
                 setLastname(response.data.lastname)
                 setEmail(response.data.email)
                 setPhone(response.data.phone)
                 setAddress(response.data.address)
-                setDob(response.data.dob)
+                setDob(formattedDate)
                 if (response.data.gender === 1) {
                     setGender("Nam")
                 }

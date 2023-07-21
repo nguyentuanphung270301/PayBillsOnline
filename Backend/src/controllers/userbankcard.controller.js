@@ -14,9 +14,20 @@ exports.getById = function (req, res) {
     const cardId = req.params.id
     UserBankCard.getById(cardId, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
+        }
+    })
+}
+
+exports.getByUserId = function (req, res) {
+    const userId = req.params.id
+    UserBankCard.getByUserId(userId, function (err, data) {
+        if (err) {
+            res.status(500).send({error: err, success: false});
+        } else {
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -70,9 +81,9 @@ exports.deleteCard = function (req, res) {
     const cardId = req.params.id
     UserBankCard.deleteCard(cardId, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).json({ message: `Xoá thẻ với id ${cardId} thành công` });
+            res.status(200).json({ data: data, success: true });
         }
     })
 }

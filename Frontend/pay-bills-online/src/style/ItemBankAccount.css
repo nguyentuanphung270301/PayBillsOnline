@@ -1,0 +1,47 @@
+.main-item-bank {
+    width: 60%;
+    height: 180px;
+    position: relative;
+    background-color: white;
+    margin-bottom: 20px;
+    border-radius: 20px;
+
+
+    .item-bank-header {
+
+        background-color: #eed0ff;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        height: 130px;
+        .item-bank-header-1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .item-bank-header-2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+    }
+    .item-bank-footer {
+        height: 50px;
+        background-color: #ab50b7;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        width: 100%;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .logo-visa {
+            width: 50px;
+            height: 30px;
+            margin: 10px 20px 0 0;
+        }
+    }
+}
