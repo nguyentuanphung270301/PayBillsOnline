@@ -1,23 +1,46 @@
+::-webkit-scrollbar {
+    width: 8px;
+    background-color: #f5f5f5;
+  }
+  
+  /* Thay đổi màu của phần cuộn trên thanh cuộn */
+  ::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+  }
+  
+  /* Thay đổi màu của phần nền phía sau của thanh cuộn */
+  ::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+  }
 .main-item-bank {
-    width: 60%;
-    height: 180px;
+    width: 350px;
+    height: 200px;
     position: relative;
     background-color: white;
     margin-bottom: 20px;
     border-radius: 20px;
 
+ 
+
 
     .item-bank-header {
 
-        background-color: #eed0ff;
+        background: linear-gradient(to bottom, #99dff5, #7945e9) ;
         border-top-left-radius: 20px;
         border-top-right-radius: 20px;
-        height: 130px;
+        height: 140px;
         .item-bank-header-1 {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
+
+            .logo-header {
+                width: 40px;
+                height: 40px;
+                margin: 15px 15px 0 15px;
+            }
         }
 
         .item-bank-header-2 {
@@ -28,8 +51,8 @@
 
     }
     .item-bank-footer {
-        height: 50px;
-        background-color: #ab50b7;
+        height: 60px;
+        background-color: #503396;
         border-bottom-left-radius: 20px;
         border-bottom-right-radius: 20px;
         width: 100%;
@@ -40,8 +63,12 @@
 
         .logo-visa {
             width: 50px;
-            height: 30px;
+            height: 50px;
             margin: 10px 20px 0 0;
         }
     }
+}
+
+.main-item-bank:hover {
+    cursor: pointer;
 }

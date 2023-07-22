@@ -3,6 +3,7 @@ const db = require('../configs/connect');
 const UserBankCard = function (userbankcard) {
     this.id = userbankcard.id;
     this.card_number = userbankcard.card_number;
+    this.bank_name = userbankcard.bank_name;
     this.expiry_date = userbankcard.expiry_date;
     this.holder_name = userbankcard.holder_name;
     this.cvv = userbankcard.cvv;
@@ -56,9 +57,9 @@ UserBankCard.getByUserId = function (id, callback) {
 }
 
 UserBankCard.createCard = function (cardData, callback) {
-    const { card_number, expiry_date, holder_name, cvv, balance, user_id } = cardData;
-    const query = 'INSERT INTO userbankcard (card_number, expiry_date, holder_name, cvv, balance, user_id) VALUES (?,?,?,?,?,?)';
-    db.query(query, [card_number, expiry_date, holder_name, cvv, balance, user_id], (err, results) => {
+    const { card_number,bank_name , expiry_date, holder_name, cvv, balance, user_id } = cardData;
+    const query = 'INSERT INTO userbankcard (card_number,bank_name ,expiry_date, holder_name, cvv, balance, user_id) VALUES (?,?,?,?,?,?,?)';
+    db.query(query, [card_number,bank_name ,expiry_date, holder_name, cvv, balance, user_id], (err, results) => {
         if (err) {
             callback(err, null);
         }

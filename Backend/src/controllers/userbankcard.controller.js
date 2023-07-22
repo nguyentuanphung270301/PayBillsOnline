@@ -33,12 +33,10 @@ exports.getByUserId = function (req, res) {
 }
 
 exports.createCard = function (req, res) {
-    const { card_number, expiry_date, holder_name, cvv, balance, user_id } = req.body;
-    if (!card_number || !expiry_date || !holder_name || !cvv || !balance || !user_id) {
-        res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin' });
-    }
+    const { card_number, bank_name,expiry_date, holder_name, cvv, balance, user_id } = req.body;
     const newCard = {
         card_number: card_number,
+        bank_name: bank_name,
         expiry_date: expiry_date,
         holder_name: holder_name,
         cvv: cvv,
@@ -47,9 +45,9 @@ exports.createCard = function (req, res) {
     }
     UserBankCard.createCard(newCard, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }

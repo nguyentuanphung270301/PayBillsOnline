@@ -24,35 +24,58 @@ const ItemBankAccount = ({ data }) => {
 
 
     return (
-        <div className='main-item-bank' >
+        <div className='main-item-bank'>
             <div className='item-bank-header'>
                 <div className='item-bank-header-1'>
-                    <Typography sx={{
-                        margin: '20px 30px 0 20px',
-                        fontSize: '20px',
-                        fontWeight: '600'
-                    }}>{data.bank_name}</Typography>
-                    <FontAwesomeIcon icon={faSimCard} style={{ fontSize: '40px', margin: '20px 30px 0 0' }} />
+                    <img src={require('../../images/chip.png')} alt='logo' className='logo-header' />
+                    <img src={require('../../images/contactless.png')} alt='logo' className='logo-header' />
                 </div>
                 <div className='item-bank-header-2'>
-                    <Typography sx={{
-                        marginLeft: '20px',
-                        fontSize: '18px',
-                        fontWeight: '500'
-                    }}>{data.holder_name}</Typography>
-                    <Typography sx={{
-                        marginRight: '20px',
-                        fontSize: '18px',
-                        fontWeight: '600'
-                    }}>**** **** {data.card_number.substr(-4)}</Typography>
+                    <div>
+                        <Typography sx={{
+                            marginLeft: '20px',
+                            fontSize: '15px',
+                            fontWeight: '400',
+                            color: 'white',
+                        }}>Name</Typography>
+                        <Typography sx={{
+                            marginLeft: '20px',
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            color: 'white',
+                        }}>{data.holder_name}</Typography>
+                    </div>
+                    <div>
+                        <Typography sx={{
+                            marginLeft: '50px',
+                            fontSize: '15px',
+                            fontWeight: '400',
+                            color: 'white',
+                        }}>Number</Typography>
+                        <Typography sx={{
+                            marginRight: '20px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            color: 'white',
+                        }}>**** **** {data.card_number.substr(-4)}</Typography>
+                    </div>
                 </div>
             </div>
             <div className='item-bank-footer'>
-                {expiryDate && <Typography sx={{
-                    marginLeft: '20px',
-                    fontSize: '18px',
-                    fontWeight: '500'
-                }}>EXP {expiryDate}</Typography>}
+                <div>
+                    {expiryDate && <Typography sx={{
+                        marginLeft: '20px',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: 'white',
+                    }}>{expiryDate}</Typography>}
+                    <Typography sx={{
+                        marginLeft: '20px',
+                        fontSize: '15px',
+                        fontWeight: '400',
+                        color: 'white',
+                    }}>Expiry date</Typography>
+                </div>
                 <div>
                     <img src={require('../../images/visa.png')} alt='logo' className='logo-visa' />
                 </div>
