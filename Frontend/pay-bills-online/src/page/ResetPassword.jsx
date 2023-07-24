@@ -27,6 +27,8 @@ const ResetPassword = () => {
         e.preventDefault()
         if (!email) {
             toast.error('Vui lòng điền email')
+        } else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(email)) {
+            toast.error('Email phải có tên miền "@gmail.com"');
         }
         else {
             const response = await userApis.getUserByEmail(email)
@@ -80,7 +82,7 @@ const ResetPassword = () => {
                     <FontAwesomeIcon icon={faAt} className='input-icon' />
                     <input
                         placeholder="Nhập email của bạn"
-                        className="input" type="email"
+                        className="input" type="text"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email || ''}
                     />

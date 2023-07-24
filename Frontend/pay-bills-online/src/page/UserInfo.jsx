@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../style/UserInfo.css'
 import { Typography } from '@mui/material'
 import userApis from '../api/modules/user.api'
-import {toast} from 'react-toastify'
+import { toast } from 'react-toastify'
 import { format, addDays } from 'date-fns';
 
 const UserInfo = () => {
@@ -51,6 +51,10 @@ const UserInfo = () => {
     const handlesubmit = async (e) => {
         e.preventDefault()
         var gen = null
+        const currentDate = new Date();
+        const dobDate = new Date(dob);
+        const minAge = 18;
+        const minAgeDate = new Date(currentDate.getFullYear() - minAge, currentDate.getMonth(), currentDate.getDate());
         if (gender === "Nam") {
             gen = 1
         }
@@ -60,24 +64,34 @@ const UserInfo = () => {
         else {
             gen = null
         }
-        const data = {
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            phone: phone,
-            address: address,
-            dob: dob,
-            gender: gen
-        }
-        const response = await userApis.updateUser(id, data)
-        if(response.success && response) {
-            console.log(response)
-            setIsEdit(false)
-            toast.success('Cập nhật thông tin thành công!')
+
+        if (!/^[0-9]{10,11}$/.test(phone)) {
+            toast.error('Số điện thoại không hợp lệ');
+        } else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(email)) {
+            toast.error("Email phải có tên miền '@gmail.com'");
+        } else if (dobDate > minAgeDate) {
+            toast.error('Bạn phải từ 18 tuổi trở lên')
         }
         else {
-            console.log(response)
-            toast.error('Cập nhật thông tin thất bại!')
+            const data = {
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                phone: phone,
+                address: address,
+                dob: dob,
+                gender: gen,
+            }
+            const response = await userApis.updateUser(id, data)
+            if (response.success && response) {
+                console.log(response)
+                setIsEdit(false)
+                toast.success('Cập nhật thông tin thành công!')
+            }
+            else {
+                console.log(response)
+                toast.error('Cập nhật thông tin thất bại!')
+            }
         }
     }
 

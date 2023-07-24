@@ -22,6 +22,21 @@ Authorization.getAll = function (callback) {
     });
 }
 
+Authorization.getByUserId = function (userId, callback) {
+    db.query('SELECT * FROM user_authorization WHERE user_id =?', [userId], (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            if (results.length > 0) {
+                callback(null, results)
+            }
+            if (results.length == 0) {
+                callback('Không tìm thấy dữ liệu')
+            }
+        }
+    });
+}
+
 Authorization.getById = function (id, callback) {
     db.query('SELECT * FROM user_authorization WHERE id =?', [id], (err, results) => {
         if (err) {
@@ -38,9 +53,9 @@ Authorization.getById = function (id, callback) {
 }
 
 Authorization.createAuthorization = function (authorizationData, callback) {
-    const { user_id, role_id } = authorizationData;
-    const query = 'INSERT INTO user_authorization (user_id,role_id) VALUES (?,?)'
-    db.query(query, [user_id, role_id], (err, results) => {
+    const { user_id, role_id, status } = authorizationData;
+    const query = 'INSERT INTO user_authorization (user_id,role_id,status) VALUES (?,?,?)'
+    db.query(query, [user_id, role_id, status], (err, results) => {
         if (err) {
             callback(err, null);
         }
@@ -67,6 +82,18 @@ Authorization.updateAuthorization = function (id, authorizationData, callback) {
 Authorization.deleteAuthorization = function (id, callback) {
     const query = 'DELETE FROM user_authorization WHERE id =?'
     db.query(query, [id], (err, results) => {
+        if (err) {
+            callback(err, null);
+        }
+        else {
+            callback(null, results);
+        }
+    })
+}
+
+Authorization.updateStatus = (userId, callback) => {
+    const query = 'UPDATE user_authorization SET status = 0 WHERE user_id =?'
+    db.query(query, [userId], (err, results) => {
         if (err) {
             callback(err, null);
         }

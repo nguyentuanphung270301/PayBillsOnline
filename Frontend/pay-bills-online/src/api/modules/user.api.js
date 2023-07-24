@@ -6,7 +6,9 @@ const userEndpoints = {
     getUserByEmail: (email) => `/user/email/${email}`,
     updatePassword: '/user/updatepassword',
     changPassword: '/user/changepassword',
-    updateUser: (id) => `/user/update/${id}`
+    updateUser: (id) => `/user/update/${id}`,
+    getAll: '/user/all',
+    updateStatus: (id) => `/user/updateStatus/${id}`
 }
 
 const userApis = {
@@ -49,6 +51,24 @@ const userApis = {
     updateUser: async (id, data) => {
         try {
             const response = await privateClient.put(userEndpoints.updateUser(id), data)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getAll: async () => {
+        try {
+            const response = await privateClient.get(userEndpoints.getAll)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    updateStatus: async (id) => {
+        try {
+            const response = await privateClient.put(userEndpoints.updateStatus(id))
             return response
         }
         catch (error) {

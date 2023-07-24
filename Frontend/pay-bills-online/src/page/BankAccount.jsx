@@ -20,6 +20,7 @@ const BankAccount = () => {
   const [isShowAddCard, setIsShowAddCard] = useState(false)
   const [isOpenForm, setIsOpenForm] = useState({});
   const [bankInfo, setBankInfo] = useState('')
+  const [showBlurOverlay, setShowBlurOverlay] = useState(false);
 
   useEffect(() => {
     const getListBankCard = async () => {
@@ -46,6 +47,7 @@ const BankAccount = () => {
   const handleDelete = async (id) => {
     setSelectedCardId(id);
     setShowDeleteConfirmation(true);
+    setShowBlurOverlay(true);
   };
 
 
@@ -86,11 +88,14 @@ const BankAccount = () => {
     }
     setShowDeleteConfirmation(false);
     setSelectedCardId(null);
+    setShowBlurOverlay(false);
+
   };
 
   const handleCancelDelete = () => {
     setShowDeleteConfirmation(false);
     setSelectedCardId(null);
+    setShowBlurOverlay(false);
   };
   return (
     <div className='main-bank-account'>
@@ -105,7 +110,9 @@ const BankAccount = () => {
             margin: '40px 0px 0px 0px'
           }}
         >Danh sách tài khoản</Typography>
-        <button className='btn-add-bank' onClick={() => setIsShowAddCard(true)}><FontAwesomeIcon icon={faPlus} /> Thêm tài khoản</button>
+        <button className='btn-add-bank' onClick={() =>
+          setIsShowAddCard(true)
+        }><FontAwesomeIcon icon={faPlus} /> Thêm tài khoản</button>
         <div className='table-bank-account'>
           {listAccounts &&
             listAccounts.map((item) => (
@@ -123,52 +130,52 @@ const BankAccount = () => {
         <div className='right-top-bank-account'>
           {bankInfo ? (<>
             <div className='left-detail-bank'>
-            <Typography sx={{
-              fontSize: '25px',
-              fontWeight: '600',
-              margin: '10px 0px 30px 20px'
-            }}
-            >Thông tin thẻ</Typography>
-            <div>
-              <FontAwesomeIcon icon={faBuildingColumns} />
-              <span>Ngân hàng</span>
-              <span className='span-data'>{bankInfo.bank_name}</span>
+              <Typography sx={{
+                fontSize: '25px',
+                fontWeight: '600',
+                margin: '10px 0px 30px 20px'
+              }}
+              >Thông tin thẻ</Typography>
+              <div>
+                <FontAwesomeIcon icon={faBuildingColumns} />
+                <span>Ngân hàng</span>
+                <span className='span-data'>{bankInfo.bank_name}</span>
+              </div>
+              <div>
+                <FontAwesomeIcon icon={faUser} />
+                <span>Tên chủ thẻ</span>
+                <span className='span-data'>{bankInfo.holder_name}</span>
+              </div>
+              <div>
+                <FontAwesomeIcon icon={faCreditCard} />
+                <span>Số tài khoản</span>
+                <span className='span-data'>{bankInfo.card_number}</span>
+              </div>
+              <div>
+                <FontAwesomeIcon icon={faBarcode} />
+                <span>CVV</span>
+                <span className='span-data'>{bankInfo.cvv}</span>
+              </div>
+              <div>
+                <FontAwesomeIcon icon={faCalendarXmark} />
+                <span>Expiry date</span>
+                <span className='span-data'>{formattedDate(bankInfo.expiry_date)}</span>
+              </div>
             </div>
-            <div>
-              <FontAwesomeIcon icon={faUser} />
-              <span>Tên chủ thẻ</span>
-              <span className='span-data'>{bankInfo.holder_name}</span>
+            <div className='right-detail-bank'>
+              <Avatar src={require('../images/atm-card.png')} sx={{ width: '120px', height: '120px', margin: '40px 0px 20px 0px', border: '1px solid #ccc' }} />
+              <div>
+                <FontAwesomeIcon icon={faDollarSign} style={{ marginRight: '10px' }} />
+                <span style={{ fontSize: '18px', fontWeight: '500' }}>Số dư khả dụng</span>
+              </div>
+              <span style={{ fontSize: '22px', fontWeight: '700', marginTop: '10px' }} >{formattedBalance(bankInfo.balance)} đ</span>
             </div>
-            <div>
-              <FontAwesomeIcon icon={faCreditCard} />
-              <span>Số tài khoản</span>
-              <span className='span-data'>{bankInfo.card_number}</span>
-            </div>
-            <div>
-              <FontAwesomeIcon icon={faBarcode} />
-              <span>CVV</span>
-              <span className='span-data'>{bankInfo.cvv}</span>
-            </div>
-            <div>
-              <FontAwesomeIcon icon={faCalendarXmark} />
-              <span>Expiry date</span>
-              <span className='span-data'>{formattedDate(bankInfo.expiry_date)}</span>
-            </div>
-          </div>
-          <div className='right-detail-bank'>
-            <Avatar src={require('../images/atm-card.png')} sx={{ width: '120px', height: '120px', margin: '40px 0px 20px 0px', border: '1px solid #ccc' }} />
-            <div>
-              <FontAwesomeIcon icon={faDollarSign} style={{ marginRight: '10px' }} />
-              <span style={{ fontSize: '18px', fontWeight: '500' }}>Số dư khả dụng</span>
-            </div>
-            <span style={{ fontSize: '22px', fontWeight: '700', marginTop: '10px' }} >{formattedBalance(bankInfo.balance)} đ</span>
-          </div>
-          </>): <Typography sx={{
+          </>) : <Typography sx={{
             fontSize: '25px',
             fontWeight: '600',
             position: 'relative',
-            top:'120px',
-            left:'280px',
+            top: '120px',
+            left: '280px',
           }}>Chưa có dữ liệu</Typography>}
         </div>
 
@@ -176,6 +183,7 @@ const BankAccount = () => {
 
         </div>
       </div>
+      {showBlurOverlay && <div className='blur-overlay'></div>}
       {/* Form xác nhận */}
       {showDeleteConfirmation && (
         <div className='delete-confirmation'>

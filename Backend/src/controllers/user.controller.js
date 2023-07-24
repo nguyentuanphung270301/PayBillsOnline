@@ -3,9 +3,9 @@ const User = require('../models/user.model');
 exports.getAllUser = (req, res) => {
     User.getAll(function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -17,6 +17,17 @@ exports.getUserById = (req, res) => {
             res.status(500).send(err);
         } else {
             res.status(200).send(data);
+        }
+    })
+}
+
+exports.updateStatusUser = (req, res) => {
+    const userId = req.params.id
+    User.updateStatusUser(userId, function (err, data) {
+        if (err) {
+            res.status(500).send({ err: err, success: false });
+        } else {
+            res.status(200).send({ data: data, success: true });
         }
     })
 }

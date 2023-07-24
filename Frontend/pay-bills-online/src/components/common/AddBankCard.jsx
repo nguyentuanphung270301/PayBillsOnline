@@ -92,11 +92,11 @@ const AddBankCard = ({ onClose }) => {
 
         if (handleValidation()) {
 
-                const existingBankCard = listBank && listBank.find(
-                    (account) =>
-                        account.bank_name.toLowerCase() === bankName.toLowerCase() ||
-                        account.card_number === cardNumber
-                );
+            const existingBankCard = listBank && listBank.find(
+                (account) =>
+                    account.bank_name.toLowerCase() === bankName.toLowerCase() ||
+                    account.card_number === cardNumber
+            );
             if (existingBankCard) {
                 toast.error('Thẻ ngân hàng đã tồn tại');
             } else {
@@ -123,38 +123,41 @@ const AddBankCard = ({ onClose }) => {
     };
 
     return (
-        <div className='main-add-bank'>
-            <FontAwesomeIcon icon={faXmark} className='icon-close' onClick={onClose} />
-            <form className='form-add-bank' onSubmit={handleSubmit}>
-                <div className='header-add-bank'>
-                    <div className='left-add-bank'>
-                        <span>Ngân hàng</span>
-                        <span>Số tài khoản</span>
-                        <span>Ngày hết hạn</span>
-                        <span>Tên chủ thẻ</span>
-                        <span>CVV</span>
-                        <span>Số dư</span>
+        <div className="overlay" >
+
+            <div className='main-add-bank'>
+                <FontAwesomeIcon icon={faXmark} className='icon-close' onClick={onClose} />
+                <form className='form-add-bank' onSubmit={handleSubmit}>
+                    <div className='header-add-bank'>
+                        <div className='left-add-bank'>
+                            <span>Ngân hàng</span>
+                            <span>Số tài khoản</span>
+                            <span>Ngày hết hạn</span>
+                            <span>Tên chủ thẻ</span>
+                            <span>CVV</span>
+                            <span>Số dư</span>
+                        </div>
+                        <div className='right-add-bank'>
+                            <select id="bankSelect" onChange={(e) => setBankName(e.target.value)}>
+                                <option value="">--Chọn ngân hàng--</option>
+                                {bankNames.map((bankName, index) => (
+                                    <option key={index} value={bankName}>
+                                        {bankName}
+                                    </option>
+                                ))}
+                            </select>
+                            <input type="text" placeholder="Nhập số tài khoản" onChange={(e) => setCardNumber(e.target.value)} />
+                            <input type="date" onChange={(e) => setExpireDate(e.target.value)} />
+                            <input type="text" placeholder="Tên chủ thẻ viết hoa không dấu" onChange={(e) => setCardHolderName(e.target.value)} />
+                            <input type="text" placeholder="CVV" onChange={(e) => setCvv(e.target.value)} />
+                            <input type="number" placeholder="Số dư" onChange={(e) => setBalance(e.target.value)} />
+                        </div>
                     </div>
-                    <div className='right-add-bank'>
-                        <select id="bankSelect" onChange={(e) => setBankName(e.target.value)}>
-                            <option value="">--Chọn ngân hàng--</option>
-                            {bankNames.map((bankName, index) => (
-                                <option key={index} value={bankName}>
-                                    {bankName}
-                                </option>
-                            ))}
-                        </select>
-                        <input type="text" placeholder="Nhập số tài khoản" onChange={(e) => setCardNumber(e.target.value)} />
-                        <input type="date" onChange={(e) => setExpireDate(e.target.value)} />
-                        <input type="text" placeholder="Tên chủ thẻ viết hoa không dấu" onChange={(e) => setCardHolderName(e.target.value)} />
-                        <input type="text" placeholder="CVV" onChange={(e) => setCvv(e.target.value)} />
-                        <input type="number" placeholder="Số dư" onChange={(e) => setBalance(e.target.value)} />
+                    <div className='footer-add-bank'>
+                        <button type='submit'>Xác nhận thêm thẻ</button>
                     </div>
-                </div>
-                <div className='footer-add-bank'>
-                    <button type='submit'>Xác nhận thêm thẻ</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     )
 }

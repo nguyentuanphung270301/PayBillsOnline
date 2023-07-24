@@ -13,9 +13,9 @@ exports.getAllRole = (req, res) => {
 exports.getRoleById = (req, res) => {
     Role.getById(req.params.id, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }

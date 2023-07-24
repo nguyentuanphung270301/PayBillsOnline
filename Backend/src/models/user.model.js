@@ -14,6 +14,7 @@ const User = function (user) {
     this.address = user.address
     this.username = user.username
     this.password = user.password
+    this.status = user.status
 }
 
 User.getAll = function (callback) {
@@ -100,8 +101,8 @@ User.createUser = function (userData, callback) {
 
 
 User.updateUser = function (id, userData, callback) {
-    const { firstname, lastname, email, phone, dob, gender, address } = userData
-    db.query('UPDATE users SET firstname =?, lastname =?, email =?, phone =?, dob =?, gender =?, address =? WHERE id =?',
+    const { firstname, lastname, email, phone, dob, gender, address} = userData
+    db.query('UPDATE users SET firstname =?, lastname =?, email =?, phone =?, dob =?, gender =?, address =?, status = 1 WHERE id =?',
         [firstname, lastname, email, phone, dob, gender, address, id], (err, results) => {
             if (err) {
                 callback(err, null);
@@ -161,6 +162,17 @@ User.deleteUser = function (id, callback) {
             callback(null, results);
         }
     })
+}
+
+User.updateStatusUser = function (id, callback) {
+    db.query('UPDATE users SET status = 0 WHERE id =?', [id], (err, results) => {
+            if (err) {
+                callback(err, null);
+            }
+            else {
+                this.getById(id, callback);
+            }
+        })
 }
 
 module.exports = User;

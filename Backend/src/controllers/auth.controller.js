@@ -39,7 +39,8 @@ exports.register = function (req, res) {
         email: email,
         phone: phone,
         username: username,
-        password: password
+        password: password,
+        status: 1
     }
 
     Auth.register(newUser, function (err, data) {
@@ -49,7 +50,8 @@ exports.register = function (req, res) {
         else {
             const newAuth = {
                 user_id: data.insertId,
-                role_id: 1
+                role_id: 1,
+                status: 1
             }
             userAuth.createAuthorization(newAuth, function (error, data) {
                 if (error) {

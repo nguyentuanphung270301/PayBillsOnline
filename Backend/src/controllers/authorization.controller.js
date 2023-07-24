@@ -21,14 +21,26 @@ exports.getAuthorizationById = (req, res) => {
     })
 }
 
+exports.getAuthorizationByUserId = (req, res) =>{
+    const userId = req.params.id
+    Authorization.getByUserId(userId, function (err, data) {
+        if (err) {
+            res.status(500).send({error: err, success: false})
+        } else {
+            res.status(200).send({data: data, success: true})
+        }
+    })
+}
+
 exports.createAuthorization = (req, res) => {
-    const { user_id, role_id } = req.body;
+    const { user_id, role_id, status } = req.body;
     if (!user_id || !role_id) {
         res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin' })
     }
     const newAuth = {
         user_id: user_id,
-        role_id: role_id
+        role_id: role_id,
+        status: status
     }
     Authorization.createAuthorization(newAuth, function (err, data) {
         if (err) {
@@ -66,6 +78,17 @@ exports.deleteAuthorization = (req, res) => {
             res.status(500).send(err)
         } else {
             res.status(200).json({ message: `Xoá auth với id ${authorizationId} thành công` });
+        }
+    })
+}
+
+exports.updateStatus = (req, res) => {
+    const authorizationId = req.params.id
+    Authorization.updateStatus(authorizationId, function (err, data) {
+        if (err) {
+            res.status(500).send({error: err, success: false});
+        } else {
+            res.status(200).send({data: data, success: true});
         }
     })
 }

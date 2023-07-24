@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import '../style/RegisterForm.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faPen, faAt } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faLock, faPen, faAt, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,6 +15,7 @@ const RegisterForm = () => {
     const [phone, setPhone] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
@@ -28,6 +29,8 @@ const RegisterForm = () => {
             toast.error('Tên đăng nhập phải từ 5 đến 16 kí tự');
         } else if (password.length < 8 || password.length > 20) {
             toast.error('Mật khẩu phải từ 8 đến 20 kí tự');
+        } else if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(email)) {
+            toast.error("Email phải có tên miền '@gmail.com'");
         }
         else {
             const data = {
@@ -50,7 +53,7 @@ const RegisterForm = () => {
                 navigate('/login')
             }
             else {
-                toast.error("Đăng ký thất bại")
+                toast.error(response.error.sqlMessage)
             }
         }
     }
@@ -96,7 +99,7 @@ const RegisterForm = () => {
                         <input
                             placeholder="Nhập email của bạn"
                             className="input"
-                            type="email"
+                            type="text"
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
@@ -130,9 +133,11 @@ const RegisterForm = () => {
                         <input
                             placeholder="Nhập mật khẩu của bạn"
                             className="input"
-                            type="password"
+                            type={showPassword ? 'text':'password'}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        {password && (!showPassword ? <FontAwesomeIcon icon={faEye} onClick={() => setShowPassword(true)} /> :
+                            <FontAwesomeIcon icon={faEyeSlash} onClick={() => setShowPassword(false)} />)}
                     </div>
                     <button className="button-submit" type='submit'>Đăng ký</button>
                     <p className="p">Bạn đã có tài khoản ?

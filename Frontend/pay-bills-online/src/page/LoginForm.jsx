@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../style/LoginForm.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -13,6 +13,8 @@ const LoginForm = () => {
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const token = localStorage.getItem('token')
+  const user = localStorage.getItem('username')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -36,6 +38,16 @@ const LoginForm = () => {
       }
     }
   }
+
+  useEffect(() => {
+   const checkLogin = () => {
+    if (user && token) {
+      navigate('/')
+    }
+   }
+   checkLogin()
+  }, [user, token])
+  
 
   return (
     <div className='main-login'>

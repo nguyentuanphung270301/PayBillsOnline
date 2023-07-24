@@ -12,5 +12,6 @@ router.put('/changepassword',authMiddleware.authenticateToken, userController.ch
 router.post('/create',authMiddleware.authenticateToken, userController.createUser); 
 router.put('/update/:id',authMiddleware.authenticateToken, userController.updateUser);
 router.delete('/delete/:id',authMiddleware.authenticateToken, userController.deleteUser);
+router.put('/updateStatus/:id',authMiddleware.authenticateToken, userController.updateStatusUser);
 
 module.exports = router;

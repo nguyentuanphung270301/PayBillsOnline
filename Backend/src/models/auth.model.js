@@ -46,13 +46,13 @@ Auth.getById = function (id, callback) {
 }
 
 Auth.register = function (registerData, callback) {
-    const { firstname, lastname, email, phone, username, password } = registerData;
+    const { firstname, lastname, email, phone, username, password, status } = registerData;
 
     // Mã hoá password với salt cố định
     const hashedPassword = bcrypt.hashSync(password, salt);
     db.query(
-        'INSERT INTO users (firstname, lastname, email, phone, username, password) VALUES (?,?,?,?,?,?)',
-        [firstname, lastname, email, phone, username, hashedPassword],
+        'INSERT INTO users (firstname, lastname, email, phone, username, password, status) VALUES (?,?,?,?,?,?,?)',
+        [firstname, lastname, email, phone, username, hashedPassword, status],
         (err, results) => {
             if (err) {
                 callback(err, null);

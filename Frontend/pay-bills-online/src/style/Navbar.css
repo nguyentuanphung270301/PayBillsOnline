@@ -33,7 +33,7 @@
             background-color: #fa9805;
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px;
-            
+
 
             .form-item-1,
             .form-item-2,
@@ -124,13 +124,80 @@
             align-items: center;
         }
 
+        .li-ul-menu.ul {
+            height: 60px;
+            width: 100%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .li-ul-menu.close {
+            color: white;
+            margin-bottom: 20px;
+            height: 50px;
+        }
+
+        .li-ul-menu.close:hover {
+            background-color: #0057da;
+        }
+
+        .li-ul-menu.ul.open {
+            transition: height 0.3s ease-in-out;
+            height: 230px;
+        }
+
+        .li-ul-menu.ul>div {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
+
+        .li-ul-menu.ul>div>div {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            width: 100%;
+        }
+
+        .li-ul-menu.ul>div>div:hover {
+            background-color: #0057da;
+        }
+
+        .open {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 0;
+            width: 100%;
+        }
+
+        .admin-li {
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+            align-items: center;
+            height: 60px;
+        }
+
+        .admin-li:hover {
+            background-color: #0057da;
+        }
+
         .li-menu:hover {
             background-color: #0057da;
         }
 
-        .icon-close{
+        .icon-close {
             padding: 20px;
         }
+
         .list-menu>ul>li.close {
             display: flex;
             justify-content: center;

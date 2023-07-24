@@ -5,6 +5,7 @@ import Navbar from '../common/Navbar';
 import ChangPassword from '../../page/ChangPassword';
 import UserInfo from '../../page/UserInfo';
 import BankAccount from '../../page/BankAccount';
+import AdminUser from '../../page/AdminUser';
 
 
 const RouteLayout = () => {
@@ -16,6 +17,7 @@ const RouteLayout = () => {
         <Route path='/changepassword' element={<ChangPassword />} />
         <Route path='/info' element={<UserInfo />} />
         <Route path='/bankaccount' element={<BankAccount/>} />
+        <Route path='/admin/user' element={<AdminUser/>} />
       </Routes>
     </div>
   )
