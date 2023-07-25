@@ -180,14 +180,18 @@ const Navbar = () => {
                                             <span>Quản trị người dùng</span>
                                         </li>
                                     </Link>
-                                    <li className='admin-li'>
-                                        <FontAwesomeIcon icon={faBuilding} style={{ margin: '0px 20px 0px 50px' }} />
-                                        <span>Quản trị nhà cung cấp</span>
-                                    </li>
-                                    <li className='admin-li'>
-                                        <FontAwesomeIcon icon={faMicrochip} style={{ margin: '0px 20px 0px 50px' }} />
-                                        <span>Quản trị dịch vụ</span>
-                                    </li>
+                                    <Link to='/mainpage/admin/supplier' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faBuilding} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Quản trị nhà cung cấp</span>
+                                        </li>
+                                    </Link>
+                                    <Link to='/mainpage/admin/service' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faMicrochip} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Quản trị dịch vụ</span>
+                                        </li>
+                                    </Link>
                                 </ul>}
                             </div>
                         </li>}

@@ -22,9 +22,6 @@ exports.getById = (req, res) => {
 
 exports.createCard = (req, res) => {
     const { balance, supplier_id } = req.body;
-    if (!balance || !supplier_id) {
-        res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin.' });
-    }
 
     const newCard = {
         balance: balance,
@@ -32,9 +29,9 @@ exports.createCard = (req, res) => {
     }
     SupplierBankCard.createCard(newCard, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -59,6 +56,17 @@ exports.deleteCard = (req, res) => {
             res.status(500).send(err);
         } else {
             res.status(200).send("Xoá card thành công");
+        }
+    })
+}
+
+exports.deleteCardBySupplierId = (req, res) => {
+    const supplier_id = req.params.id
+    SupplierBankCard.deleteCardBySupplierId(supplier_id, function (err, data) {
+        if (err) {
+            res.status(500).send({error: err, success: false});
+        } else {
+            res.status(200).send({data: data, success: true});
         }
     })
 }

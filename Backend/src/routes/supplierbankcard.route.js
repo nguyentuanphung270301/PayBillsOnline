@@ -8,5 +8,6 @@ router.get('/:id', authMiddleware.authenticateToken, SupplierBankCardController.
 router.post('/create', authMiddleware.authenticateToken, SupplierBankCardController.createCard)
 router.put('/update/:id', authMiddleware.authenticateToken, SupplierBankCardController.updateCard)
 router.delete('/delete/:id', authMiddleware.authenticateToken, SupplierBankCardController.deleteCard)
+router.delete('/deleteBySupplierId/:id', authMiddleware.authenticateToken, SupplierBankCardController.deleteCardBySupplierId)
 
 module.exports = router;

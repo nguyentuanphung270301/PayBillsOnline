@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import '../style/AdminUser.css'
-import PropTypes from 'prop-types';
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
-import userApis from '../api/modules/user.api';
-import { addDays, format } from 'date-fns';
-import { toast } from 'react-toastify';
-import authApis from '../api/modules/auth.api';
-import userAuthApis from '../api/modules/user_auth.api';
-import AddUser from '../components/common/AddUser';
-import EditUser from '../components/common/EditUser';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import '../style/AdminService.css'
+import PropTypes from 'prop-types';
+import serviceApis from '../api/modules/service.api'
+import supplierApis from '../api/modules/supplier.api'
+import { toast } from 'react-toastify'
+
+
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -45,49 +43,25 @@ const headCells = [
         id: 'id',
         numberic: true,
         disablePadding: true,
-        label: 'Mã User'
+        label: 'Mã dịch vụ'
     },
     {
         id: 'name',
         numberic: false,
         disablePadding: true,
-        label: 'Tên người dùng'
+        label: 'Tên dịch vụ'
     },
     {
-        id: 'email',
-        numberic: false,
-        disablePadding: true,
-        label: 'Email'
-    },
-    {
-        id: 'phone',
-        numberic: false,
-        disablePadding: true,
-        label: 'Số điện thoại'
-    },
-    {
-        id: 'dob',
-        numberic: false,
-        disablePadding: true,
-        label: 'Ngày sinh'
-    },
-    {
-        id: 'gender',
-        numberic: false,
-        disablePadding: true,
-        label: 'Giới tính'
-    },
-    {
-        id: 'address',
-        numberic: false,
-        disablePadding: true,
-        label: 'Địa chỉ'
-    },
-    {
-        id: 'status',
+        id: 'price',
         numberic: true,
         disablePadding: true,
-        label: 'Trạng thái'
+        label: 'Giá'
+    },
+    {
+        id: 'supplier',
+        numberic: false,
+        disablePadding: true,
+        label: 'Nhà cung cấp'
     },
     {
         id: 'action',
@@ -143,22 +117,21 @@ EnhancedTableHead.propTypes = {
     rowCount: PropTypes.number.isRequired,
 };
 
-
-const AdminUser = () => {
+const AdminService = () => {
     const [isLoading, setIsLoading] = useState(true)
-    const [userList, setUserList] = useState('')
+    const [serviceList, setServiceList] = useState('')
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [isRequest, setIsRequest] = useState(false)
-
+    const [supplierNames, setSupplierNames] = useState({});
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [showAddUser, setShowAddUser] = useState(false);
-    const [showEditUser, setShowEditUser] = useState(false);
+    const [showAddService, setShowAddService] = useState(false);
+    const [showEditService, setShowEditService] = useState(false);
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -195,7 +168,7 @@ const AdminUser = () => {
     };
 
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userList.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - serviceList.length) : 0;
 
     const handleClickOpen = (id) => {
         setSelectedId(id);
@@ -208,63 +181,92 @@ const AdminUser = () => {
     };
     const handleEidt = (id) => {
         setSelectedId(id)
-        setShowEditUser(true)
+        setShowEditService(true)
     }
-    useEffect(() => {
-        const getAllUser = async () => {
-            const res = await userApis.getAll()
-            if (res.success && res) {
-                console.log(res)
-                setUserList(res.data)
-                setIsLoading(false)
+
+    // useEffect(() => {
+    //     const getServiceList = async () => {
+    //         const res = await serviceApis.getAll()
+    //         if (res.success && res) {
+    //             console.log(res)
+    //             setServiceList(res.data)
+    //             setIsLoading(false)
+    //         }
+    //         else {
+    //             console.log(res)
+    //             setIsLoading(false)
+    //         }
+    //     }
+    //     getServiceList()
+    // }, [isRequest, showEditService, showAddService]);
+
+    const getSupplierNameById = async (id) => {
+        try {
+            const res = await supplierApis.getById(id);
+            if (res.success && res.data) {
+                return res.data.name;
             }
-            else {
-                console.log(res)
-                setIsLoading(false)
-            }
+            return null;
+        } catch (error) {
+            console.log(error);
+            return null;
         }
-        getAllUser()
-    }, [isRequest, showAddUser, showEditUser])
+    };
 
-    const formatDate = (date) => {
-        const increasedDate = addDays(new Date(date), 0);
-        const formattedDate = format(increasedDate, 'dd-MM-yyyy');
-        return formattedDate;
-    }
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const serviceRes = await serviceApis.getAll();
+                if (serviceRes.success && serviceRes.data) {
+                    const updatedServiceList = await Promise.all(
+                        serviceRes.data.map(async (service) => {
+                            const supplierName = await getSupplierNameById(service.supplier_id);
+                            return {
+                                ...service,
+                                supplierName: supplierName || 'N/A',
+                            };
+                        })
+                    );
+                    setServiceList(updatedServiceList);
+                    setIsLoading(false);
+                } else {
+                    console.log(serviceRes);
+                    setServiceList('');
+                    setIsLoading(false);
+                }
+            } catch (error) {
+                console.log(error);
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [isRequest, showEditService, showAddService]);
 
-    const deleteUser = async (userId) => {
-        const res = await userApis.updateStatus(userId)
-        if (res.success && res) {
-            const response = await userAuthApis.updateStatus(userId)
-            if (response.success && response) {
-                console.log(response)
-                toast.success("Xoá người dùng thành công!")
-                setIsRequest(!isRequest)
-                setOpen(false)
-            }
-            else {
-                console.log(response)
-                toast.error("Xoá người dùng thất bại!")
-                setIsRequest(!isRequest)
-                setOpen(false)
-            }
+    const deleteService = async (id) => {
+        const res = await serviceApis.deleteService(id);
+        if (res.success && res.data) {
+            console.log(res);
+            setIsRequest(!isRequest);
+            toast.success('Xoá dịch vụ thành công')
+            handleClose();
         }
         else {
-            console.log(res)
+            console.log(res);
+            toast.success('Xoá dịch vụ thất bại')
         }
     }
 
     return (
-        <div className='main-admin-user'>
+        <div className='main-admin-service'>
             <Typography sx={{
                 color: '#0057da',
                 margin: '20px',
                 fontSize: '25px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-            }}>Quản trị người dùng</Typography>
-            <button className='btn-admin-add' onClick={() => setShowAddUser(true)}><FontAwesomeIcon icon={faPlus} />Thêm người dùng</button>
-            <div className='admin-user-table'>
+            }}>Quản trị dịch vụ</Typography>
+            <button className='btn-admin-add' ><FontAwesomeIcon icon={faPlus} />Thêm dịch vụ</button>
+            <div className='admin-service-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
                     top: '200px',
@@ -280,14 +282,14 @@ const AdminUser = () => {
                                     order={order}
                                     orderBy={orderBy}
                                     onRequestSort={handleRequestSort}
-                                    rowCount={userList.length}
+                                    rowCount={serviceList.length}
                                 />
-                                {!userList ? <Typography sx={{
+                                {!serviceList ? <Typography sx={{
                                     position: 'absolute',
                                     top: '200px',
                                     right: 'calc(100% / 2)',
                                 }} >Không có dữ liệu</Typography> : <TableBody>
-                                    {stableSort(userList, getComparator(order, orderBy))
+                                    {stableSort(serviceList, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
                                             return (
@@ -301,29 +303,9 @@ const AdminUser = () => {
                                                     >
                                                         {row.id}
                                                     </TableCell>
-                                                    <TableCell >{`${row.firstname} ${row.lastname}`}</TableCell>
-                                                    <TableCell >{row.email}</TableCell>
-                                                    <TableCell >{row.phone}</TableCell>
-                                                    <TableCell>{row.dob && formatDate(row.dob)}</TableCell>
-                                                    <TableCell>{(row.gender === 1 && 'Nam') || (row.gender === 0 && 'Nữ')}</TableCell>
-                                                    <TableCell>{row.address}</TableCell>
-                                                    <TableCell>
-                                                        <Typography sx={{
-                                                            textTransform: 'uppercase',
-                                                            border: '1px solid #ccc',
-                                                            height: '40px',
-                                                            display: 'flex',
-                                                            justifyContent: 'center',
-                                                            alignItems: 'center',
-                                                            borderRadius: '5px',
-                                                            fontweight: '700',
-                                                            color: 'white',
-                                                            backgroundColor: `${row.status === 1 ? '#00da2d' : '#da3600'}`,
-                                                            fontSize: '15px',
-                                                        }}>
-                                                            {row.status === 1 ? 'active' : 'deleted'}
-                                                        </Typography>
-                                                    </TableCell>
+                                                    <TableCell >{row.name}</TableCell>
+                                                    <TableCell >{row.price}</TableCell>
+                                                    <TableCell >{row.supplierName}</TableCell>
                                                     <TableCell sx={{
                                                         display: 'flex',
                                                         justifyItems: 'center',
@@ -334,7 +316,6 @@ const AdminUser = () => {
                                                                 marginRight: '10px',
                                                                 height: '40px'
                                                             }}
-                                                            disabled={row.status === 0}
                                                             onClick={() => handleEidt(row.id)}
                                                         ><FontAwesomeIcon icon={faPenToSquare} /></Button>
                                                         <Box>
@@ -349,7 +330,6 @@ const AdminUser = () => {
                                                                     }
                                                                 }}
                                                                 onClick={() => handleClickOpen(row.id)}
-                                                                disabled={row.status === 0}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </Button>
@@ -357,16 +337,16 @@ const AdminUser = () => {
                                                                 open={open}
                                                                 onClose={handleClose}
                                                             >
-                                                                <DialogTitle>Xoá Người Dùng</DialogTitle>
+                                                                <DialogTitle>Xoá Dịch vụ</DialogTitle>
                                                                 <DialogContent>
                                                                     <DialogContentText>
-                                                                        Bạn có muốn xoá người dùng này không
+                                                                        Bạn có muốn xoá dịch vụ này không
                                                                     </DialogContentText>
                                                                 </DialogContent>
                                                                 <DialogActions>
                                                                     <Button onClick={handleClose}>Cancel</Button>
                                                                     <Button
-                                                                        onClick={() => deleteUser(selectedId)}
+                                                                        onClick={() => deleteService(selectedId)}
                                                                         sx={{
                                                                             backgroundColor: 'white',
                                                                             ":hover": {
@@ -399,17 +379,15 @@ const AdminUser = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={userList.length}
+                    count={serviceList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showAddUser && <AddUser onClose={() => setShowAddUser(false)} />}
-            {showEditUser && <EditUser onClose={() => setShowEditUser(false)} id={selectedId} />}
         </div>
     )
 }
 
-export default AdminUser
+export default AdminService

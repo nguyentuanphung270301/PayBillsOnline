@@ -71,4 +71,15 @@ SupplierBankCard.deleteCard = function(id, callback) {
     })
 }
 
+SupplierBankCard.deleteCardBySupplierId = function(supplier_id, callback) {
+    db.query('DELETE FROM suppliersbankcards WHERE supplier_id =?', [supplier_id], (err, results) => {
+        if (err) {
+            callback(err, null);
+        }
+        else {
+            callback(null, results);
+        }
+    })
+}
+
 module.exports = SupplierBankCard;

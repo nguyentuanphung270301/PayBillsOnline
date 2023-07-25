@@ -3,10 +3,10 @@ const Supplier = require('../models/supplier.model');
 exports.getAllSupplier = (req, res) => {
     Supplier.getAll(function (err, data) {
         if (err) {
-            res.status(500).json(err);
+            res.status(500).json({error: err, success: false});
         }
         else {
-            res.status(200).json(data);
+            res.status(200).json({data: data,success: true});
         }
     })
 }
@@ -15,19 +15,16 @@ exports.getSupplierById = (req, res) => {
     const supplierId = req.params.id;
     Supplier.getById(supplierId, function (err, data) {
         if (err) {
-            return res.status(400).json(err);
+            res.status(500).json({error: err, success: false});
         }
         else {
-            res.status(200).json(data);
+            res.status(200).json({data: data,success: true});
         }
     })
 }
 
 exports.createSupplier = (req, res) => {
     const { name, email, phone } = req.body;
-    if (!name || !email || !phone) {
-        return res.status(400).json({ error: 'Vui lòng cung cấp đầy đủ thông tin.' });
-    }
     const newSupplier = {
         name: name,
         email: email,
@@ -35,10 +32,10 @@ exports.createSupplier = (req, res) => {
     };
     Supplier.createSupplier(newSupplier, function (err, data) {
         if (err) {
-            res.status(500).json(err);
+            res.status(500).json({error: err, success: false});
         }
         else {
-            res.status(200).json(data);
+            res.status(200).json({data: data, success: true});
         }
     })
 }
@@ -46,9 +43,6 @@ exports.createSupplier = (req, res) => {
 exports.updateSupplier = (req, res) => {
     const supplierId = req.params.id;
     const { name, email, phone } = req.body;
-    if (!name || !email || !phone) {
-        return res.status(400).json({ error: 'Vui lòng cung cấp đầy đủ thông tin.' });
-    }
     const newSupplier = {
         name: name,
         email: email,
@@ -56,10 +50,10 @@ exports.updateSupplier = (req, res) => {
     };
     Supplier.updateSupplier(supplierId, newSupplier, function (err, data) {
         if (err) {
-            res.status(500).json(err);
+            res.status(500).json({error: err, success: false});
         }
         else {
-            res.status(200).json(data);
+            res.status(200).json({data: data, success: true});
         }
     })
 }
@@ -68,10 +62,10 @@ exports.deleteSupplier = (req, res) => {
     const supplierId = req.params.id;
     Supplier.deleteSupplier(supplierId, function (err, data) {
         if (err) {
-            res.status(500).json(err);
+            res.status(500).json({error: err, success: false});
         }
         else {
-            res.status(200).json({ message: `Xoá nhà cung cấp với id ${supplierId} thành công` });
+            res.status(200).json({data:data, success: true});
         }
     })
 }

@@ -3,9 +3,9 @@ const User = require('../models/user.model');
 exports.getAllUser = (req, res) => {
     User.getAll(function (err, data) {
         if (err) {
-            res.status(500).send({error: err, success: false});
+            res.status(500).send({ error: err, success: false });
         } else {
-            res.status(200).send({data: data, success: true});
+            res.status(200).send({ data: data, success: true });
         }
     })
 }
@@ -14,9 +14,9 @@ exports.getUserById = (req, res) => {
     const userId = req.params.id
     User.getById(userId, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({ error: err, success: false });
         } else {
-            res.status(200).send(data);
+            res.status(200).send({ data: data, success: true });
         }
     })
 }
@@ -55,26 +55,26 @@ exports.getUserByEmail = (req, res) => {
 }
 
 exports.createUser = (req, res) => {
-    const { firstname, lastname, email, phone, username, password } = req.body
-
-    if (!firstname || !lastname || !email || !phone || !username || !password) {
-        res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin' })
-    }
+    const { firstname, lastname, email, phone, username, address, dob, gender, password, status} = req.body
 
     const newUser = {
         firstname: firstname,
         lastname: lastname,
         email: email,
         phone: phone,
+        dob: dob,
+        gender: gender,
+        address: address,
         username: username,
-        password: password
+        password: password,
+        status: 1
     }
     User.createUser(newUser, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({ error: err, success: false });
         }
         else {
-            res.status(200).send(data);
+            res.status(200).send({ data: data, success: true });
         }
     })
 }
@@ -96,10 +96,10 @@ exports.updateUser = (req, res) => {
     }
     User.updateUser(userId, newUser, function (err, data) {
         if (err) {
-            res.status(500).send({error: err, success: false});
+            res.status(500).send({ error: err, success: false });
         }
         else {
-            res.status(200).send({data: data, success: true});
+            res.status(200).send({ data: data, success: true });
         }
     })
 }

@@ -3,9 +3,9 @@ const Service = require('../models/services.model');
 exports.getAllServices = (req, res) => {
     Service.getAll(function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -64,9 +64,9 @@ exports.deleteService = (req, res) => {
     const serviceId = req.params.id;
     Service.deleteService(serviceId, function (err, data) {
         if (err) {
-            res.status(500).json(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).json({ message: `Xoá nhà cung cấp với id ${serviceId} thành công` });
+            res.status(200).send({data: data, success: true});
         }
     })
 }

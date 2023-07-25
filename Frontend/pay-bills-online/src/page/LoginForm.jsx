@@ -6,6 +6,8 @@ import { Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'
 import authApis from '../api/modules/auth.api';
+import userApis from '../api/modules/user.api';
+import userAuthApis from '../api/modules/user_auth.api';
 
 
 const LoginForm = () => {
@@ -29,9 +31,27 @@ const LoginForm = () => {
       const response = await authApis.login(data)
       if (response.success) {
         localStorage.setItem('token', response.accessToken)
-        localStorage.setItem('username', username)
-        toast.success('Đăng nhập thành công')
-        navigate('/')
+        const res = await userApis.getUserByUsername(username)
+        if (res.success && res.data.status === 1) {
+          const results = await userAuthApis.getUserByUserId(res.data.id)
+          if (results.success && results) {
+            localStorage.setItem('username', username)
+            toast.success('Đăng nhập thành công')
+            navigate('/')
+          }
+          else {
+            localStorage.removeItem('token')
+            toast.error('Tài khoản chưa được phân quyền')
+            console.log(results)
+          }
+        }
+        else if (res.success && res.data.status === 0) {
+          localStorage.removeItem('token')
+          toast.error('Người dùng đã bị vô hiệu hoá')
+        }
+        else {
+          console.log(res)
+        }
       }
       else {
         toast.error(response.message)
@@ -40,14 +60,14 @@ const LoginForm = () => {
   }
 
   useEffect(() => {
-   const checkLogin = () => {
-    if (user && token) {
-      navigate('/')
+    const checkLogin = () => {
+      if (user && token) {
+        navigate('/')
+      }
     }
-   }
-   checkLogin()
+    checkLogin()
   }, [user, token])
-  
+
 
   return (
     <div className='main-login'>
@@ -81,12 +101,12 @@ const LoginForm = () => {
             className="input" type={showPassword ? "text" : "password"}
             onChange={(e) => setPassword(e.target.value)
             } />
-          {password && (showPassword ? 
-          (<FontAwesomeIcon icon={faEyeSlash} onClick={() => setShowPassword(!showPassword)}
-            style={{
-              margin: '0 10px',
-            }}
-          />) :
+          {password && (showPassword ?
+            (<FontAwesomeIcon icon={faEyeSlash} onClick={() => setShowPassword(!showPassword)}
+              style={{
+                margin: '0 10px',
+              }}
+            />) :
             (<FontAwesomeIcon icon={faEye} onClick={() => setShowPassword(!showPassword)}
               style={{
                 margin: '0 10px',

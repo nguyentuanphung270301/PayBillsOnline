@@ -8,7 +8,9 @@ const userEndpoints = {
     changPassword: '/user/changepassword',
     updateUser: (id) => `/user/update/${id}`,
     getAll: '/user/all',
-    updateStatus: (id) => `/user/updateStatus/${id}`
+    updateStatus: (id) => `/user/updateStatus/${id}`,
+    createUser: '/user/create',
+    getById: (id) => `/user/${id}`,
 }
 
 const userApis = {
@@ -69,6 +71,24 @@ const userApis = {
     updateStatus: async (id) => {
         try {
             const response = await privateClient.put(userEndpoints.updateStatus(id))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    createUser: async (data) => {
+        try {
+            const response = await privateClient.post(userEndpoints.createUser, data)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getById: async (id) => {
+        try {
+            const response = await privateClient.get(userEndpoints.getById(id))
             return response
         }
         catch (error) {

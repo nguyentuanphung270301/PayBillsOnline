@@ -6,6 +6,8 @@ import ChangPassword from '../../page/ChangPassword';
 import UserInfo from '../../page/UserInfo';
 import BankAccount from '../../page/BankAccount';
 import AdminUser from '../../page/AdminUser';
+import AdminSupplier from '../../page/AdminSupplier';
+import AdminService from '../../page/AdminService';
 
 
 const RouteLayout = () => {
@@ -18,6 +20,9 @@ const RouteLayout = () => {
         <Route path='/info' element={<UserInfo />} />
         <Route path='/bankaccount' element={<BankAccount/>} />
         <Route path='/admin/user' element={<AdminUser/>} />
+        <Route path='/admin/supplier' element={<AdminSupplier/>} />
+        <Route path='/admin/service' element={<AdminService/>} />
+
       </Routes>
     </div>
   )

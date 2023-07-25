@@ -80,14 +80,14 @@ User.getByEmail = function (email, callback) {
 
 
 User.createUser = function (userData, callback) {
-    const { firstname, lastname, email, phone, username, password } = userData;
+    const { firstname, lastname, email, phone, username, address, dob, gender, password, status } = userData;
 
     // Mã hoá password với salt cố định
     const hashedPassword = bcrypt.hashSync(password, salt);
 
     db.query(
-        'INSERT INTO users (firstname, lastname, email, phone, username, password) VALUES (?,?,?,?,?,?)',
-        [firstname, lastname, email, phone, username, hashedPassword],
+        'INSERT INTO users (firstname, lastname, email, phone, username, address, dob, gender, password, status) VALUES (?,?,?,?,?,?,?,?,?,?)',
+        [firstname, lastname, email, phone, username, address, dob, gender, hashedPassword, status],
         (err, results) => {
             if (err) {
                 callback(err, null);
@@ -101,7 +101,7 @@ User.createUser = function (userData, callback) {
 
 
 User.updateUser = function (id, userData, callback) {
-    const { firstname, lastname, email, phone, dob, gender, address} = userData
+    const { firstname, lastname, email, phone, dob, gender, address } = userData
     db.query('UPDATE users SET firstname =?, lastname =?, email =?, phone =?, dob =?, gender =?, address =?, status = 1 WHERE id =?',
         [firstname, lastname, email, phone, dob, gender, address, id], (err, results) => {
             if (err) {
@@ -166,13 +166,13 @@ User.deleteUser = function (id, callback) {
 
 User.updateStatusUser = function (id, callback) {
     db.query('UPDATE users SET status = 0 WHERE id =?', [id], (err, results) => {
-            if (err) {
-                callback(err, null);
-            }
-            else {
-                this.getById(id, callback);
-            }
-        })
+        if (err) {
+            callback(err, null);
+        }
+        else {
+            this.getById(id, callback);
+        }
+    })
 }
 
 module.exports = User;
