@@ -2,7 +2,10 @@ import privateClient from '../axiosClient/privateClient';
 
 const serviceEndpoints = {
     getAll: '/service/all',
-    deleteService:(id) => `/service/delete/${id}`
+    deleteService:(id) => `/service/delete/${id}`,
+    createService: '/service/create',
+    getById: (id) => `/service/${id}`,
+    updateService: (id) => `/service/update/${id}`
 }
 
 const serviceApis = {
@@ -18,6 +21,33 @@ const serviceApis = {
     deleteService: async (id) => {
         try {
             const response = await privateClient.delete(serviceEndpoints.deleteService(id));
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    createService: async (data) => {
+        try {
+            const response = await privateClient.post(serviceEndpoints.createService, data);
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getById: async (id) => {
+        try {
+            const response = await privateClient.get(serviceEndpoints.getById(id));
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    updateService: async (id, data) => {
+        try {
+            const response = await privateClient.put(serviceEndpoints.updateService(id), data);
             return response
         }
         catch (error) {

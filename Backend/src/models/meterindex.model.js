@@ -7,7 +7,6 @@ const MeterIndex = function (meterindex) {
     this.meter_date_new = meterindex.meter_date_new
     this.meter_reading_old = meterindex.meter_reading_old
     this.meter_date_old = meterindex.meter_date_old
-    this.price = meterindex.price
     this.service_id = meterindex.service_id
     this.user_id = meterindex.user_id
 }
@@ -43,9 +42,9 @@ MeterIndex.getById = function (id, callback) {
 }
 
 MeterIndex.createMeter = function (meterData, callback) {
-    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, price, service_id, user_id } = meterData
-    const query = 'INSERT INTO meterindex (meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, price, service_id, user_id) VALUES (?,?,?,?,?,?,?)'
-    db.query(query, [meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, price, service_id, user_id], (err, results) => {
+    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id } = meterData
+    const query = 'INSERT INTO meterindex (meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id) VALUES (?,?,?,?,?,?)'
+    db.query(query, [meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id], (err, results) => {
         if (err) {
             callback(err, null);
         } else {
@@ -56,9 +55,9 @@ MeterIndex.createMeter = function (meterData, callback) {
 }
 
 MeterIndex.updateMeter = function (id, meterData, callback) {
-    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, price, service_id, user_id } = meterData
-    const query = 'UPDATE meterindex SET meter_reading_new =?, meter_date_new =?, meter_reading_old =?, meter_date_old =?, price =?, service_id =?, user_id =? WHERE id =?'
-    db.query(query, [meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, price, service_id, user_id, id], (err, results) => {
+    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id } = meterData
+    const query = 'UPDATE meterindex SET meter_reading_new =?, meter_date_new =?, meter_reading_old =?, meter_date_old =?, service_id =?, user_id =? WHERE id =?'
+    db.query(query, [meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id, id], (err, results) => {
         if (err) {
             callback(err, null);
         } else {

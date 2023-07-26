@@ -7,6 +7,8 @@ import PropTypes from 'prop-types';
 import serviceApis from '../api/modules/service.api'
 import supplierApis from '../api/modules/supplier.api'
 import { toast } from 'react-toastify'
+import AddService from '../components/common/AddService'
+import EditService from '../components/common/EditService'
 
 
 
@@ -123,7 +125,6 @@ const AdminService = () => {
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [isRequest, setIsRequest] = useState(false)
-    const [supplierNames, setSupplierNames] = useState({});
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
@@ -253,7 +254,14 @@ const AdminService = () => {
         else {
             console.log(res);
             toast.success('Xoá dịch vụ thất bại')
+            handleClose();
         }
+    }
+
+    const formattedBalance = (balance) => {
+        const formattedBalance = balance.toLocaleString('vi-VN');
+
+        return formattedBalance;
     }
 
     return (
@@ -265,7 +273,7 @@ const AdminService = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Quản trị dịch vụ</Typography>
-            <button className='btn-admin-add' ><FontAwesomeIcon icon={faPlus} />Thêm dịch vụ</button>
+            <button className='btn-admin-add' onClick={() => setShowAddService(true)} ><FontAwesomeIcon icon={faPlus} />Thêm dịch vụ</button>
             <div className='admin-service-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
@@ -304,7 +312,7 @@ const AdminService = () => {
                                                         {row.id}
                                                     </TableCell>
                                                     <TableCell >{row.name}</TableCell>
-                                                    <TableCell >{row.price}</TableCell>
+                                                    <TableCell >{formattedBalance(row.price)}đ</TableCell>
                                                     <TableCell >{row.supplierName}</TableCell>
                                                     <TableCell sx={{
                                                         display: 'flex',
@@ -337,7 +345,7 @@ const AdminService = () => {
                                                                 open={open}
                                                                 onClose={handleClose}
                                                             >
-                                                                <DialogTitle>Xoá Dịch vụ</DialogTitle>
+                                                                <DialogTitle>Xoá Dịch Vụ</DialogTitle>
                                                                 <DialogContent>
                                                                     <DialogContentText>
                                                                         Bạn có muốn xoá dịch vụ này không
@@ -386,6 +394,8 @@ const AdminService = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
+            {showAddService && <AddService onClose={() => setShowAddService(false)} />}
+            {showEditService && <EditService onClose={() => setShowEditService(false)} id={selectedId}/>}
         </div>
     )
 }

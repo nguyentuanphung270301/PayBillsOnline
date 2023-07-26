@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import '../style/AdminSupplier.css'
-import PropTypes from 'prop-types';
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
-import supplierApis from '../api/modules/supplier.api';
-import { toast } from 'react-toastify';
-import AddSupplier from '../components/common/AddSupplier';
-import EditSupplier from '../components/common/EditSupplier';
-import SupplierBankCardApis from '../api/modules/supplierbankcard.api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import '../style/MeterIndex.css'
+import meterApis from '../api/modules/meterindex.api'
+import PropTypes from 'prop-types';
+import serviceApis from '../api/modules/service.api'
+import userApis from '../api/modules/user.api'
+import { addDays, format } from 'date-fns'
+import { toast } from 'react-toastify'
+import AddMeter from '../components/common/AddMeter'
+
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -43,25 +45,43 @@ const headCells = [
         id: 'id',
         numberic: true,
         disablePadding: true,
-        label: 'Mã nhà cung cấp'
+        label: 'Mã bản ghi'
     },
     {
-        id: 'name',
-        numberic: false,
+        id: 'meter_reading_old',
+        numberic: true,
         disablePadding: true,
-        label: 'Tên nhà cung cấp'
+        label: 'Cs cũ'
     },
     {
-        id: 'email',
-        numberic: false,
+        id: 'meter_date_old',
+        numberic: true,
         disablePadding: true,
-        label: 'Email'
+        label: 'Ngày ghi cs cũ'
     },
     {
-        id: 'phone',
+        id: 'meter_reading_new',
+        numberic: true,
+        disablePadding: true,
+        label: 'Cs mới'
+    },
+    {
+        id: 'meter_date_new',
+        numberic: true,
+        disablePadding: true,
+        label: 'Ngày ghi cs mới'
+    },
+    {
+        id: 'service',
         numberic: false,
         disablePadding: true,
-        label: 'Số điện thoại'
+        label: 'Tên dịch vụ'
+    },
+    {
+        id: 'user',
+        numberic: false,
+        disablePadding: true,
+        label: 'Mã khách hàng - Tên khách hàng'
     },
     {
         id: 'action',
@@ -118,9 +138,9 @@ EnhancedTableHead.propTypes = {
 };
 
 
-const AdminSupplier = () => {
+const MeterIndex = () => {
+    const [meterList, setMeterList] = useState('')
     const [isLoading, setIsLoading] = useState(true)
-    const [supplierList, setSupplierList] = useState('')
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [isRequest, setIsRequest] = useState(false)
@@ -130,8 +150,8 @@ const AdminSupplier = () => {
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [showAddSupplier, setShowAddSupplier] = useState(false);
-    const [showEditSupplier, setShowEditSupplier] = useState(false);
+    const [showAddMeter, setShowAddMeter] = useState(false);
+    const [showEditMeter, setShowEditMeter] = useState(false);
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -168,7 +188,7 @@ const AdminSupplier = () => {
     };
 
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - supplierList.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - meterList.length) : 0;
 
     const handleClickOpen = (id) => {
         setSelectedId(id);
@@ -181,59 +201,99 @@ const AdminSupplier = () => {
     };
     const handleEidt = (id) => {
         setSelectedId(id)
-        setShowEditSupplier(true)
+        setShowEditMeter(true)
+    }
+
+    const getServiceNameById = async (id) => {
+        try {
+            const res = await serviceApis.getById(id);
+            if (res.success && res.data) {
+                return res.data.name;
+            }
+            return null;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    };
+
+    const getNameUserById = async (id) => {
+        try {
+            const res = await userApis.getById(id);
+            if (res.success && res.data) {
+                return res.data.firstname + ' ' + res.data.lastname;
+            }
+            return null;
+        }
+        catch (error) {
+            console.log(error);
+            return null;
+        }
     }
 
     useEffect(() => {
-        const getSupplierList = async () => {
-            const res = await supplierApis.getAll()
-            if (res.success && res) {
-                console.log(res)
-                setSupplierList(res.data)
-                setIsLoading(false)
+        const fetchData = async () => {
+            try {
+                const meterRes = await meterApis.getAll();
+                if (meterRes.success && meterRes.data) {
+                    const updatedMeterList = await Promise.all(
+                        meterRes.data.map(async (service) => {
+                            const serviceName = await getServiceNameById(service.service_id);
+                            const nameUser = await getNameUserById(service.user_id);
+                            return {
+                                ...service,
+                                serviceName: serviceName || 'N/A',
+                                nameUser: nameUser || 'N/A'
+                            };
+                        })
+                    );
+                    setMeterList(updatedMeterList);
+                    setIsLoading(false);
+                } else {
+                    console.log(meterRes);
+                    setMeterList('');
+                    setIsLoading(false);
+                }
+            } catch (error) {
+                console.log(error);
+                setIsLoading(false);
             }
-            else {
-                console.log(res)
-                setIsLoading(false)
-                setSupplierList('')
-            }
-        }
-        getSupplierList()
-    }, [isRequest, showAddSupplier, showEditSupplier])
+        };
+        fetchData();
+    }, [isRequest, showEditMeter, showAddMeter]);
 
-    const deleteSupplier = async (id) => {
-        const response = await SupplierBankCardApis.deleteSupplierBankCardBySupplierId(id)
-        if (response.success && response) {
-            const res = await supplierApis.deleteById(id)
-            if (res.success && res) {
-                console.log(res)
-                toast.success('Xoá nhà cung cấp thành công')
-                setIsRequest(!isRequest)
-                handleClose()
-            }
-            else {
-                console.log(res)
-                toast.error(res.error.sqlMessage)
-                handleClose()
-            }
+    const formatDate = (date) => {
+        const increasedDate = addDays(new Date(date), 0);
+        const formattedDate = format(increasedDate, 'dd-MM-yyyy');
+        return formattedDate;
+    }
+
+    const deleteMeter = async (id) => {
+        const res = await meterApis.deleteMeter(id);
+        if (res.success && res) {
+            console.log(res);
+            toast.success('Xoá dữ liệu thành công');
+            setIsRequest(!isRequest)
+            handleClose();
         }
         else {
-            console.log(response)
-            toast.error(response.error.sqlMessage)
+            console.log(res);
+            toast.error('Xoá dữ liệu thất bại');
+            handleClose();
         }
     }
 
     return (
-        <div className='main-admin-supplier'>
+        <div className='main-meter'>
             <Typography sx={{
                 color: '#0057da',
                 margin: '20px',
                 fontSize: '25px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-            }}>Quản trị nhà cung cấp</Typography>
-            <button className='btn-admin-add' onClick={() => setShowAddSupplier(true)}><FontAwesomeIcon icon={faPlus} />Thêm nhà cung cấp</button>
-            <div className='admin-supplier-table'>
+            }}>Nhập liệu điện nước</Typography>
+            <button className='btn-add-meter' onClick={() => setShowAddMeter(true)}><FontAwesomeIcon icon={faPlus} />Thêm</button>
+            <div className='meter-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
                     top: '200px',
@@ -249,14 +309,14 @@ const AdminSupplier = () => {
                                     order={order}
                                     orderBy={orderBy}
                                     onRequestSort={handleRequestSort}
-                                    rowCount={supplierList.length}
+                                    rowCount={meterList.length}
                                 />
-                                {!supplierList ? <Typography sx={{
+                                {!meterList ? <Typography sx={{
                                     position: 'absolute',
                                     top: '200px',
                                     right: 'calc(100% / 2)',
                                 }} >Không có dữ liệu</Typography> : <TableBody>
-                                    {stableSort(supplierList, getComparator(order, orderBy))
+                                    {stableSort(meterList, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
                                             return (
@@ -270,9 +330,13 @@ const AdminSupplier = () => {
                                                     >
                                                         {row.id}
                                                     </TableCell>
-                                                    <TableCell >{row.name}</TableCell>
-                                                    <TableCell >{row.email}</TableCell>
-                                                    <TableCell >{row.phone}</TableCell>
+                                                    <TableCell >{row.meter_reading_old}</TableCell>
+                                                    <TableCell >{formatDate(row.meter_date_old)}</TableCell>
+                                                    <TableCell >{row.meter_reading_new}</TableCell>
+                                                    <TableCell >{formatDate(row.meter_date_new)}</TableCell>
+                                                    <TableCell >{row.serviceName}</TableCell>
+                                                    <TableCell >{row.user_id} - {row.nameUser}</TableCell>
+
                                                     <TableCell sx={{
                                                         display: 'flex',
                                                         justifyItems: 'center',
@@ -304,16 +368,16 @@ const AdminSupplier = () => {
                                                                 open={open}
                                                                 onClose={handleClose}
                                                             >
-                                                                <DialogTitle>Xoá Nhà Cung Cấp</DialogTitle>
+                                                                <DialogTitle>Xoá Dữ Liệu</DialogTitle>
                                                                 <DialogContent>
                                                                     <DialogContentText>
-                                                                        Bạn có muốn xoá nhà cung cấp này không
+                                                                        Bạn có muốn xoá dữ liệu này không
                                                                     </DialogContentText>
                                                                 </DialogContent>
                                                                 <DialogActions>
                                                                     <Button onClick={handleClose}>Cancel</Button>
                                                                     <Button
-                                                                        onClick={() => deleteSupplier(selectedId)}
+                                                                        onClick={() => deleteMeter(selectedId)}
                                                                         sx={{
                                                                             backgroundColor: 'white',
                                                                             ":hover": {
@@ -346,17 +410,16 @@ const AdminSupplier = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={supplierList.length}
+                    count={meterList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showAddSupplier && <AddSupplier onClose={() => setShowAddSupplier(false)} />}
-            {showEditSupplier && <EditSupplier id={selectedId} onClose={() => setShowEditSupplier(false)} />}
+            {showAddMeter && <AddMeter onClose={() => setShowAddMeter(false)} />}
         </div>
     )
 }
 
-export default AdminSupplier
+export default MeterIndex

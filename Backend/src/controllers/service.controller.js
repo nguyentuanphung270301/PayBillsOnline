@@ -14,18 +14,15 @@ exports.getServiceById = (req, res) => {
     const serviceId = req.params.id;
     Service.getById(serviceId, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
 
 exports.createService = (req, res) => {
     const { name, price, supplier_id } = req.body;
-    if (!name || !price || !supplier_id) {
-        res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin.' });
-    }
     const newService = {
         name: name,
         price: price,
@@ -33,9 +30,9 @@ exports.createService = (req, res) => {
     };
     Service.createService(newService, function (err, data) {
         if (err) {
-            res.status(500).json(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -43,9 +40,6 @@ exports.createService = (req, res) => {
 exports.updateService = (req, res) => {
     const serviceId = req.params.id;
     const { name, price, supplier_id } = req.body;
-    if (!name ||!price ||!supplier_id) {
-        res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin.' });
-    }
     const newService = {
         name: name,
         price: price,
@@ -53,9 +47,9 @@ exports.updateService = (req, res) => {
     };
     Service.updateService(serviceId, newService, function (err, data) {
         if (err) {
-            res.status(500).json(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }

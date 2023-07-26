@@ -8,6 +8,7 @@ import BankAccount from '../../page/BankAccount';
 import AdminUser from '../../page/AdminUser';
 import AdminSupplier from '../../page/AdminSupplier';
 import AdminService from '../../page/AdminService';
+import MeterIndex from '../../page/MeterIndex';
 
 
 const RouteLayout = () => {
@@ -22,7 +23,7 @@ const RouteLayout = () => {
         <Route path='/admin/user' element={<AdminUser/>} />
         <Route path='/admin/supplier' element={<AdminSupplier/>} />
         <Route path='/admin/service' element={<AdminService/>} />
-
+        <Route path='/meterindex' element={<MeterIndex/>} />
       </Routes>
     </div>
   )

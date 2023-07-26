@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../../style/Navbar.css'
 import { Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import userApis from '../../api/modules/user.api';
@@ -19,6 +19,8 @@ const Navbar = () => {
     const [userInfo, setUserInfo] = useState([])
     const [listRoleUsers, setListRoleUsers] = useState([])
     const [isOpenAdmin, setIsOpenAdmin] = useState(false)
+    const [isOpenWrite, setIsOpenWrite] = useState(false)
+
 
     const handleLogout = () => {
         localStorage.removeItem('token')
@@ -73,6 +75,7 @@ const Navbar = () => {
         else {
             document.documentElement.style.setProperty('--width-menu', '60px');
             setIsOpenAdmin(false)
+            setIsOpenWrite(false)
         }
     }
 
@@ -156,8 +159,8 @@ const Navbar = () => {
             </div>
 
             <div className='menu-nav' style={{ alignItems: `${!openMenu ? '' : 'center'}` }}>
-                <div className='menu-title'>
-                    {!openMenu && <span>BILL PAYMENT SYSTEM</span>}
+                <div className='menu-logo'>
+                    <img src={require('../../images/Logo_PTIT_University.png')} alt='logo' className='logo-menu'/>
                 </div>
                 <div className='list-menu'>
                     <ul className={`${openMenu ? 'close' : ''}`}>
@@ -167,7 +170,7 @@ const Navbar = () => {
                                 {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
                             </li>
                         )}
-                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`li-ul-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
+                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenAdmin(!isOpenAdmin)}>
                                     <FontAwesomeIcon icon={faServer} className={`${openMenu ? '' : 'icon-close'}`} />
@@ -198,6 +201,28 @@ const Navbar = () => {
                         {listRoleUsers.includes('ROLE_ADMIN') && <li className={`li-menu ${openMenu ? 'close' : ''}`}>
                             <FontAwesomeIcon icon={faWrench} className={`${openMenu ? '' : 'icon-close'}`} />
                             {!openMenu ? <span style={{ marginLeft: '10px' }}>Phân quyền</span> : <span></span>}
+                        </li>}
+                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenWrite ? 'open' : ''}`}`}>
+                            <div>
+                                <div onClick={() => setIsOpenWrite(!isOpenWrite)}>
+                                    <FontAwesomeIcon icon={faKeyboard} className={`${openMenu ? '' : 'icon-close'}`} />
+                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Nhập liệu</span> : <span></span>}
+                                </div>
+                                {!openMenu && <ul className={`${isOpenWrite ? 'open' : ''}`}>
+                                    <Link to='/mainpage/meterindex' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faBolt} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Nhập liệu điện nước</span>
+                                        </li>
+                                    </Link>
+                                    <Link to='' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faTv} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Nhập liệu truyền hình cab</span>
+                                        </li>
+                                    </Link>
+                                </ul>}
+                            </div>
                         </li>}
                         {(listRoleUsers.includes('ROLE_ADMIN') || listRoleUsers.includes('ROLE_CUSTOMER')) && <Link to='/mainpage/bankaccount' style={{ textDecoration: 'none', color: 'white' }}>
                             <li className={`li-menu ${openMenu ? 'close' : ''}`}>
