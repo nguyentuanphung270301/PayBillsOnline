@@ -10,19 +10,19 @@
     /* Đặt lớp mờ ở phía trên cùng */
 }
 
-.main-add-meter {
+.main-create-bill {
     width: 500px;
-    height: 380px;
+    height: 560px;
     background-color: #e8f4ff;
     position: relative;
-    top: 100px;
+    top: 70px;
     left: 500px;
     border-radius: 10px;
     z-index: 9999;
     display: flex;
     flex-direction: column;
 
-    .icon-close-add-meter {
+    .icon-close-create-bill {
         position: absolute;
         height: 25px;
         width: 25px;
@@ -30,11 +30,11 @@
         top: 10px
     }
 
-    .icon-close-add-meter:hover {
+    .icon-close-create-bill:hover {
         color: red;
     }
 
-    .form-add-meter {
+    .form-create-bill {
         width: 100%;
         height: 100%;
         display: flex;
@@ -43,44 +43,30 @@
         top: 40px;
     }
 
-    .form-flex-column {
+    .bill-flex-column {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         width: 100%;
     }
-
-    .form-flex-column>label {
+    .bill-flex-column>label {
         position: relative;
-        left: 10px;
+        left: 20px;
         margin-bottom: 6px;
     }
-
-    .form-flex-column>input {
+    .bill-flex-column>input, .bill-flex-column>textarea, .bill-flex-column>select {
         height: 30px;
-        width: 90%;
+        width: 95%;
         position: relative;
         left: 10px;
         margin-bottom: 10px;
         border-radius: 10px;
         border: 1px solid #ccc;
     }
-
-    .form-flex {
-        display: flex;
-        width: 100%;
+    .bill-flex-column>textarea{
+        height: 100px;
     }
-
-    .form-flex-column>select {
-        height: 30px;
-        width: 96%;
-        position: relative;
-        left: 10px;
-        margin-bottom: 10px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-    }
-    .btn-save-meter {
+    .btn-save-bill {
         margin-top: 10px;
         height: 40px;
         width: 96%;
@@ -92,8 +78,7 @@
         background-color: green;
         font-size: 16px;
     }
-
-    .btn-save-meter:hover {
+    .btn-save-bill:hover {
         cursor: pointer;
         opacity: 0.9;
     }

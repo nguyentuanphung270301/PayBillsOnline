@@ -321,7 +321,7 @@ const AdminUser = () => {
                                                             backgroundColor: `${row.status === 1 ? '#00da2d' : '#da3600'}`,
                                                             fontSize: '15px',
                                                         }}>
-                                                            {row.status === 1 ? 'active' : 'deleted'}
+                                                            {row.status === 1 ? 'đang hoạt động' : 'đã xoá'}
                                                         </Typography>
                                                     </TableCell>
                                                     <TableCell sx={{

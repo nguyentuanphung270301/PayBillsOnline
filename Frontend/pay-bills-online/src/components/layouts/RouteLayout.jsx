@@ -9,6 +9,8 @@ import AdminUser from '../../page/AdminUser';
 import AdminSupplier from '../../page/AdminSupplier';
 import AdminService from '../../page/AdminService';
 import MeterIndex from '../../page/MeterIndex';
+import CabTV from '../../page/CabTV';
+import Bill from '../../page/Bill';
 
 
 const RouteLayout = () => {
@@ -24,6 +26,8 @@ const RouteLayout = () => {
         <Route path='/admin/supplier' element={<AdminSupplier/>} />
         <Route path='/admin/service' element={<AdminService/>} />
         <Route path='/meterindex' element={<MeterIndex/>} />
+        <Route path='/cabtv' element={<CabTV/>} />
+        <Route path='/bill' element={<Bill/>} />
       </Routes>
     </div>
   )

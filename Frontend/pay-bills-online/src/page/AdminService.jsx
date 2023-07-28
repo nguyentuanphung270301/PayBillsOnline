@@ -253,7 +253,7 @@ const AdminService = () => {
         }
         else {
             console.log(res);
-            toast.success('Xoá dịch vụ thất bại')
+            toast.error(res.error.sqlMessage)
             handleClose();
         }
     }
@@ -312,7 +312,7 @@ const AdminService = () => {
                                                         {row.id}
                                                     </TableCell>
                                                     <TableCell >{row.name}</TableCell>
-                                                    <TableCell >{formattedBalance(row.price)}đ</TableCell>
+                                                    <TableCell >{formattedBalance(row.price)} đ</TableCell>
                                                     <TableCell >{row.supplierName}</TableCell>
                                                     <TableCell sx={{
                                                         display: 'flex',

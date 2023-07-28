@@ -2,17 +2,16 @@ import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import '../style/MeterIndex.css'
-import meterApis from '../api/modules/meterindex.api'
 import PropTypes from 'prop-types';
-import serviceApis from '../api/modules/service.api'
-import userApis from '../api/modules/user.api'
-import { addDays, format } from 'date-fns'
-import { toast } from 'react-toastify'
-import AddMeter from '../components/common/AddMeter'
-import EditMeter from '../components/common/EditMeter'
-import supplierApis from '../api/modules/supplier.api'
-
+import '../style/Cabtv.css'
+import serviceApis from '../api/modules/service.api';
+import userApis from '../api/modules/user.api';
+import cabApis from '../api/modules/cab.api';
+import { addDays, format } from 'date-fns';
+import supplierApis from '../api/modules/supplier.api';
+import { toast } from 'react-toastify';
+import AddCab from '../components/common/AddCab';
+import EditCab from '../components/common/EditCab';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -50,28 +49,28 @@ const headCells = [
         label: 'Mã bản ghi'
     },
     {
-        id: 'meter_reading_old',
-        numberic: true,
+        id: 'package_name',
+        numberic: false,
         disablePadding: true,
-        label: 'Chỉ số cũ'
+        label: 'Tên gói'
     },
     {
-        id: 'meter_date_old',
-        numberic: true,
+        id: 'start_date',
+        numberic: false,
         disablePadding: true,
-        label: 'Ngày ghi chỉ số cũ'
+        label: 'Ngày bắt đầu'
     },
     {
-        id: 'meter_reading_new',
-        numberic: true,
+        id: 'end_date',
+        numberic: false,
         disablePadding: true,
-        label: 'Chỉ số mới'
+        label: 'Ngày kết thúc'
     },
     {
-        id: 'meter_date_new',
+        id: 'price',
         numberic: true,
         disablePadding: true,
-        label: 'Ngày ghi chỉ số mới'
+        label: 'Giá'
     },
     {
         id: 'service',
@@ -140,8 +139,8 @@ EnhancedTableHead.propTypes = {
 };
 
 
-const MeterIndex = () => {
-    const [meterList, setMeterList] = useState('')
+const CabTV = () => {
+    const [cabList, setCabList] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
@@ -152,8 +151,8 @@ const MeterIndex = () => {
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [showAddMeter, setShowAddMeter] = useState(false);
-    const [showEditMeter, setShowEditMeter] = useState(false);
+    const [showAddCab, setShowAddCab] = useState(false);
+    const [showEditCab, setShowEditCab] = useState(false);
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -190,7 +189,7 @@ const MeterIndex = () => {
     };
 
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - meterList.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cabList.length) : 0;
 
     const handleClickOpen = (id) => {
         setSelectedId(id);
@@ -203,7 +202,7 @@ const MeterIndex = () => {
     };
     const handleEidt = (id) => {
         setSelectedId(id)
-        setShowEditMeter(true)
+        setShowEditCab(true)
     }
 
     const getServiceNameById = async (id) => {
@@ -242,10 +241,10 @@ const MeterIndex = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const meterRes = await meterApis.getAll();
-                if (meterRes.success && meterRes.data) {
-                    const updatedMeterList = await Promise.all(
-                        meterRes.data.map(async (service) => {
+                const cabRes = await cabApis.getAll();
+                if (cabRes.success && cabRes.data) {
+                    const updatedCabList = await Promise.all(
+                        cabRes.data.map(async (service) => {
                             const serviceName = await getServiceNameById(service.service_id);
                             const nameUser = await getNameUserById(service.user_id);
                             return {
@@ -255,11 +254,11 @@ const MeterIndex = () => {
                             };
                         })
                     );
-                    setMeterList(updatedMeterList);
+                    setCabList(updatedCabList);
                     setIsLoading(false);
                 } else {
-                    console.log(meterRes);
-                    setMeterList('');
+                    console.log(cabRes);
+                    setCabList('');
                     setIsLoading(false);
                 }
             } catch (error) {
@@ -268,40 +267,42 @@ const MeterIndex = () => {
             }
         };
         fetchData();
-    }, [isRequest, showEditMeter, showAddMeter]);
+    }, [isRequest, showEditCab, showAddCab]);
+
+    const deleteCab = async (id) => {
+        const res = await cabApis.deleteCab(id)
+        if (res.success && res) {
+            toast.success('Xoá dữ liệu thành công')
+            setIsRequest(!isRequest)
+            handleClose()
+        }
+        else {
+            toast.error(res.error.sqlMessage)
+            handleClose()
+        }
+    }
 
     const formatDate = (date) => {
         const increasedDate = addDays(new Date(date), 0);
         const formattedDate = format(increasedDate, 'dd-MM-yyyy');
         return formattedDate;
     }
+    const formattedPrice = (balance) => {
+        const formattedBalance = balance.toLocaleString('vi-VN');
 
-    const deleteMeter = async (id) => {
-        const res = await meterApis.deleteMeter(id);
-        if (res.success && res) {
-            console.log(res);
-            toast.success('Xoá dữ liệu thành công');
-            setIsRequest(!isRequest)
-            handleClose();
-        }
-        else {
-            console.log(res);
-            toast.error('Xoá dữ liệu thất bại');
-            handleClose();
-        }
+        return formattedBalance;
     }
-
     return (
-        <div className='main-meter'>
+        <div className='main-cabtv'>
             <Typography sx={{
                 color: '#0057da',
                 margin: '20px',
                 fontSize: '25px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-            }}>Nhập liệu điện nước</Typography>
-            <button className='btn-add-meter' onClick={() => setShowAddMeter(true)}><FontAwesomeIcon icon={faPlus} />Thêm</button>
-            <div className='meter-table'>
+            }}>Nhập liệu truyền hình cáp</Typography>
+            <button className='btn-add-cab' onClick={() => setShowAddCab(true)}><FontAwesomeIcon icon={faPlus} />Thêm</button>
+            <div className='admin-cab-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
                     top: '200px',
@@ -317,14 +318,14 @@ const MeterIndex = () => {
                                     order={order}
                                     orderBy={orderBy}
                                     onRequestSort={handleRequestSort}
-                                    rowCount={meterList.length}
+                                    rowCount={cabList.length}
                                 />
-                                {!meterList ? <Typography sx={{
+                                {!cabList ? <Typography sx={{
                                     position: 'absolute',
                                     top: '200px',
                                     right: 'calc(100% / 2)',
                                 }} >Không có dữ liệu</Typography> : <TableBody>
-                                    {stableSort(meterList, getComparator(order, orderBy))
+                                    {stableSort(cabList, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
                                             return (
@@ -338,10 +339,10 @@ const MeterIndex = () => {
                                                     >
                                                         {row.id}
                                                     </TableCell>
-                                                    <TableCell >{row.meter_reading_old}</TableCell>
-                                                    <TableCell >{formatDate(row.meter_date_old)}</TableCell>
-                                                    <TableCell >{row.meter_reading_new}</TableCell>
-                                                    <TableCell >{formatDate(row.meter_date_new)}</TableCell>
+                                                    <TableCell >{row.package_name}</TableCell>
+                                                    <TableCell >{formatDate(row.start_date)}</TableCell>
+                                                    <TableCell >{formatDate(row.end_date)}</TableCell>
+                                                    <TableCell >{formattedPrice(row.price)} đ</TableCell>
                                                     <TableCell >{row.serviceName}</TableCell>
                                                     <TableCell >{row.user_id} - {row.nameUser}</TableCell>
 
@@ -385,7 +386,7 @@ const MeterIndex = () => {
                                                                 <DialogActions>
                                                                     <Button onClick={handleClose}>Cancel</Button>
                                                                     <Button
-                                                                        onClick={() => deleteMeter(selectedId)}
+                                                                        onClick={() => deleteCab(selectedId)}
                                                                         sx={{
                                                                             backgroundColor: 'white',
                                                                             ":hover": {
@@ -418,17 +419,17 @@ const MeterIndex = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={meterList.length}
+                    count={cabList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showAddMeter && <AddMeter onClose={() => setShowAddMeter(false)} />}
-            {showEditMeter && <EditMeter onClose={() => setShowEditMeter(false)} id={selectedId} />}
+            {showAddCab && <AddCab onClose={() => setShowAddCab(false)} />}
+            {showEditCab && <EditCab onClose={() => setShowEditCab(false)} id={selectedId}/>}
         </div>
     )
 }
 
-export default MeterIndex
+export default CabTV

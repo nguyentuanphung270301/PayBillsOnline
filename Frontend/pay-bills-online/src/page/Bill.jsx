@@ -1,17 +1,13 @@
-import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faClipboardCheck, faFileCirclePlus, faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import '../style/MeterIndex.css'
-import meterApis from '../api/modules/meterindex.api'
+import '../style/Bill.css'
 import PropTypes from 'prop-types';
-import serviceApis from '../api/modules/service.api'
-import userApis from '../api/modules/user.api'
+import billApis from '../api/modules/bill.api'
 import { addDays, format } from 'date-fns'
+import CreateBill from '../components/common/CreateBill'
 import { toast } from 'react-toastify'
-import AddMeter from '../components/common/AddMeter'
-import EditMeter from '../components/common/EditMeter'
-import supplierApis from '../api/modules/supplier.api'
 
 
 function descendingComparator(a, b, orderBy) {
@@ -47,43 +43,43 @@ const headCells = [
         id: 'id',
         numberic: true,
         disablePadding: true,
-        label: 'Mã bản ghi'
-    },
-    {
-        id: 'meter_reading_old',
-        numberic: true,
-        disablePadding: true,
-        label: 'Chỉ số cũ'
-    },
-    {
-        id: 'meter_date_old',
-        numberic: true,
-        disablePadding: true,
-        label: 'Ngày ghi chỉ số cũ'
-    },
-    {
-        id: 'meter_reading_new',
-        numberic: true,
-        disablePadding: true,
-        label: 'Chỉ số mới'
-    },
-    {
-        id: 'meter_date_new',
-        numberic: true,
-        disablePadding: true,
-        label: 'Ngày ghi chỉ số mới'
+        label: 'Mã hoá đơn'
     },
     {
         id: 'service',
         numberic: false,
         disablePadding: true,
-        label: 'Tên dịch vụ - Nhà cung cấp'
+        label: 'Dịch vụ'
     },
     {
-        id: 'user',
+        id: 'supplier',
         numberic: false,
         disablePadding: true,
-        label: 'Mã khách hàng - Tên khách hàng'
+        label: 'Nhà cung cấp'
+    },
+    {
+        id: 'nameUser',
+        numberic: false,
+        disablePadding: true,
+        label: 'Tên khách hàng'
+    },
+    {
+        id: 'amount',
+        numberic: true,
+        disablePadding: true,
+        label: 'Tổng tiền'
+    },
+    {
+        id: 'due_date',
+        numberic: false,
+        disablePadding: true,
+        label: 'Ngày hết hạn'
+    },
+    {
+        id: 'status',
+        numberic: false,
+        disablePadding: true,
+        label: 'Trạng thái'
     },
     {
         id: 'action',
@@ -140,8 +136,9 @@ EnhancedTableHead.propTypes = {
 };
 
 
-const MeterIndex = () => {
-    const [meterList, setMeterList] = useState('')
+
+const Bill = () => {
+    const [billList, setBillList] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
@@ -152,8 +149,8 @@ const MeterIndex = () => {
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [showAddMeter, setShowAddMeter] = useState(false);
-    const [showEditMeter, setShowEditMeter] = useState(false);
+    const [showCreateBill, setShowCreateBill] = useState(false);
+    const [showEditCab, setShowEditCab] = useState(false);
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -190,7 +187,7 @@ const MeterIndex = () => {
     };
 
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - meterList.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - billList.length) : 0;
 
     const handleClickOpen = (id) => {
         setSelectedId(id);
@@ -203,105 +200,65 @@ const MeterIndex = () => {
     };
     const handleEidt = (id) => {
         setSelectedId(id)
-        setShowEditMeter(true)
-    }
-
-    const getServiceNameById = async (id) => {
-        try {
-            const res = await serviceApis.getById(id);
-            if (res.success && res.data) {
-                const result = await supplierApis.getById(res.data.supplier_id);
-                if (result.success && result) {
-                    return res.data.name + ' - ' + result.data.name;
-                }
-                else {
-                    return null
-                }
-            }
-            return null;
-        } catch (error) {
-            console.log(error);
-            return null;
-        }
-    };
-
-    const getNameUserById = async (id) => {
-        try {
-            const res = await userApis.getById(id);
-            if (res.success && res.data) {
-                return res.data.firstname + ' ' + res.data.lastname;
-            }
-            return null;
-        }
-        catch (error) {
-            console.log(error);
-            return null;
-        }
+        setShowEditCab(true)
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const meterRes = await meterApis.getAll();
-                if (meterRes.success && meterRes.data) {
-                    const updatedMeterList = await Promise.all(
-                        meterRes.data.map(async (service) => {
-                            const serviceName = await getServiceNameById(service.service_id);
-                            const nameUser = await getNameUserById(service.user_id);
-                            return {
-                                ...service,
-                                serviceName: serviceName || 'N/A',
-                                nameUser: nameUser || 'N/A'
-                            };
-                        })
-                    );
-                    setMeterList(updatedMeterList);
-                    setIsLoading(false);
-                } else {
-                    console.log(meterRes);
-                    setMeterList('');
-                    setIsLoading(false);
-                }
-            } catch (error) {
-                console.log(error);
-                setIsLoading(false);
+        const getBillList = async () => {
+            const res = await billApis.getAll()
+            if (res.success && res) {
+                console.log(res)
+                setBillList(res.data)
+                setIsLoading(false)
             }
-        };
-        fetchData();
-    }, [isRequest, showEditMeter, showAddMeter]);
+            else {
+                console.log(res)
+                setIsLoading(false)
+                setBillList('')
+            }
+        }
+        getBillList()
+    }, [isRequest, showCreateBill])
+
+    const deleteBill = async (id) => {
+        const res = await billApis.deleteBill(id)
+        if(res.success && res) {
+            toast.success("Xoá hoá đơn thành công")
+            setIsRequest(!isRequest)
+            handleClose()
+        }
+        else {
+            toast.error("Xoá hoá đơn thất bại")
+            console.log(res)
+            handleClose()
+        }
+    }
 
     const formatDate = (date) => {
         const increasedDate = addDays(new Date(date), 0);
         const formattedDate = format(increasedDate, 'dd-MM-yyyy');
         return formattedDate;
     }
+    const formattedPrice = (balance) => {
+        const formattedBalance = balance.toLocaleString('vi-VN');
 
-    const deleteMeter = async (id) => {
-        const res = await meterApis.deleteMeter(id);
-        if (res.success && res) {
-            console.log(res);
-            toast.success('Xoá dữ liệu thành công');
-            setIsRequest(!isRequest)
-            handleClose();
-        }
-        else {
-            console.log(res);
-            toast.error('Xoá dữ liệu thất bại');
-            handleClose();
-        }
+        return formattedBalance;
     }
 
     return (
-        <div className='main-meter'>
+        <div className='main-bill'>
             <Typography sx={{
                 color: '#0057da',
                 margin: '20px',
                 fontSize: '25px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-            }}>Nhập liệu điện nước</Typography>
-            <button className='btn-add-meter' onClick={() => setShowAddMeter(true)}><FontAwesomeIcon icon={faPlus} />Thêm</button>
-            <div className='meter-table'>
+            }}>Quản lý hoá đơn</Typography>
+            <div className='main-btn'>
+                <button className='btn-create-bill' onClick={() => setShowCreateBill(true)}><FontAwesomeIcon icon={faFileCirclePlus} />Tạo hoá đơn</button>
+                <button className='btn-approved-bill'><FontAwesomeIcon icon={faClipboardCheck} />Duyệt hoá đơn</button>
+            </div>
+            <div className='admin-cab-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
                     top: '200px',
@@ -317,14 +274,14 @@ const MeterIndex = () => {
                                     order={order}
                                     orderBy={orderBy}
                                     onRequestSort={handleRequestSort}
-                                    rowCount={meterList.length}
+                                    rowCount={billList.length}
                                 />
-                                {!meterList ? <Typography sx={{
+                                {!billList ? <Typography sx={{
                                     position: 'absolute',
                                     top: '200px',
                                     right: 'calc(100% / 2)',
                                 }} >Không có dữ liệu</Typography> : <TableBody>
-                                    {stableSort(meterList, getComparator(order, orderBy))
+                                    {stableSort(billList, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
                                             return (
@@ -338,12 +295,28 @@ const MeterIndex = () => {
                                                     >
                                                         {row.id}
                                                     </TableCell>
-                                                    <TableCell >{row.meter_reading_old}</TableCell>
-                                                    <TableCell >{formatDate(row.meter_date_old)}</TableCell>
-                                                    <TableCell >{row.meter_reading_new}</TableCell>
-                                                    <TableCell >{formatDate(row.meter_date_new)}</TableCell>
-                                                    <TableCell >{row.serviceName}</TableCell>
-                                                    <TableCell >{row.user_id} - {row.nameUser}</TableCell>
+                                                    <TableCell >{row.service_name}</TableCell>
+                                                    <TableCell >{row.supplier_name}</TableCell>
+                                                    <TableCell >{row.firstname} {row.lastname}</TableCell>
+                                                    <TableCell >{formattedPrice(row.amount)} đ</TableCell>
+                                                    <TableCell >{formatDate(row.due_date)}</TableCell>
+                                                    <TableCell >
+                                                        <Typography sx={{
+                                                            textTransform: 'uppercase',
+                                                            border: '1px solid #ccc',
+                                                            height: '40px',
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            borderRadius: '5px',
+                                                            fontweight: '700',
+                                                            color: 'white',
+                                                            backgroundColor: `${row.status === 'CHƯA DUYỆT' && 'red'}`,
+                                                            fontSize: '15px',
+                                                        }}>
+                                                            {row.status}
+                                                        </Typography>
+                                                    </TableCell>
 
                                                     <TableCell sx={{
                                                         display: 'flex',
@@ -355,6 +328,7 @@ const MeterIndex = () => {
                                                                 marginRight: '10px',
                                                                 height: '40px'
                                                             }}
+                                                            disabled={row.status === 'CHƯA DUYỆT' ? false : true}
                                                             onClick={() => handleEidt(row.id)}
                                                         ><FontAwesomeIcon icon={faPenToSquare} /></Button>
                                                         <Box>
@@ -368,6 +342,7 @@ const MeterIndex = () => {
                                                                         opacity: 0.8
                                                                     }
                                                                 }}
+                                                                disabled={row.status === 'CHƯA DUYỆT' ? false : true}
                                                                 onClick={() => handleClickOpen(row.id)}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
@@ -376,16 +351,16 @@ const MeterIndex = () => {
                                                                 open={open}
                                                                 onClose={handleClose}
                                                             >
-                                                                <DialogTitle>Xoá Dữ Liệu</DialogTitle>
+                                                                <DialogTitle>Xoá Hoá Đơn</DialogTitle>
                                                                 <DialogContent>
                                                                     <DialogContentText>
-                                                                        Bạn có muốn xoá dữ liệu này không
+                                                                        Bạn có muốn xoá hoá đơn này không
                                                                     </DialogContentText>
                                                                 </DialogContent>
                                                                 <DialogActions>
                                                                     <Button onClick={handleClose}>Cancel</Button>
                                                                     <Button
-                                                                        onClick={() => deleteMeter(selectedId)}
+                                                                        onClick={() => deleteBill(selectedId)}
                                                                         sx={{
                                                                             backgroundColor: 'white',
                                                                             ":hover": {
@@ -418,17 +393,16 @@ const MeterIndex = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={meterList.length}
+                    count={billList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showAddMeter && <AddMeter onClose={() => setShowAddMeter(false)} />}
-            {showEditMeter && <EditMeter onClose={() => setShowEditMeter(false)} id={selectedId} />}
+            {showCreateBill && <CreateBill onClose={() => setShowCreateBill(false)} />}
         </div>
     )
 }
 
-export default MeterIndex
+export default Bill 

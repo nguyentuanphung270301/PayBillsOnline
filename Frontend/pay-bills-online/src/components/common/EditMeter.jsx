@@ -1,14 +1,15 @@
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
-import '../../style/AddMeter.css'
 import serviceApis from '../../api/modules/service.api'
 import userApis from '../../api/modules/user.api'
 import { toast } from 'react-toastify'
 import meterApis from '../../api/modules/meterindex.api'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import '../../style/AddMeter.css'
+import { addDays, format } from 'date-fns'
 import supplierApis from '../../api/modules/supplier.api'
 
-const AddMeter = ({ onClose }) => {
+const EditMeter = ({ id, onClose }) => {
     const [oldMeter, setOldMeter] = useState(0)
     const [newMeter, setNewMeter] = useState(0)
     const [oldDate, setOldDate] = useState('')
@@ -55,6 +56,30 @@ const AddMeter = ({ onClose }) => {
             }
         }
         getServiceList()
+    }, [])
+
+    const formatDate = (date) => {
+        const increasedDate = addDays(new Date(date), 0);
+        const formattedDate = format(increasedDate, 'yyyy-MM-dd');
+        return formattedDate;
+    }
+
+    useEffect(() => {
+        const getMeterById = async () => {
+            const res = await meterApis.getById(id)
+            if (res.success && res) {
+                setOldMeter(res.data.meter_reading_old)
+                setOldDate(formatDate(res.data.meter_date_old))
+                setNewMeter(res.data.meter_reading_new)
+                setNewDate(formatDate(res.data.meter_date_new))
+                setServiceId(res.data.service_id)
+                setUserId(res.data.user_id)
+            }
+            else {
+                console.log(res)
+            }
+        }
+        getMeterById()
     }, [])
 
     useEffect(() => {
@@ -118,14 +143,14 @@ const AddMeter = ({ onClose }) => {
             service_id: parseInt(serviceId),
             user_id: parseInt(userId),
         }
-        const res = await meterApis.createMeter(data)
+        const res = await meterApis.updateMeter(id, data)
         if (res.success && res) {
-            toast.success('Thêm dữ liệu thành công');
+            toast.success('Cập nhật dữ liệu thành công');
             onClose()
         }
         else {
             console.log(res)
-            toast.error('Thêm dữ liệu thất bại');
+            toast.error('Cập nhật dữ liệu thất bại');
         }
     }
 
@@ -141,6 +166,7 @@ const AddMeter = ({ onClose }) => {
                                 className='input-flex'
                                 type='number'
                                 placeholder='Chỉ số cũ'
+                                value={oldMeter || ''}
                                 onChange={(e) => setOldMeter(e.target.value)}
                             />
                         </div>
@@ -150,6 +176,7 @@ const AddMeter = ({ onClose }) => {
                                 className='input-flex'
                                 type='date'
                                 placeholder='Ngày ghi số cũ'
+                                value={oldDate || ''}
                                 onChange={(e) => setOldDate(e.target.value)}
                             />
                         </div>
@@ -161,6 +188,7 @@ const AddMeter = ({ onClose }) => {
                                 className='input-flex'
                                 type='number'
                                 placeholder='Chỉ số mới'
+                                value={newMeter || ''}
                                 onChange={(e) => setNewMeter(e.target.value)}
                             />
                         </div>
@@ -170,13 +198,14 @@ const AddMeter = ({ onClose }) => {
                                 className='input-flex'
                                 type='date'
                                 placeholder='Ngày ghi số mới'
+                                value={newDate || ''}
                                 onChange={(e) => setNewDate(e.target.value)}
                             />
                         </div>
                     </div>
                     <div className='form-flex-column'>
                         <label>Dịch vụ - Nhà cung cấp</label>
-                        <select onChange={(e) => setServiceId(e.target.value)}>
+                        <select onChange={(e) => setServiceId(e.target.value)} value={serviceId || ''}>
                             <option value=''>---Chọn---</option>
                             {serviceList && serviceList.map((item, index) => {
                                 return <option key={index} value={item.id}>{item.name} - {item.supplierName}</option>
@@ -184,8 +213,8 @@ const AddMeter = ({ onClose }) => {
                         </select>
                     </div>
                     <div className='form-flex-column'>
-                        <label>Mã khách hàng - Tên Khách hàng</label>
-                        <select onChange={(e) => setUserId(e.target.value)}>
+                        <label>Mã khách hàng - Tên khách hàng</label>
+                        <select onChange={(e) => setUserId(e.target.value)} value={userId || ''}>
                             <option value=''>---Chọn---</option>
                             {userList && userList.map((item, index) => {
                                 return <option key={index} value={item.id}>{item.id} - {item.firstname} {item.lastname}</option>
@@ -199,4 +228,4 @@ const AddMeter = ({ onClose }) => {
     )
 }
 
-export default AddMeter
+export default EditMeter

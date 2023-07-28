@@ -160,7 +160,7 @@ const Navbar = () => {
 
             <div className='menu-nav' style={{ alignItems: `${!openMenu ? '' : 'center'}` }}>
                 <div className='menu-logo'>
-                    <img src={require('../../images/Logo_PTIT_University.png')} alt='logo' className='logo-menu'/>
+                    <img src={require('../../images/Logo_PTIT_University.png')} alt='logo' className='logo-menu' />
                 </div>
                 <div className='list-menu'>
                     <ul className={`${openMenu ? 'close' : ''}`}>
@@ -215,7 +215,7 @@ const Navbar = () => {
                                             <span>Nhập liệu điện nước</span>
                                         </li>
                                     </Link>
-                                    <Link to='' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <Link to='/mainpage/cabtv' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faTv} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Nhập liệu truyền hình cab</span>
@@ -230,10 +230,14 @@ const Navbar = () => {
                                 {!openMenu ? <span style={{ marginLeft: '10px' }}>Tài khoản ngân hàng</span> : <span></span>}
                             </li>
                         </Link>}
-                        {(listRoleUsers.includes('ROLE_ADMIN') || listRoleUsers.includes('ROLE_CUSTOMER')) && <li className={`li-menu ${openMenu ? 'close' : ''}`}>
-                            <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
-                            {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
-                        </li>}
+                        {(listRoleUsers.includes('ROLE_ADMIN') || listRoleUsers.includes('ROLE_CUSTOMER')) &&
+                            <Link to='/mainpage/bill' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <li className={`li-menu ${openMenu ? 'close' : ''}`}>
+                                    <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
+                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
+                                </li>
+                            </Link>
+                        }
 
                     </ul>
                 </div>

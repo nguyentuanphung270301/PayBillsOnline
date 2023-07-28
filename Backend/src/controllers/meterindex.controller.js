@@ -57,10 +57,10 @@ exports.updateMeter = (req, res) => {
     }
     MeterIndex.updateMeter(id, newMeter, function (err, data) {
         if (err) {
-            res.status(500).send(err)
+            res.status(500).send({ error: err, success: false });
         }
         else {
-            res.status(200).send(data)
+            res.status(200).send({ data: data, success: true });
         }
     })
 }
