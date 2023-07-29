@@ -42,6 +42,17 @@ exports.getServiceByUserId = (req, res) => {
     })
 }
 
+exports.getCableByUserId = (req, res) => {
+    const userId = req.params.id
+    Bill.getCableByUserId(userId, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        } else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
 
 exports.createBill = (req, res) => {
     const { due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info } = req.body

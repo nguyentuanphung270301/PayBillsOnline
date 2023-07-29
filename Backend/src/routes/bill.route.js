@@ -10,5 +10,6 @@ router.post('/create', authMiddleware.authenticateToken, billController.createBi
 router.put('/update/:id', authMiddleware.authenticateToken, billController.updateBill);
 router.delete('/delete/:id', authMiddleware.authenticateToken, billController.deleteBill);
 router.get('/getByUserId/:id', authMiddleware.authenticateToken, billController.getServiceByUserId)
+router.get('/getCableByUserId/:id', authMiddleware.authenticateToken,billController.getCableByUserId)
 
 module.exports = router;

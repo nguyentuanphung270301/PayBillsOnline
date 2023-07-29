@@ -8,6 +8,7 @@ import billApis from '../api/modules/bill.api'
 import { addDays, format } from 'date-fns'
 import CreateBill from '../components/common/CreateBill'
 import { toast } from 'react-toastify'
+import EditBill from '../components/common/EditBill'
 
 
 function descendingComparator(a, b, orderBy) {
@@ -150,7 +151,7 @@ const Bill = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showCreateBill, setShowCreateBill] = useState(false);
-    const [showEditCab, setShowEditCab] = useState(false);
+    const [showEditBill, setShowEditBill] = useState(false);
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -200,7 +201,7 @@ const Bill = () => {
     };
     const handleEidt = (id) => {
         setSelectedId(id)
-        setShowEditCab(true)
+        setShowEditBill(true)
     }
 
     useEffect(() => {
@@ -218,7 +219,7 @@ const Bill = () => {
             }
         }
         getBillList()
-    }, [isRequest, showCreateBill])
+    }, [isRequest, showCreateBill, showEditBill])
 
     const deleteBill = async (id) => {
         const res = await billApis.deleteBill(id)
@@ -401,6 +402,7 @@ const Bill = () => {
                 />
             </div>
             {showCreateBill && <CreateBill onClose={() => setShowCreateBill(false)} />}
+            {showEditBill && <EditBill id={selectedId} onClose={() => setShowEditBill(false)} />}
         </div>
     )
 }

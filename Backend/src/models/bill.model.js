@@ -113,6 +113,27 @@ Bill.getServiceByUserId = function (id, callback) {
   })
 }
 
+Bill.getCableByUserId = function (id, callback) {
+  db.query(`Select cabletv.* , services.name as service_name , suppliers.name as supplier_name
+  from cabletv
+  inner join 
+  services on cabletv.service_id = services.id
+  inner join
+  suppliers on services.supplier_id = suppliers.id
+  WHERE cabletv.user_id = ${id}`, (err, results) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      if (results.length > 0) {
+        callback(null, results[0])
+      }
+      if (results.length == 0) {
+        callback('Không tìm thấy cabletv với id: ' + id)
+      }
+    }
+  })
+}
+
 Bill.getById = function (id, callback) {
   db.query(`SELECT * FROM bills WHERE id = ${id}`, (err, results) => {
     if (err) {
@@ -144,7 +165,7 @@ Bill.createBill = function (billData, callback) {
 
 Bill.updateBill = function (id, billData, callback) {
   const { due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info } = billData
-  const query = "UPDATE bill SET  due_date = ?, amount = ?, status = ?, user_id = ?, create_id = ?, approved_id = ?, meter_id = ?, cab_id = ?, info = ? WHERE id = ?"
+  const query = "UPDATE bills SET  due_date = ?, amount = ?, status = ?, user_id = ?, create_id = ?, approved_id = ?, meter_id = ?, cab_id = ?, info = ? WHERE id = ?"
   db.query(query, [due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info, id], (err, results) => {
     if (err) {
       callback(err, null);

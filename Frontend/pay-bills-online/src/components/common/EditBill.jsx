@@ -1,17 +1,16 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
-import '../../style/CreateBill.css'
-import userApis from '../../api/modules/user.api'
-import billApis from '../../api/modules/bill.api'
-import { addDays, format } from 'date-fns'
 import { toast } from 'react-toastify'
+import billApis from '../../api/modules/bill.api'
+import userApis from '../../api/modules/user.api'
+import { addDays, format } from 'date-fns'
 
-const CreateBill = ({ onClose }) => {
+const EditBill = ({ id, onClose }) => {
     const [userId, setUserId] = useState('')
     const [dueDate, setDueDate] = useState('')
     const [createId, setCreateId] = useState('')
-    const [meterOrCbId, setMeterOrCabId] = useState('')
+    const [meterOrCabId, setMeterOrCabId] = useState('')
     const [price, setPrice] = useState(0)
     const [info, setInfo] = useState('')
     const username = localStorage.getItem('username')
@@ -33,6 +32,33 @@ const CreateBill = ({ onClose }) => {
         const formattedDate = format(increasedDate, 'dd-MM-yyyy');
         return formattedDate;
     }
+
+    const formatDateApi = (date) => {
+        const increasedDate = addDays(new Date(date), 0);
+        const formattedDate = format(increasedDate, 'yyyy-MM-dd');
+        return formattedDate;
+    }
+
+    useEffect(() => {
+        const getBillById = async () => {
+            const res = await billApis.getById(id)
+            if (res.success && res) {
+                setUserId(res.data.user_id)
+                setDueDate(formatDateApi(res.data.due_date))
+                if (res.data.meter_id !== null) {
+                    setCheckService('true')
+                    setMeterOrCabId(res.data.meter_id)
+                }
+                if (res.data.cab_id !== null) {
+                    setCheckService('false')
+                    setMeterOrCabId(res.data.cab_id)
+                }
+                setPrice(res.data.amount)
+                setInfo(res.data.info)
+            }
+        }
+        getBillById()
+    }, [id])
 
     useEffect(() => {
         const getBillList = async () => {
@@ -82,7 +108,7 @@ const CreateBill = ({ onClose }) => {
             if (checkService === 'true' && userId) {
                 const id = parseInt(userId);
                 const res = await billApis.getService(id);
-                if (res.success && res && (!billList.length || !billList.some((bill) => bill.meter_id === res.data.id))) {
+                if (res.success && res) {
                     console.log(res);
                     setServiceList((prevArray) => {
                         if (prevArray.some((item) => item.id === res.data.id)) {
@@ -101,7 +127,7 @@ const CreateBill = ({ onClose }) => {
             else if (checkService === 'false' && userId) {
                 const id = parseInt(userId);
                 const res = await billApis.getCableByUserId(id);
-                if (res.success && res && (!billList.length || !billList.some((bill) => bill.cab_id === res.data.id))) {
+                if (res.success && res) {
                     console.log(res);
                     setServiceList((prevArray) => {
                         if (prevArray.some((item) => item.id === res.data.id)) {
@@ -155,7 +181,7 @@ const CreateBill = ({ onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (!userId || !price || !dueDate || !info || !createId || !meterOrCbId) {
+        if (!userId || !price || !dueDate || !info || !createId || !meterOrCabId) {
             toast.error('Vui lòng điền đầy đủ thông tin.');
             return;
         }
@@ -180,20 +206,20 @@ const CreateBill = ({ onClose }) => {
                 user_id: parseInt(userId),
                 create_id: createId,
                 approved_id: null,
-                meter_id: parseInt(meterOrCbId),
+                meter_id: parseInt(meterOrCabId),
                 cab_id: null,
                 info: info
             }
             console.log(data)
 
-            const res = await billApis.createBill(data)
+            const res = await billApis.updateBill(id, data)
             if (res.success && res) {
-                toast.success("Tạo hoá đơn thành công")
+                toast.success("Cập nhật hoá đơn thành công")
                 onClose()
             }
             else {
                 console.log(res)
-                toast.error("Tạo hoá đơn thất bại")
+                toast.error("Cập nhật hoá đơn thất bại")
             }
         }
         else {
@@ -205,19 +231,19 @@ const CreateBill = ({ onClose }) => {
                 create_id: createId,
                 approved_id: null,
                 meter_id: null,
-                cab_id: parseInt(meterOrCbId),
+                cab_id: parseInt(meterOrCabId),
                 info: info
             }
             console.log(data)
 
-            const res = await billApis.createBill(data)
+            const res = await billApis.updateBill(id, data)
             if (res.success && res) {
-                toast.success("Tạo hoá đơn thành công")
+                toast.success("Cập nhật hoá đơn thành công")
                 onClose()
             }
             else {
                 console.log(res)
-                toast.error("Tạo hoá đơn thất bại")
+                toast.error("Cập nhật hoá đơn thất bại")
             }
         }
     }
@@ -228,7 +254,7 @@ const CreateBill = ({ onClose }) => {
                 <form className='form-create-bill' onSubmit={handleSubmit} >
                     <div className='bill-flex-column'>
                         <label>Khách hàng</label>
-                        <select onChange={(e) => setUserId(e.target.value)}>
+                        <select onChange={(e) => setUserId(e.target.value)} value={userId || ''} disabled={true}>
                             <option value=''>---Chọn---</option>
                             {userList && userList.map((item, index) => {
                                 return <option value={item.id} key={index}>{item.id} - {item.firstname} {item.lastname}</option>
@@ -237,12 +263,12 @@ const CreateBill = ({ onClose }) => {
                     </div>
                     <div className='bill-flex-column'>
                         <label>Loại dịch vụ</label>
-                        <select onChange={(e) => setCheckService(e.target.value)}>
+                        <select onChange={(e) => setCheckService(e.target.value)} value={checkService || ''} disabled={true}>
                             <option value=''>---Chọn---</option>
                             <option value='true'>Điện, nước</option>
                             <option value='false'>Truyền hình cáp</option>
                         </select>
-                        <select onChange={handleChangeOptions}>
+                        <select onChange={handleChangeOptions} value={meterOrCabId || ''} disabled={true}>
                             <option value=''>---Chọn---</option>
                             {serviceList && checkService === 'true' && serviceList.map((item, index) => {
                                 const price = `${(item.meter_reading_new - item.meter_reading_old) * item.price}`
@@ -259,7 +285,7 @@ const CreateBill = ({ onClose }) => {
                     </div>
                     <div className='bill-flex-column'>
                         <label>Ngày hết hạn</label>
-                        <input type='date' onChange={(e) => setDueDate(e.target.value)} />
+                        <input type='date' onChange={(e) => setDueDate(e.target.value)} value={dueDate || ''} />
                     </div>
                     <div className='bill-flex-column'>
                         <label>Thông tin hoá đơn </label>
@@ -272,4 +298,4 @@ const CreateBill = ({ onClose }) => {
     )
 }
 
-export default CreateBill
+export default EditBill
