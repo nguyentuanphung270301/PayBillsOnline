@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../../style/Navbar.css'
 import { Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv, faShieldHalved, faUsers, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import userApis from '../../api/modules/user.api';
@@ -20,6 +20,7 @@ const Navbar = () => {
     const [listRoleUsers, setListRoleUsers] = useState([])
     const [isOpenAdmin, setIsOpenAdmin] = useState(false)
     const [isOpenWrite, setIsOpenWrite] = useState(false)
+    const [isOpenAuth, setIsOpenAuth] = useState(false)
 
 
     const handleLogout = () => {
@@ -76,6 +77,7 @@ const Navbar = () => {
             document.documentElement.style.setProperty('--width-menu', '60px');
             setIsOpenAdmin(false)
             setIsOpenWrite(false)
+            setIsOpenAuth(false)
         }
     }
 
@@ -198,10 +200,6 @@ const Navbar = () => {
                                 </ul>}
                             </div>
                         </li>}
-                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`li-menu ${openMenu ? 'close' : ''}`}>
-                            <FontAwesomeIcon icon={faWrench} className={`${openMenu ? '' : 'icon-close'}`} />
-                            {!openMenu ? <span style={{ marginLeft: '10px' }}>Phân quyền</span> : <span></span>}
-                        </li>}
                         {listRoleUsers.includes('ROLE_ADMIN') && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenWrite ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenWrite(!isOpenWrite)}>
@@ -219,6 +217,34 @@ const Navbar = () => {
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faTv} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Nhập liệu truyền hình cab</span>
+                                        </li>
+                                    </Link>
+                                </ul>}
+                            </div>
+                        </li>}
+                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAuth ? 'open' : ''}`}`}>
+                            <div>
+                                <div onClick={() => setIsOpenAuth(!isOpenAuth)}>
+                                    <FontAwesomeIcon icon={faWrench} className={`${openMenu ? '' : 'icon-close'}`} />
+                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Phân quyền</span> : <span></span>}
+                                </div>
+                                {!openMenu && <ul className={`${isOpenAuth ? 'open' : ''}`}>
+                                    <Link to='/mainpage/role' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faUsers} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Quản trị role</span>
+                                        </li>
+                                    </Link>
+                                    <Link to='/mainpage/screen-role' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faUnlockKeyhole} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Cấp quyền cho role</span>
+                                        </li>
+                                    </Link>
+                                    <Link to='/mainpage/user-auth' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faShieldHalved} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Cấp role cho tài khoản</span>
                                         </li>
                                     </Link>
                                 </ul>}

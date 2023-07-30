@@ -11,6 +11,9 @@ import AdminService from '../../page/AdminService';
 import MeterIndex from '../../page/MeterIndex';
 import CabTV from '../../page/CabTV';
 import Bill from '../../page/Bill';
+import Role from '../../page/Role';
+import ScreenRole from '../../page/ScreenRole';
+import UserAuth from '../../page/UserAuth';
 
 
 const RouteLayout = () => {
@@ -28,6 +31,9 @@ const RouteLayout = () => {
         <Route path='/meterindex' element={<MeterIndex/>} />
         <Route path='/cabtv' element={<CabTV/>} />
         <Route path='/bill' element={<Bill/>} />
+        <Route path='/role' element={<Role/>} />
+        <Route path='/screen-role' element={<ScreenRole/>} />
+        <Route path='/user-auth' element={<UserAuth/>} />
       </Routes>
     </div>
   )

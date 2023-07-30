@@ -4,6 +4,7 @@ const authorizationController = require('../controllers/authorization.controller
 const authMiddleware = require('../middleware/auth.middleware')
 
 router.get('/all', authMiddleware.authenticateToken, authorizationController.getAllAuthorizations)
+router.get('/allauth', authMiddleware.authenticateToken, authorizationController.getAll)
 router.get('/:id', authMiddleware.authenticateToken, authorizationController.getAuthorizationById)
 router.get('/userId/:id', authMiddleware.authenticateToken, authorizationController.getAuthorizationByUserId)
 router.post('/create', authMiddleware.authenticateToken, authorizationController.createAuthorization)

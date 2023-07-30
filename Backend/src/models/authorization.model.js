@@ -22,6 +22,25 @@ Authorization.getAll = function (callback) {
     });
 }
 
+Authorization.getAllAuth = function (callback) {
+    db.query(`select user_authorization.id, user_authorization.status, user_authorization.user_id, users.firstname, users.lastname , users.username , roles.rolecode
+    from user_authorization
+    inner join users on user_authorization.user_id = users.id
+    inner join roles on user_authorization.role_id = roles.id`, (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            if (results.length > 0) {
+                callback(null, results)
+            }
+            if (results.length == 0) {
+                callback('Không tìm thấy dữ liệu')
+            }
+        }
+    });
+}
+
+
 Authorization.getByUserId = function (userId, callback) {
     db.query('SELECT * FROM user_authorization WHERE user_id =?', [userId], (err, results) => {
         if (err) {

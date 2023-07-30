@@ -1,0 +1,83 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Màu đen với độ mờ 50% */
+    z-index: 9999;
+    /* Đặt lớp mờ ở phía trên cùng */
+}
+
+.main-add-auth {
+    width: 500px;
+    height: 250px;
+    background-color: #e8f4ff;
+    position: relative;
+    top: 200px;
+    left: 500px;
+    border-radius: 10px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+
+
+    .icon-close-add-auth {
+        position: absolute;
+        height: 25px;
+        width: 25px;
+        right: 10px;
+        top: 10px
+    }
+
+    .icon-close-add-auth:hover {
+        color: red;
+    }
+
+    .form-add-auth {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 40px;
+    }
+    .auth-form-flex {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .auth-form-flex>label {
+        position: relative;
+        left: 20px;
+    }
+
+    .auth-form-flex>select {
+        height: 30px;
+        width: 90%;
+        position: relative;
+        left: 20px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+    .btn-save-auth {
+        position: relative;
+        left: 20px;
+        height: 40px;
+        width: 91%;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        top: 10px;
+        background-color: green;
+        color: white;
+        font-size: 16px;
+    }
+
+    .btn-save-auth:hover {
+        cursor: pointer;
+        opacity: 0.9;
+    }
+}

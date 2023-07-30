@@ -1,0 +1,93 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Màu đen với độ mờ 50% */
+    z-index: 9999;
+    /* Đặt lớp mờ ở phía trên cùng */
+}
+
+.main-add-role {
+    width: 500px;
+    height: 380px;
+    background-color: #e8f4ff;
+    position: relative;
+    top: 200px;
+    left: 500px;
+    border-radius: 10px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+
+
+    .icon-close-add-role {
+        position: absolute;
+        height: 25px;
+        width: 25px;
+        right: 10px;
+        top: 10px
+    }
+
+    .icon-close-add-role:hover {
+        color: red;
+    }
+
+    .form-add-role {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 40px;
+    }
+
+    .form-flex {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-flex>label {
+        position: relative;
+        left: 20px;
+    }
+
+    .form-flex>input {
+        height: 30px;
+        width: 90%;
+        position: relative;
+        left: 20px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+    .form-flex>textarea {
+        height: 100px;
+        width: 90%;
+        position: relative;
+        left: 20px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+    }
+    .btn-save-role {
+        position: relative;
+        left: 20px;
+        height: 40px;
+        width: 91%;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+        background-color: green;
+        color: white;
+        font-size: 16px;
+    }
+
+    .btn-save-role:hover {
+        cursor: pointer;
+        opacity: 0.9;
+    }
+}

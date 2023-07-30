@@ -3,9 +3,9 @@ const Role = require('../models/role.model')
 exports.getAllRole = (req, res) => {
     Role.getAll(function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -32,9 +32,9 @@ exports.createRole = (req, res) => {
     }
     Role.createRole(newRole, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -52,9 +52,9 @@ exports.updateRole = (req, res) => {
     }
     Role.updateRole(roleId, newRole, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -63,9 +63,9 @@ exports.deleteRole = (req, res) => {
     const roleId = req.params.id
     Role.deleteRole(roleId, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).json({ message: `Xoá role với id ${roleId} thành công` });
+            res.status(200).send({data: data, success: true});
         }
     })
 }
