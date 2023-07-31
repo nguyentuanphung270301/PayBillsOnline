@@ -41,7 +41,7 @@ const LoginForm = () => {
           }
           else {
             localStorage.removeItem('token')
-            toast.error('Tài khoản chưa được phân quyền')
+            toast.error('Tài khoản chưa được cấp role')
             console.log(results)
           }
         }

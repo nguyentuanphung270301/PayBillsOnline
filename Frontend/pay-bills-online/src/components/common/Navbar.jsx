@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../../style/Navbar.css'
 import { Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv, faShieldHalved, faUsers, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv, faShieldHalved, faUsers, faUnlockKeyhole, faFileMedical, faFileCircleCheck, faCashRegister } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import userApis from '../../api/modules/user.api';
@@ -21,6 +21,7 @@ const Navbar = () => {
     const [isOpenAdmin, setIsOpenAdmin] = useState(false)
     const [isOpenWrite, setIsOpenWrite] = useState(false)
     const [isOpenAuth, setIsOpenAuth] = useState(false)
+    const [isOpenBill, setIsOpenBill] = useState(false)
 
 
     const handleLogout = () => {
@@ -30,42 +31,31 @@ const Navbar = () => {
         navigate('/')
 
     }
+
     useEffect(() => {
         const getInfo = async () => {
-            const res = await userApis.getUserByUsername(username)
+            const res = await userApis.getUserAuthByUsername(username);
             if (res.success && res) {
-                const result = await userAuthApis.getUserByUserId(res.data.id)
-                if (result.success && result) {
-                    const rolesPromises = result.data.map(async (item) => {
-                        const role = await roleApis.getById(item.role_id)
-                        if (role.success && role) {
-                            return role.data
-                        }
-                        else {
-                            console.log(role)
-                        }
-                    })
-                    Promise.all(rolesPromises).then((roles) => {
-                        // Lọc ra các giá trị role hợp lệ (không phải null) và cập nhật vào mảng trạng thái
-                        const validRoles = roles.filter((role) => role !== null);
-                        setUserInfo(validRoles);
-                    });
-                    Promise.all(rolesPromises).then((roles) => {
-                        const roleCodesArray = roles.map((role) => role.rolecode);
-                        setListRoleUsers(roleCodesArray);
-                    });
+                console.log(res);
+                const rolecodes = new Set();
+                const screencodes = [];
+                const filteredData = res.data.filter((item) => {
+                    if (!rolecodes.has(item.rolecode)) {
+                        rolecodes.add(item.rolecode);
+                        screencodes.push(item.screencode);
+                        return true;
+                    }
+                    return false;
+                });
 
-                }
-                else {
-                    console.log(result)
-                }
+                setListRoleUsers(screencodes)
+                setUserInfo(filteredData);
+            } else {
+                console.log(res);
             }
-            else {
-                console.log(res)
-            }
-        }
-        getInfo()
-    }, [username])
+        };
+        getInfo();
+    }, [username]);
 
 
     const openMenuClick = () => {
@@ -78,6 +68,7 @@ const Navbar = () => {
             setIsOpenAdmin(false)
             setIsOpenWrite(false)
             setIsOpenAuth(false)
+            setIsOpenBill(false)
         }
     }
 
@@ -166,105 +157,130 @@ const Navbar = () => {
                 </div>
                 <div className='list-menu'>
                     <ul className={`${openMenu ? 'close' : ''}`}>
-                        {(listRoleUsers.includes('ROLE_ADMIN') || listRoleUsers.includes('ROLE_CUSTOMER')) && (
-                            <li className={`li-menu ${openMenu ? 'close' : ''}`}>
-                                <FontAwesomeIcon icon={faHouse} className={`${openMenu ? '' : 'icon-close'}`} />
-                                {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
-                            </li>
-                        )}
-                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
+                        <li className={`li-menu ${openMenu ? 'close' : ''}`}>
+                            <FontAwesomeIcon icon={faHouse} className={`${openMenu ? '' : 'icon-close'}`} />
+                            {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
+                        </li>
+                        {listRoleUsers.includes('Full_Admin') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenAdmin(!isOpenAdmin)}>
                                     <FontAwesomeIcon icon={faServer} className={`${openMenu ? '' : 'icon-close'}`} />
                                     {!openMenu ? <span style={{ marginLeft: '10px' }}>Quản trị</span> : <span></span>}
                                 </div>
                                 {!openMenu && <ul className={`${isOpenAdmin ? 'open' : ''}`}>
-                                    <Link to='/mainpage/admin/user' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_User')) && <Link to='/mainpage/admin/user' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faUser} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Quản trị người dùng</span>
                                         </li>
-                                    </Link>
-                                    <Link to='/mainpage/admin/supplier' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_Supplier')) && <Link to='/mainpage/admin/supplier' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faBuilding} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Quản trị nhà cung cấp</span>
                                         </li>
-                                    </Link>
-                                    <Link to='/mainpage/admin/service' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_Service')) && <Link to='/mainpage/admin/service' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faMicrochip} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Quản trị dịch vụ</span>
                                         </li>
-                                    </Link>
+                                    </Link>}
                                 </ul>}
                             </div>
                         </li>}
-                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenWrite ? 'open' : ''}`}`}>
+                        {listRoleUsers.includes('Full_Admin') && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenWrite ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenWrite(!isOpenWrite)}>
                                     <FontAwesomeIcon icon={faKeyboard} className={`${openMenu ? '' : 'icon-close'}`} />
                                     {!openMenu ? <span style={{ marginLeft: '10px' }}>Nhập liệu</span> : <span></span>}
                                 </div>
                                 {!openMenu && <ul className={`${isOpenWrite ? 'open' : ''}`}>
-                                    <Link to='/mainpage/meterindex' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Writing') || listRoleUsers.includes('Writing_Meter')) && <Link to='/mainpage/meterindex' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faBolt} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Nhập liệu điện nước</span>
                                         </li>
-                                    </Link>
-                                    <Link to='/mainpage/cabtv' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Writing') || listRoleUsers.includes('Writing_Cab')) && <Link to='/mainpage/cabtv' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faTv} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Nhập liệu truyền hình cab</span>
                                         </li>
-                                    </Link>
+                                    </Link>}
                                 </ul>}
                             </div>
                         </li>}
-                        {listRoleUsers.includes('ROLE_ADMIN') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAuth ? 'open' : ''}`}`}>
+                        {listRoleUsers.includes('Full_Admin') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAuth ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenAuth(!isOpenAuth)}>
                                     <FontAwesomeIcon icon={faWrench} className={`${openMenu ? '' : 'icon-close'}`} />
                                     {!openMenu ? <span style={{ marginLeft: '10px' }}>Phân quyền</span> : <span></span>}
                                 </div>
                                 {!openMenu && <ul className={`${isOpenAuth ? 'open' : ''}`}>
-                                    <Link to='/mainpage/role' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_Role')) && <Link to='/mainpage/role' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faUsers} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Quản trị role</span>
                                         </li>
-                                    </Link>
-                                    <Link to='/mainpage/screen-role' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Role_Screen')) && <Link to='/mainpage/screen-role' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faUnlockKeyhole} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Cấp quyền cho role</span>
                                         </li>
-                                    </Link>
-                                    <Link to='/mainpage/user-auth' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('User_Role')) && <Link to='/mainpage/user-auth' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faShieldHalved} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Cấp role cho tài khoản</span>
                                         </li>
-                                    </Link>
+                                    </Link>}
                                 </ul>}
                             </div>
                         </li>}
-                        {(listRoleUsers.includes('ROLE_ADMIN') || listRoleUsers.includes('ROLE_CUSTOMER')) && <Link to='/mainpage/bankaccount' style={{ textDecoration: 'none', color: 'white' }}>
+                        {listRoleUsers.includes('BankCard') && <Link to='/mainpage/bankaccount' style={{ textDecoration: 'none', color: 'white' }}>
                             <li className={`li-menu ${openMenu ? 'close' : ''}`}>
                                 <FontAwesomeIcon icon={faMoneyCheckDollar} className={`${openMenu ? '' : 'icon-close'}`} />
                                 {!openMenu ? <span style={{ marginLeft: '10px' }}>Tài khoản ngân hàng</span> : <span></span>}
                             </li>
                         </Link>}
-                        {(listRoleUsers.includes('ROLE_ADMIN') || listRoleUsers.includes('ROLE_CUSTOMER')) &&
+                        {/* {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill')) &&
                             <Link to='/mainpage/bill' style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <li className={`li-menu ${openMenu ? 'close' : ''}`}>
                                     <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
                                     {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
                                 </li>
                             </Link>
-                        }
-
+                        } */}
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenBill ? 'open' : ''}`}`}>
+                            <div>
+                                <div onClick={() => setIsOpenBill(!isOpenBill)}>
+                                    <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
+                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
+                                </div>
+                                {!openMenu && <ul className={`${isOpenBill ? 'open' : ''}`}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill') || listRoleUsers.includes('Bill_Create')) && <Link to='/mainpage/bill-create' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faFileMedical} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Tạo hoá đơn</span>
+                                        </li>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill') || listRoleUsers.includes('Bill_Approved')) && <Link to='/mainpage/bill-approved' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faFileCircleCheck} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Duyệt hoá đơn</span>
+                                        </li>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill') || listRoleUsers.includes('User_Payment')) && <Link to='/mainpage/bill-approved' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faCashRegister} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Thanh toán hoá đơn khách hàng</span>
+                                        </li>
+                                    </Link>}
+                                </ul>}
+                            </div>
+                        </li>}
                     </ul>
                 </div>
             </div>

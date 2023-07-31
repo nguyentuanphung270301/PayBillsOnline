@@ -126,9 +126,21 @@
             align-items: center;
         }
 
+        .admin-menu ul, .write-menu ul {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0;
+            transition: max-height 0.3s ease;
+          }
+          
+          /* Thêm class 'open' khi menu mở */
+          .admin-menu.open ul, .write-menu.open ul {
+            max-height: 500px; /* Đặt max-height lớn hơn để phần tử trong menu hiển thị */
+          }
+
         .admin-menu.ul,
         .write-menu.ul {
-            height: 60px;
+            /* height: 60px; */
             width: 100%;
             color: white;
             cursor: pointer;
@@ -151,22 +163,22 @@
             background-color: #0057da;
         }
 
-        .admin-menu.ul.open {
+        /* .admin-menu.ul.open {
             transition: height 0.3s ease-in-out;
             height: 240px;
-        }
+        } */
 
-        .write-menu.ul.open {
+        /* .write-menu.ul.open {
             transition: height 0.3s ease-in-out;
             height: 180px;
-        }
+        } */
 
         .admin-menu.ul>div,
         .write-menu.ul>div {
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 60px;
+            /* height: 60px; */
             width: 100%;
             margin-bottom: 4px;
         }

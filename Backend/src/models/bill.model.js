@@ -176,6 +176,18 @@ Bill.updateBill = function (id, billData, callback) {
   })
 }
 
+Bill.updateStatusBill = function (id, statusData, callback) {
+  const { status } = statusData;
+  db.query("UPDATE bills SET status = ? WHERE id = ?", [status, id], (err, results) => {
+    if (err) {
+      callback(err, null);
+    }
+    else {
+      this.getById(id, callback);
+    }
+  })
+}
+
 Bill.deleteById = function (id, callback) {
   const query = 'DELETE FROM bills WHERE id =?';
   db.query(query, [id], (err, results) => {

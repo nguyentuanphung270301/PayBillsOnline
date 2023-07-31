@@ -43,6 +43,17 @@ exports.getUserByUsername = (req, res) => {
     })
 }
 
+exports.getUserAuthByUsername = (req, res) => {
+    const username = req.params.username
+    User.getUserAuthByUsername(username, function (err, data) {
+        if (err) {
+            res.status(500).send({ err: err, success: false });
+        } else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
 exports.getUserByEmail = (req, res) => {
     const email = req.params.email
     User.getByEmail(email, function (err, data) {
@@ -55,7 +66,7 @@ exports.getUserByEmail = (req, res) => {
 }
 
 exports.createUser = (req, res) => {
-    const { firstname, lastname, email, phone, username, address, dob, gender, password, status} = req.body
+    const { firstname, lastname, email, phone, username, address, dob, gender, password, status } = req.body
 
     const newUser = {
         firstname: firstname,

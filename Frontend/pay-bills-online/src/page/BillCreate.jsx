@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import '../style/AdminUser.css'
-import PropTypes from 'prop-types';
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
+import { faClipboardCheck, faFileCirclePlus, faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
-import userApis from '../api/modules/user.api';
-import { addDays, format } from 'date-fns';
-import { toast } from 'react-toastify';
-import authApis from '../api/modules/auth.api';
-import userAuthApis from '../api/modules/user_auth.api';
-import AddUser from '../components/common/AddUser';
-import EditUser from '../components/common/EditUser';
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import '../style/BillCreate.css'
+import PropTypes from 'prop-types';
+import billApis from '../api/modules/bill.api'
+import { addDays, format } from 'date-fns'
+import CreateBill from '../components/common/CreateBill'
+import { toast } from 'react-toastify'
+import EditBill from '../components/common/EditBill'
+import userApis from '../api/modules/user.api'
+
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -45,47 +45,41 @@ const headCells = [
         id: 'id',
         numberic: true,
         disablePadding: true,
-        label: 'Mã User'
+        label: 'Mã hoá đơn'
     },
     {
-        id: 'name',
+        id: 'service',
         numberic: false,
         disablePadding: true,
-        label: 'Tên người dùng'
+        label: 'Dịch vụ'
     },
     {
-        id: 'email',
+        id: 'supplier',
         numberic: false,
         disablePadding: true,
-        label: 'Email'
+        label: 'Nhà cung cấp'
     },
     {
-        id: 'phone',
+        id: 'nameUser',
         numberic: false,
         disablePadding: true,
-        label: 'Số điện thoại'
+        label: 'Tên khách hàng'
     },
     {
-        id: 'dob',
-        numberic: false,
+        id: 'amount',
+        numberic: true,
         disablePadding: true,
-        label: 'Ngày sinh'
+        label: 'Tổng tiền'
     },
     {
-        id: 'gender',
+        id: 'due_date',
         numberic: false,
         disablePadding: true,
-        label: 'Giới tính'
-    },
-    {
-        id: 'address',
-        numberic: false,
-        disablePadding: true,
-        label: 'Địa chỉ'
+        label: 'Ngày hết hạn'
     },
     {
         id: 'status',
-        numberic: true,
+        numberic: false,
         disablePadding: true,
         label: 'Trạng thái'
     },
@@ -144,23 +138,24 @@ EnhancedTableHead.propTypes = {
 };
 
 
-const AdminUser = () => {
+
+const BillCreate = () => {
+    const [billList, setBillList] = useState('')
     const [isLoading, setIsLoading] = useState(true)
-    const [userList, setUserList] = useState('')
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [isRequest, setIsRequest] = useState(false)
-    const [listRoleUser,setListRoleUsers] = useState([])
+    const [filterBill, setFilterBill] = useState('')
+
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [showAddUser, setShowAddUser] = useState(false);
-    const [showEditUser, setShowEditUser] = useState(false);
+    const [showCreateBill, setShowCreateBill] = useState(false);
+    const [showEditBill, setShowEditBill] = useState(false);
 
-    const username = localStorage.getItem('username');
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -181,38 +176,6 @@ const AdminUser = () => {
         setSelected(newSelected);
     };
 
-    // useEffect(() => {
-    //     const getInfo = async () => {
-    //         const res = await userApis.getUserAuthByUsername(username);
-    //         if (res.success && res) {
-    //             console.log(res);
-    //             const rolecodes = new Set();
-    //             const screencodes = [];
-    //             const filteredData = res.data.filter((item) => {
-    //                 if (!rolecodes.has(item.rolecode)) {
-    //                     rolecodes.add(item.rolecode);
-    //                     screencodes.push(item.screencode);
-    //                     return true;
-    //                 }
-    //                 return false;
-    //             });
-
-    //             setListRoleUsers(screencodes)
-    //         } else {
-    //             console.log(res);
-    //         }
-    //     };
-    //     getInfo();
-    // }, [username]);
-
-    // useEffect(() => {
-    //     const checkRole = async () => {
-    //         if(!username) {
-                
-    //         }
-    //     }
-    // },[])
-
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -229,7 +192,7 @@ const AdminUser = () => {
     };
 
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userList.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - billList.length) : 0;
 
     const handleClickOpen = (id) => {
         setSelectedId(id);
@@ -242,63 +205,79 @@ const AdminUser = () => {
     };
     const handleEidt = (id) => {
         setSelectedId(id)
-        setShowEditUser(true)
+        setShowEditBill(true)
     }
+
     useEffect(() => {
-        const getAllUser = async () => {
-            const res = await userApis.getAll()
+        const getBillList = async () => {
+            const res = await billApis.getAll()
             if (res.success && res) {
-                console.log(res)
-                setUserList(res.data)
-                setIsLoading(false)
+                if (filterBill === '') {
+                    console.log(res)
+                    setBillList(res.data)
+                    setIsLoading(false)
+                }
+                else if (filterBill === 'true') {
+                    setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
+                }
+                else if (filterBill === 'false') {
+                    setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
+                }
             }
             else {
                 console.log(res)
                 setIsLoading(false)
+                setBillList('')
             }
         }
-        getAllUser()
-    }, [isRequest, showAddUser, showEditUser])
+        getBillList()
+    }, [isRequest, showCreateBill, showEditBill, filterBill])
+
+
+    const deleteBill = async (id) => {
+        const res = await billApis.deleteBill(id)
+        if (res.success && res) {
+            toast.success("Xoá hoá đơn thành công")
+            setIsRequest(!isRequest)
+            handleClose()
+        }
+        else {
+            toast.error("Xoá hoá đơn thất bại")
+            console.log(res)
+            handleClose()
+        }
+    }
 
     const formatDate = (date) => {
         const increasedDate = addDays(new Date(date), 0);
         const formattedDate = format(increasedDate, 'dd-MM-yyyy');
         return formattedDate;
     }
+    const formattedPrice = (balance) => {
+        const formattedBalance = balance.toLocaleString('vi-VN');
 
-    const deleteUser = async (userId) => {
-        const res = await userApis.updateStatus(userId)
-        if (res.success && res) {
-            const response = await userAuthApis.updateStatus(userId)
-            if (response.success && response) {
-                console.log(response)
-                toast.success("Xoá người dùng thành công!")
-                setIsRequest(!isRequest)
-                setOpen(false)
-            }
-            else {
-                console.log(response)
-                toast.error("Xoá người dùng thất bại!")
-                setIsRequest(!isRequest)
-                setOpen(false)
-            }
-        }
-        else {
-            console.log(res)
-        }
+        return formattedBalance;
     }
 
     return (
-        <div className='main-admin-user'>
+        <div className='main-bill'>
             <Typography sx={{
                 color: '#0057da',
                 margin: '20px',
                 fontSize: '25px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-            }}>Quản trị người dùng</Typography>
-            <button className='btn-admin-add' onClick={() => setShowAddUser(true)}><FontAwesomeIcon icon={faPlus} />Thêm người dùng</button>
-            <div className='admin-user-table'>
+            }}>Tạo hoá đơn</Typography>
+            <div className='filter-bill'>
+                <label>Lọc</label>
+                <select onChange={(e) => setFilterBill(e.target.value)}>
+                    <option value=''>----Chọn---</option>
+                    <option value='true' >Đã duyệt</option>
+                    <option value='false'>Chưa duyệt</option>
+                </select>
+            </div>
+            <button className='btn-create-bill' onClick={() => setShowCreateBill(true)} ><FontAwesomeIcon icon={faFileCirclePlus} />Tạo hoá đơn</button>
+            <div className='bill-create-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
                     top: '200px',
@@ -314,14 +293,14 @@ const AdminUser = () => {
                                     order={order}
                                     orderBy={orderBy}
                                     onRequestSort={handleRequestSort}
-                                    rowCount={userList.length}
+                                    rowCount={billList.length}
                                 />
-                                {!userList ? <Typography sx={{
+                                {!billList ? <Typography sx={{
                                     position: 'absolute',
                                     top: '200px',
                                     right: 'calc(100% / 2)',
                                 }} >Không có dữ liệu</Typography> : <TableBody>
-                                    {stableSort(userList, getComparator(order, orderBy))
+                                    {stableSort(billList, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
                                             return (
@@ -335,13 +314,12 @@ const AdminUser = () => {
                                                     >
                                                         {row.id}
                                                     </TableCell>
-                                                    <TableCell >{`${row.firstname} ${row.lastname}`}</TableCell>
-                                                    <TableCell >{row.email}</TableCell>
-                                                    <TableCell >{row.phone}</TableCell>
-                                                    <TableCell>{row.dob && formatDate(row.dob)}</TableCell>
-                                                    <TableCell>{(row.gender === 1 && 'Nam') || (row.gender === 0 && 'Nữ')}</TableCell>
-                                                    <TableCell>{row.address}</TableCell>
-                                                    <TableCell>
+                                                    <TableCell >{row.service_name}</TableCell>
+                                                    <TableCell >{row.supplier_name}</TableCell>
+                                                    <TableCell >{row.firstname} {row.lastname}</TableCell>
+                                                    <TableCell >{formattedPrice(row.amount)} đ</TableCell>
+                                                    <TableCell >{formatDate(row.due_date)}</TableCell>
+                                                    <TableCell >
                                                         <Typography sx={{
                                                             textTransform: 'uppercase',
                                                             border: '1px solid #ccc',
@@ -352,12 +330,13 @@ const AdminUser = () => {
                                                             borderRadius: '5px',
                                                             fontweight: '700',
                                                             color: 'white',
-                                                            backgroundColor: `${row.status === 1 ? '#00da2d' : '#da3600'}`,
+                                                            backgroundColor: row.status === 'CHƯA DUYỆT' ? 'red' : row.status === 'CHỜ THANH TOÁN' ? '#ffa900' : row.status === 'ĐÃ THANH TOÁN' ? '#22dc00' : '',
                                                             fontSize: '15px',
                                                         }}>
-                                                            {row.status === 1 ? 'đang hoạt động' : 'đã xoá'}
+                                                            {row.status}
                                                         </Typography>
                                                     </TableCell>
+
                                                     <TableCell sx={{
                                                         display: 'flex',
                                                         justifyItems: 'center',
@@ -368,7 +347,7 @@ const AdminUser = () => {
                                                                 marginRight: '10px',
                                                                 height: '40px'
                                                             }}
-                                                            disabled={row.status === 0}
+                                                            disabled={row.status === 'CHƯA DUYỆT' ? false : true}
                                                             onClick={() => handleEidt(row.id)}
                                                         ><FontAwesomeIcon icon={faPenToSquare} /></Button>
                                                         <Box>
@@ -382,8 +361,8 @@ const AdminUser = () => {
                                                                         opacity: 0.8
                                                                     }
                                                                 }}
+                                                                disabled={row.status === 'CHƯA DUYỆT' ? false : true}
                                                                 onClick={() => handleClickOpen(row.id)}
-                                                                disabled={row.status === 0}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </Button>
@@ -391,16 +370,16 @@ const AdminUser = () => {
                                                                 open={open}
                                                                 onClose={handleClose}
                                                             >
-                                                                <DialogTitle>Xoá Người Dùng</DialogTitle>
+                                                                <DialogTitle>Xoá Hoá Đơn</DialogTitle>
                                                                 <DialogContent>
                                                                     <DialogContentText>
-                                                                        Bạn có muốn xoá người dùng này không
+                                                                        Bạn có muốn xoá hoá đơn này không
                                                                     </DialogContentText>
                                                                 </DialogContent>
                                                                 <DialogActions>
                                                                     <Button onClick={handleClose}>Cancel</Button>
                                                                     <Button
-                                                                        onClick={() => deleteUser(selectedId)}
+                                                                        onClick={() => deleteBill(selectedId)}
                                                                         sx={{
                                                                             backgroundColor: 'white',
                                                                             ":hover": {
@@ -433,17 +412,17 @@ const AdminUser = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={userList.length}
+                    count={billList.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showAddUser && <AddUser onClose={() => setShowAddUser(false)} />}
-            {showEditUser && <EditUser onClose={() => setShowEditUser(false)} id={selectedId} />}
+            {showCreateBill && <CreateBill onClose={() => setShowCreateBill(false)} />}
+            {showEditBill && <EditBill id={selectedId} onClose={() => setShowEditBill(false)} />}
         </div>
     )
 }
 
-export default AdminUser
+export default BillCreate 

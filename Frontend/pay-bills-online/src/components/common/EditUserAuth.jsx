@@ -1,19 +1,33 @@
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
-import '../../style/AddAuth.css'
 import userApis from '../../api/modules/user.api'
 import roleApis from '../../api/modules/role.api'
 import { toast } from 'react-toastify'
 import userAuthApis from '../../api/modules/user_auth.api'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
 
-const AddAuth = ({ onClose }) => {
+const EditUserAuth = ({id, onClose}) => {
 
     const [userId, setUserId] = useState('')
     const [roleId, setRoleId] = useState('')
 
     const [userList, setUserList] = useState('')
     const [roleList, setRoleList] = useState('')
+
+    useEffect(()=> {
+        const getUserAuth = async () => {
+            const res = await userAuthApis.getById(id)
+            if(res.success && res) {
+                console.log(res)
+                setRoleId(res.data.role_id)
+                setUserId(res.data.user_id)
+            }
+            else {
+                console.log(res)
+            }
+        }   
+        getUserAuth()     
+    },[id])
 
     useEffect(() => {
         const getUserList = async () => {
@@ -57,7 +71,7 @@ const AddAuth = ({ onClose }) => {
             role_id: parseInt(roleId),
             status: 1
         }
-        const res = await userAuthApis.createAuth(data)
+        const res = await userAuthApis.updateAuth(id,data)
         if (res.success && res) {
             toast.success('Cấp quyền cho tài khoản thành công')
             onClose()
@@ -75,7 +89,7 @@ const AddAuth = ({ onClose }) => {
                 <form className='form-add-auth' onSubmit={handleSubmit} >
                     <div className='auth-form-flex'>
                         <label>Người dùng</label>
-                        <select onChange={(e) => setUserId(e.target.value)}>
+                        <select onChange={(e) => setUserId(e.target.value)} value={userId || ''} disabled={true}>
                             <option>---Chọn----</option>
                             {userList && userList.map((item, i) => {
                                 return <option value={item.id} key={i}>{item.id}: {item.firstname} {item.lastname} - {item.username}</option>
@@ -84,8 +98,8 @@ const AddAuth = ({ onClose }) => {
                     </div>
                     <div className='auth-form-flex'>
                         <label>Role</label>
-                        <select onChange={(e) => setRoleId(e.target.value)}>
-                            <option>---Chọn----</option>
+                        <select onChange={(e) => setRoleId(e.target.value)} value={roleId || ''}>
+                            <option value=''>---Chọn----</option>
                             {roleList && roleList.map((item, i) => {
                                 return <option value={item.id} key={i}>{item.rolecode} - {item.name}</option>
                             })}
@@ -98,4 +112,4 @@ const AddAuth = ({ onClose }) => {
     )
 }
 
-export default AddAuth
+export default EditUserAuth

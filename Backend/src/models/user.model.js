@@ -32,6 +32,41 @@ User.getAll = function (callback) {
     })
 }
 
+User.getUserAuthByUsername = function (username, callback) {
+    db.query(`SELECT 
+    users.id,
+    users.firstname,
+    users.lastname,
+    users.username,
+    roles.rolecode,
+    roles.name,
+    screen.screencode
+  FROM
+    users
+  INNER JOIN
+    user_authorization ON users.id = user_authorization.user_id
+  INNER JOIN
+    roles ON user_authorization.role_id = roles.id
+  INNER JOIN
+    role_screen ON roles.id = role_screen.role_id
+  INNER JOIN
+    screen ON role_screen.screen_id = screen.id
+  WHERE
+    users.username = ?`, [username], (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            if (results.length > 0) {
+                callback(null, results)
+            }
+            if (results.length == 0) {
+                callback('Không tìm thấy dữ liệu')
+            }
+        }
+    })
+}
+
+
 User.getById = function (id, callback) {
     db.query('SELECT * FROM users WHERE id =?', [id], (err, results) => {
         if (err) {

@@ -2,7 +2,7 @@ const db = require('../configs/connect');
 
 const Authorization = function (authorization) {
     this.id = authorization.id;
-    this.screen_id = authorization.screen_id;
+    this.status = authorization.status;
     this.user_id = authorization.user_id;
     this.role_id = authorization.role_id;
 }
@@ -62,7 +62,7 @@ Authorization.getById = function (id, callback) {
             callback(err, null);
         } else {
             if (results.length > 0) {
-                callback(null, results)
+                callback(null, results[0])
             }
             if (results.length == 0) {
                 callback('Không tìm thấy phân quyền với id: ' + id)
@@ -86,9 +86,9 @@ Authorization.createAuthorization = function (authorizationData, callback) {
 }
 
 Authorization.updateAuthorization = function (id, authorizationData, callback) {
-    const { screen_id, user_id, role_id } = authorizationData;
-    const query = 'UPDATE user_authorization SET screen_id =?, user_id =?, role_id =? WHERE id =?'
-    db.query(query, [screen_id, user_id, role_id, id], (err, results) => {
+    const { status, user_id, role_id } = authorizationData;
+    const query = 'UPDATE user_authorization SET status =?, user_id =?, role_id =? WHERE id =?'
+    db.query(query, [status, user_id, role_id, id], (err, results) => {
         if (err) {
             callback(err, null);
         }

@@ -11,6 +11,7 @@ const userEndpoints = {
     updateStatus: (id) => `/user/updateStatus/${id}`,
     createUser: '/user/create',
     getById: (id) => `/user/${id}`,
+    getUserAuthByUsername: (username) => `/user/userauth/${username}`,
 }
 
 const userApis = {
@@ -89,6 +90,15 @@ const userApis = {
     getById: async (id) => {
         try {
             const response = await privateClient.get(userEndpoints.getById(id))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getUserAuthByUsername: async (username) => {
+        try {
+            const response = await privateClient.get(userEndpoints.getUserAuthByUsername(username))
             return response
         }
         catch (error) {

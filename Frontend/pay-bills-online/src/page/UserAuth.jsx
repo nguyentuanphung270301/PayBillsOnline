@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import userAuthApis from '../api/modules/user_auth.api'
 import AddAuth from '../components/common/AddAuth'
 import { toast } from 'react-toastify'
+import EditUserAuth from '../components/common/EditUserAuth'
 
 
 function descendingComparator(a, b, orderBy) {
@@ -136,6 +137,8 @@ const UserAuth = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showAddAuth, setShowAddAuth] = useState(false);
     const [showEditAuth, setShowEditAuth] = useState(false);
+
+    const username = localStorage.getItem('username');
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -291,6 +294,7 @@ const UserAuth = () => {
                                                                 height: '40px'
                                                             }}
                                                             onClick={() => handleEidt(row.id)}
+                                                            disabled={username === row.username ? true : false}
                                                         ><FontAwesomeIcon icon={faPenToSquare} /></Button>
                                                         <Box>
                                                             <Button
@@ -303,6 +307,7 @@ const UserAuth = () => {
                                                                         opacity: 0.8
                                                                     }
                                                                 }}
+                                                                disabled={username === row.username ? true : false}
                                                                 onClick={() => handleClickOpen(row.id)}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
@@ -361,6 +366,7 @@ const UserAuth = () => {
                 />
             </div>
             {showAddAuth && <AddAuth onClose={() => setShowAddAuth(false)} />}
+            {showEditAuth && <EditUserAuth id={selectedId} onClose={() => setShowEditAuth(false)}/>}
         </div>
     )
 }

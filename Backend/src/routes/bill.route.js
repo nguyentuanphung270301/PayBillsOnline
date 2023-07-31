@@ -8,6 +8,7 @@ router.get('/allbill', authMiddleware.authenticateToken, billController.getAll);
 router.get('/:id', authMiddleware.authenticateToken, billController.getById);
 router.post('/create', authMiddleware.authenticateToken, billController.createBill);
 router.put('/update/:id', authMiddleware.authenticateToken, billController.updateBill);
+router.put('/updatestatus/:id', authMiddleware.authenticateToken, billController.updateStatusBill)
 router.delete('/delete/:id', authMiddleware.authenticateToken, billController.deleteBill);
 router.get('/getByUserId/:id', authMiddleware.authenticateToken, billController.getServiceByUserId)
 router.get('/getCableByUserId/:id', authMiddleware.authenticateToken,billController.getCableByUserId)

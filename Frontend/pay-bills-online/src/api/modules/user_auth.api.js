@@ -5,7 +5,9 @@ const userAuthEndpoints = {
     updateStatus: (userId) => `/authorization/updateStatus/${userId}`,
     getAllAuth: '/authorization/allauth',
     createAuth: '/authorization/create',
-    deleteAuth:(id) => `/authorization/delete/${id}`,
+    deleteAuth: (id) => `/authorization/delete/${id}`,
+    getById: (id) => `/authorization/${id}`,
+    updateAuth: (id) => `/authorization/update/${id}`
 }
 
 const userAuthApis = {
@@ -37,8 +39,8 @@ const userAuthApis = {
         }
     },
     createAuth: async (data) => {
-        try{
-            const response = await privateClient.post(userAuthEndpoints.createAuth,data)
+        try {
+            const response = await privateClient.post(userAuthEndpoints.createAuth, data)
             return response
         }
         catch (error) {
@@ -48,6 +50,24 @@ const userAuthApis = {
     deleteAuth: async (id) => {
         try {
             const response = await privateClient.delete(userAuthEndpoints.deleteAuth(id))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getById: async (id) => {
+        try {
+            const response = await privateClient.get(userAuthEndpoints.getById(id));
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    updateAuth: async (id, data) => {
+        try {
+            const response = await privateClient.put(userAuthEndpoints.updateAuth(id), data)
             return response
         }
         catch (error) {

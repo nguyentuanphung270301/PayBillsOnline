@@ -99,6 +99,21 @@ exports.updateBill = (req, res) => {
     })
 }
 
+exports.updateStatusBill = (req, res) => {
+    const billId = req.params.id
+    const { status } = req.body
+    const statusBill = {
+        status: status
+    }
+    Bill.updateStatusBill(billId, statusBill, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        } else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
 exports.deleteBill = (req, res) => {
     const billId = req.params.id
     Bill.deleteById(billId, function (err, data) {

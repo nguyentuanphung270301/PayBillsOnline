@@ -60,20 +60,17 @@ exports.createAuthorization = (req, res) => {
 
 exports.updateAuthorization = (req, res) => {
     const authorizationId = req.params.id
-    const { screen_id, user_id, role_id } = req.body;
-    if (!user_id || !role_id) {
-        res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin' })
-    }
+    const { status, user_id, role_id } = req.body;
     const newAuth = {
-        screen_id: screen_id,
+        status: status,
         user_id: user_id,
         role_id: role_id
     }
     Authorization.updateAuthorization(authorizationId, newAuth, function (err, data) {
         if (err) {
-            res.status(500).send(err)
+            res.status(500).send({error: err, success: false})
         } else {
-            res.status(200).send(data)
+            res.status(200).send({data: data, success: true})
         }
     })
 }

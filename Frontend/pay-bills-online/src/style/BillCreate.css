@@ -15,24 +15,34 @@
     flex-direction: column;
     overflow: hidden;
 
-    .main-btn {
+    .filter-bill{
         position: absolute;
-        top: 40px;
-        right: 50px;
-        height: 60px;
-        width: 350px;
+        top: 50px;
+        left: 50px;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        width: 150px;
+    }
+    .filter-bill>label {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+    .filter-bill>select {
+        height: 30px;
+        border-radius: 10px;
+        font-size: 15px;
     }
 
-    .btn-create-bill,
-    .btn-approved-bill {
-        width: 150px;
-        height: 40px;
+
+    .btn-create-bill {
+        top: 50px;
+        right: 50px;
         display: flex;
+        position: absolute;
         align-items: center;
         justify-content: space-around;
+        width: 150px;
+        height: 50px;
         font-size: 16px;
         border-radius: 10px;
         border: 1px solid #ccc;
@@ -40,18 +50,13 @@
         color: white;
     }
 
-    .btn-approved-bill {
-        background-color: #ffa700;
-    }
-
-    .btn-create-bill:hover,
-    .btn-approved-bill:hover {
+    .btn-create-bill:hover {
         cursor: pointer;
         scale: 1.1;
         opacity: 0.9;
     }
 
-    .admin-cab-table {
+    .bill-create-table {
         position: absolute;
         width: 95%;
         margin-left: 20px;

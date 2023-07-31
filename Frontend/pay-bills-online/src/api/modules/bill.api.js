@@ -9,6 +9,7 @@ const billEndpoints = {
     deleteBill: (id) => `/bill/delete/${id}`,
     createBill: '/bill/create',
     updateBill: (id) => `/bill/update/${id}`,
+    updatestatus: (id) => `/bill/updatestatus/${id}`,
 }
 const billApis = {
     getAll: async () => {
@@ -77,6 +78,15 @@ const billApis = {
     updateBill: async (id,data) => {
         try {
             const response = await privateClient.put(billEndpoints.updateBill(id), data)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    updateStatusBill: async (id, data) => {
+        try {
+            const response = await privateClient.put(billEndpoints.updatestatus(id), data)
             return response
         }
         catch (error) {
