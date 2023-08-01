@@ -15,6 +15,8 @@ import ScreenRole from '../../page/ScreenRole';
 import UserAuth from '../../page/UserAuth';
 import BillCreate from '../../page/BillCreate';
 import BillApproved from '../../page/BillApproved';
+import BillPaymentForCustomer from '../../page/BillPaymentForCustomer';
+import PrintBill from '../common/PrintBill';
 
 
 const RouteLayout = () => {
@@ -36,6 +38,8 @@ const RouteLayout = () => {
         <Route path='/screen-role' element={<ScreenRole/>} />
         <Route path='/user-auth' element={<UserAuth/>} />
         <Route path='/bill-approved' element={<BillApproved/>} />
+        <Route path='/bill-payment-customer' element={<BillPaymentForCustomer/>} />
+        <Route path='/print-bill/:id' element={<PrintBill/>} />
       </Routes>
     </div>
   )

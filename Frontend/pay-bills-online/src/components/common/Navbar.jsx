@@ -245,14 +245,7 @@ const Navbar = () => {
                                 {!openMenu ? <span style={{ marginLeft: '10px' }}>Tài khoản ngân hàng</span> : <span></span>}
                             </li>
                         </Link>}
-                        {/* {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill')) &&
-                            <Link to='/mainpage/bill' style={{ textDecoration: 'none', color: 'inherit' }}>
-                                <li className={`li-menu ${openMenu ? 'close' : ''}`}>
-                                    <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
-                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
-                                </li>
-                            </Link>
-                        } */}
+
                         {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenBill ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenBill(!isOpenBill)}>
@@ -272,7 +265,7 @@ const Navbar = () => {
                                             <span>Duyệt hoá đơn</span>
                                         </li>
                                     </Link>}
-                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill') || listRoleUsers.includes('User_Payment')) && <Link to='/mainpage/bill-approved' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill') || listRoleUsers.includes('User_Payment')) && <Link to='/mainpage/bill-payment-customer' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faCashRegister} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Thanh toán hoá đơn khách hàng</span>

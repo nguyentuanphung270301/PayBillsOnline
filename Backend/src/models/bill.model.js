@@ -7,6 +7,7 @@ const Bill = function (bill) {
   this.user_id = bill.user_id
   this.create_id = bill.create_id
   this.approved_id = bill.approved_id
+  this.done_id = bill.done_id
   this.meter_id = bill.meter_id
   this.cab_id = bill.cab_id
   this.info = bill.info
@@ -19,6 +20,8 @@ Bill.getAll = function (callback) {
     bills.due_date, 
     bills.amount, 
     bills.status,
+    bills.cab_id,
+    bills.meter_id,
     users.firstname, 
     users.lastname,
     services.name as service_name, 
@@ -45,6 +48,8 @@ Bill.getAll = function (callback) {
     bills.due_date, 
     bills.amount, 
     bills.status,
+    bills.cab_id,
+    bills.meter_id,
     users.firstname, 
     users.lastname,
     services.name as service_name, 
@@ -100,6 +105,98 @@ Bill.getServiceByUserId = function (id, callback) {
   inner join
   suppliers on services.supplier_id = suppliers.id
   WHERE meterindex.user_id = ${id}`, (err, results) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      if (results.length > 0) {
+        callback(null, results[0])
+      }
+      if (results.length == 0) {
+        callback('Không tìm thấy cabletv với id: ' + id)
+      }
+    }
+  })
+}
+
+Bill.getBillMeterById = function (id, callback) {
+  db.query(`SELECT
+  bills.id AS bill_id,
+  bills.due_date,
+  bills.amount,
+  bills.status,
+  bills.create_id,
+  bills.approved_id,
+  bills.done_id,
+  bills.user_id,
+  users.firstname,
+  users.lastname,
+  users.email,
+  users.phone,
+  users.address,
+  meterindex.meter_reading_new,
+  meterindex.meter_date_new,
+  meterindex.meter_reading_old,
+  meterindex.meter_date_old,
+  services.name AS service_name,
+  services.price AS service_price,
+  suppliers.name AS supplier_name,
+  payment.payment_date,
+  payment.payment_method,
+  payment.description,
+  payment.userbankcard_id
+FROM bills
+LEFT JOIN users ON bills.user_id = users.id
+LEFT JOIN meterindex ON bills.meter_id = meterindex.id
+LEFT JOIN services ON meterindex.service_id = services.id
+LEFT JOIN suppliers ON services.supplier_id = suppliers.id
+LEFT JOIN payment ON payment.bill_id = bills.id
+WHERE bills.meter_id IS NOT NULL AND bills.id = ${id}`, (err, results) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      if (results.length > 0) {
+        callback(null, results[0])
+      }
+      if (results.length == 0) {
+        callback('Không tìm thấy cabletv với id: ' + id)
+      }
+    }
+  })
+}
+
+Bill.getBillCabById = function (id, callback) {
+  db.query(`SELECT
+  bills.id AS bill_id,
+  bills.due_date,
+  bills.amount,
+  bills.status,
+  bills.create_id,
+  bills.approved_id,
+  bills.done_id,
+  bills.user_id,
+  users.firstname,
+  users.lastname,
+  users.email,
+  users.phone,
+  users.address,
+  cabletv.package_name,
+  cabletv.start_date,
+  cabletv.end_date,
+  cabletv.price,
+  services.name AS service_name,
+  services.price AS service_price,
+  suppliers.name AS supplier_name,
+  payment.payment_date,
+  payment.payment_method,
+  payment.description,
+  payment.userbankcard_id
+FROM bills
+LEFT JOIN users ON bills.user_id = users.id
+LEFT JOIN cabletv ON bills.cab_id = cabletv.id
+LEFT JOIN services ON cabletv.service_id = services.id
+LEFT JOIN suppliers ON services.supplier_id = suppliers.id
+LEFT JOIN payment ON payment.bill_id = bills.id
+WHERE bills.cab_id IS NOT NULL AND bills.id = ${id}`, (err, results) => {
     if (err) {
       callback(err, null);
     } else {
@@ -177,8 +274,20 @@ Bill.updateBill = function (id, billData, callback) {
 }
 
 Bill.updateStatusBill = function (id, statusData, callback) {
-  const { status } = statusData;
-  db.query("UPDATE bills SET status = ? WHERE id = ?", [status, id], (err, results) => {
+  const { status, approved_id } = statusData;
+  db.query("UPDATE bills SET status = ?, approved_id = ? WHERE id = ?", [status, approved_id, id], (err, results) => {
+    if (err) {
+      callback(err, null);
+    }
+    else {
+      this.getById(id, callback);
+    }
+  })
+}
+
+Bill.updateStatusBillPayment = function (id, statusData, callback) {
+  const { status, done_id } = statusData;
+  db.query("UPDATE bills SET status = ?, done_id = ? WHERE id = ?", [status, done_id, id], (err, results) => {
     if (err) {
       callback(err, null);
     }

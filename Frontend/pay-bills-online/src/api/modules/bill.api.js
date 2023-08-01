@@ -10,6 +10,9 @@ const billEndpoints = {
     createBill: '/bill/create',
     updateBill: (id) => `/bill/update/${id}`,
     updatestatus: (id) => `/bill/updatestatus/${id}`,
+    getBillMeterById: (id) => `/bill/getBillMeterById/${id}`,
+    getBillCabById: (id) => `/bill/getBillCabById/${id}`,
+    updateStatusBillPayment: (id) => `/bill/updatestatuspayment/${id}`,
 }
 const billApis = {
     getAll: async () => {
@@ -55,7 +58,7 @@ const billApis = {
         }
         catch (error) {
             return error
-        }  
+        }
     },
     deleteBill: async (id) => {
         try {
@@ -75,7 +78,7 @@ const billApis = {
             return error
         }
     },
-    updateBill: async (id,data) => {
+    updateBill: async (id, data) => {
         try {
             const response = await privateClient.put(billEndpoints.updateBill(id), data)
             return response
@@ -87,6 +90,33 @@ const billApis = {
     updateStatusBill: async (id, data) => {
         try {
             const response = await privateClient.put(billEndpoints.updatestatus(id), data)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getBillMeterById: async (id) => {
+        try {
+            const response = await privateClient.get(billEndpoints.getBillMeterById(id))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getBillCabById: async (id) => {
+        try {
+            const response = await privateClient.get(billEndpoints.getBillCabById(id))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    updateStatusBillPayment: async (id,data) => {
+        try {
+            const response = await privateClient.put(billEndpoints.updateStatusBillPayment(id),data)
             return response
         }
         catch (error) {

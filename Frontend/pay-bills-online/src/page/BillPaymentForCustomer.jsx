@@ -1,4 +1,4 @@
-import { faCheckToSlot, faClipboardCheck, faFileCirclePlus, faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheckToSlot, faClipboardCheck, faFileCirclePlus, faFileInvoiceDollar, faPenToSquare, faPlus, faPrint, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
@@ -10,6 +10,8 @@ import CreateBill from '../components/common/CreateBill'
 import { toast } from 'react-toastify'
 import EditBill from '../components/common/EditBill'
 import userApis from '../api/modules/user.api'
+import BillPayment from '../components/common/BillPayment'
+import { Link } from 'react-router-dom'
 
 
 function descendingComparator(a, b, orderBy) {
@@ -139,14 +141,14 @@ EnhancedTableHead.propTypes = {
 
 
 
-const BillApproved = () => {
+const BillPaymentForCustomer = () => {
     const [billList, setBillList] = useState('')
     const [isLoading, setIsLoading] = useState(true)
-    const [open, setOpen] = useState(false);
+    const [openBillPayment, setOpenBillPayment] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [isRequest, setIsRequest] = useState(false)
-    const [filterBill, setFilterBill] = useState('')
-    const [userId, setUserId] = useState('')
+
+    const [checkBill, setCheckBill] = useState(false)
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
@@ -154,7 +156,6 @@ const BillApproved = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    const username = localStorage.getItem('username');
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -193,42 +194,31 @@ const BillApproved = () => {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - billList.length) : 0;
 
-    const handleClickOpen = (id) => {
+    const handleClickOpen = (id, check) => {
+        if (check !== null) {
+            setCheckBill(true)
+        }
+        else {
+            setCheckBill(false)
+        }
         setSelectedId(id);
-        setOpen(true);
+        setOpenBillPayment(true);
     };
 
     const handleClose = () => {
         setSelectedId(null);
-        setOpen(false);
+        setOpenBillPayment(false);
     };
 
-    useEffect(() => {
-        const getUserId = async () => {
-            const res = await userApis.getUserByUsername(username);
-            if(res.success && res ){
-                setUserId(res.data.id);
-            }
-        }
-        getUserId()
-    },[username])
 
 
     useEffect(() => {
         const getBillList = async () => {
             const res = await billApis.getAll()
             if (res.success && res) {
-                if (filterBill === '') {
-                    console.log(res)
-                    setBillList(res.data)
-                    setIsLoading(false)
-                }
-                else if (filterBill === 'true'){
-                    setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
-                }
-                else if(filterBill === 'false'){
-                    setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
-                }
+                console.log(res)
+                setBillList(res.data.filter(bill => bill.status === 'CHỜ THANH TOÁN' || bill.status === 'ĐÃ THANH TOÁN'))
+                setIsLoading(false)
             }
             else {
                 console.log(res)
@@ -237,28 +227,9 @@ const BillApproved = () => {
             }
         }
         getBillList()
-    }, [isRequest, filterBill])
+    }, [isRequest, openBillPayment])
 
 
-    const approvedBill = async (id) => {
-
-        const data = {
-            status: 'CHỜ THANH TOÁN',
-            approved_id: userId
-        }
-
-        const res = await billApis.updateStatusBill(id, data)
-        if (res.success && res) {
-            toast.success("Duyệt hoá đơn thành công")
-            setIsRequest(!isRequest)
-            handleClose()
-        }
-        else {
-            toast.error("Duyệt hoá đơn thất bại")
-            console.log(res)
-            handleClose()
-        }
-    }
 
     const formatDate = (date) => {
         const increasedDate = addDays(new Date(date), 0);
@@ -279,15 +250,7 @@ const BillApproved = () => {
                 fontSize: '25px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-            }}>Duyệt hoá đơn</Typography>
-            <div className='filter-bill'>
-                <label>Lọc</label>
-                <select onChange={(e) => setFilterBill(e.target.value)}>
-                    <option value=''>----Chọn---</option>
-                    <option value='true' >Đã duyệt</option>
-                    <option value='false'>Chưa duyệt</option>
-                </select>
-            </div>
+            }}>Thanh toán hoá đơn</Typography>
             <div className='bill-create-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
@@ -353,7 +316,7 @@ const BillApproved = () => {
                                                         justifyItems: 'center',
                                                     }}>
                                                         <Box>
-                                                            <Button
+                                                            {row.status === 'CHỜ THANH TOÁN' && <Button
                                                                 variant='contained'
                                                                 sx={{
                                                                     backgroundColor: '#00d842',
@@ -364,38 +327,26 @@ const BillApproved = () => {
                                                                         opacity: 0.8
                                                                     }
                                                                 }}
-                                                                disabled={row.status === 'CHƯA DUYỆT' ? false : true}
-                                                                onClick={() => handleClickOpen(row.id)}
+                                                                onClick={() => handleClickOpen(row.id, row.meter_id)}
                                                             >
-                                                                <FontAwesomeIcon icon={faCheckToSlot} />
-                                                            </Button>
-                                                            <Dialog
-                                                                open={open}
-                                                                onClose={handleClose}
-                                                            >
-                                                                <DialogTitle>Duyệt Hoá Đơn</DialogTitle>
-                                                                <DialogContent>
-                                                                    <DialogContentText>
-                                                                        Bạn có muốn duyệt hoá đơn này không
-                                                                    </DialogContentText>
-                                                                </DialogContent>
-                                                                <DialogActions>
-                                                                    <Button onClick={handleClose}>huỷ</Button>
-                                                                    <Button
-                                                                        onClick={() => approvedBill(selectedId)}
-                                                                        sx={{
-                                                                            backgroundColor: 'white',
-                                                                            ":hover": {
-                                                                                backgroundColor: '#00d842',
-                                                                                opacity: 0.8,
-                                                                                color: 'white'
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        Duyệt
-                                                                    </Button>
-                                                                </DialogActions>
-                                                            </Dialog>
+                                                                <FontAwesomeIcon icon={faFileInvoiceDollar} />
+                                                            </Button>}
+                                                            {row.status === 'ĐÃ THANH TOÁN' && <Link to={`/mainpage/print-bill/${row.id}`}>
+                                                                <Button
+                                                                    variant='contained'
+                                                                    sx={{
+                                                                        backgroundColor: '#ff1616',
+                                                                        height: '40px',
+                                                                        width: '100px',
+                                                                        ":hover": {
+                                                                            backgroundColor: '#ff4516',
+                                                                            opacity: 0.8
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <FontAwesomeIcon icon={faPrint} />
+                                                                </Button>
+                                                            </Link>}
                                                         </Box>
                                                     </TableCell>
                                                 </TableRow>
@@ -422,8 +373,9 @@ const BillApproved = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
+            {openBillPayment && <BillPayment onClose={handleClose} id={selectedId} check={checkBill} />}
         </div>
     )
 }
 
-export default BillApproved
+export default BillPaymentForCustomer

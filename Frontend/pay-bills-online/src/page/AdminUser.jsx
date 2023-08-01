@@ -354,6 +354,7 @@ const AdminUser = () => {
                                                             color: 'white',
                                                             backgroundColor: `${row.status === 1 ? '#00da2d' : '#da3600'}`,
                                                             fontSize: '15px',
+                                                            width: '150px',
                                                         }}>
                                                             {row.status === 1 ? 'đang hoạt động' : 'đã xoá'}
                                                         </Typography>

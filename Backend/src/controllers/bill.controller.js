@@ -42,6 +42,28 @@ exports.getServiceByUserId = (req, res) => {
     })
 }
 
+exports.getBillMeterById = (req, res) => {
+    const billId = req.params.id;
+    Bill.getBillMeterById(billId, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        } else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
+exports.getBillCabById = (req, res) => {
+    const billId = req.params.id;
+    Bill.getBillCabById(billId, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        } else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
 exports.getCableByUserId = (req, res) => {
     const userId = req.params.id
     Bill.getCableByUserId(userId, function (err, data) {
@@ -101,11 +123,28 @@ exports.updateBill = (req, res) => {
 
 exports.updateStatusBill = (req, res) => {
     const billId = req.params.id
-    const { status } = req.body
+    const { status, approved_id } = req.body
     const statusBill = {
-        status: status
+        status: status,
+        approved_id: approved_id
     }
     Bill.updateStatusBill(billId, statusBill, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        } else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
+exports.updateStatusBillPayment = (req, res) => {
+    const billId = req.params.id
+    const { status, done_id } = req.body
+    const statusBill = {
+        status: status,
+        done_id: done_id
+    }
+    Bill.updateStatusBillPayment(billId, statusBill, function (err, data) {
         if (err) {
             res.status(500).send({ error: err, success: false });
         } else {

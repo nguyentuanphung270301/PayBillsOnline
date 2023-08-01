@@ -22,6 +22,7 @@ const authRoute = require('./src/routes/auth.route')
 const supplierBankCardRoute = require('./src/routes/supplierbankcard.route');
 const billRoute = require('./src/routes/bill.route');
 const screenRoute = require('./src/routes/screen.route');
+const paymentRoute = require('./src/routes/payment.route')
 
 app.use('/api/supplier', supplierRoutes);
 app.use('/api/service', serviceRoutes);
@@ -35,6 +36,8 @@ app.use('/api/auth', authRoute);
 app.use('/api/supllierbankcard', supplierBankCardRoute);
 app.use('/api/bill', billRoute);
 app.use('/api/screen', screenRoute);
+app.use('/api/payment', paymentRoute);
+
 
 
 app.post('/api/sendmailpasswords', async (req, res) => {

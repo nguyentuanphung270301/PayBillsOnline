@@ -1,0 +1,140 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Màu đen với độ mờ 50% */
+    z-index: 9999;
+    /* Đặt lớp mờ ở phía trên cùng */
+}
+
+.main-bill-payment {
+    width: 900px;
+    height: 650px;
+    background-color: #e8f4ff;
+    position: relative;
+    top: 30px;
+    left: 350px;
+    border-radius: 10px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+
+    .icon-close-bill-payment {
+        position: absolute;
+        height: 25px;
+        width: 25px;
+        right: 10px;
+        top: 10px
+    }
+
+    .icon-close-bill-payment:hover {
+        color: red;
+    }
+
+    .body-bill-payment {
+        width: 98%;
+        height: 93%;
+        bottom: 0;
+        position: absolute;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 10px;
+        margin: 0 0 5px 10px;
+    }
+
+    .bill-payment-info,
+    .bill-payment-customer,
+    .bill-payment-service,
+    .form-bill-payment {
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+    .bill-payment-info::before {
+        content: "Thông tin hoá đơn";
+        position: absolute;
+        top: -11px;
+        left: 12%;
+        transform: translateX(-50%);
+        background-color: #92e8fd;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    .bill-payment-customer::before {
+        content: "Thông tin khách hàng";
+        position: absolute;
+        top: -11px;
+        left: 65%;
+        transform: translateX(-50%);
+        background-color: #92e8fd;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    .bill-payment-service::before {
+        content: "Thông tin dịch vụ";
+        position: absolute;
+        top: 299px;
+        left: 12%;
+        transform: translateX(-50%);
+        background-color: #92e8fd;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    .form-bill-payment::before {
+        content: "Thanh toán";
+        position: absolute;
+        top: 299px;
+        left: 60%;
+        transform: translateX(-50%);
+        background-color: #92e8fd;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    .flex-info {
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+    .flex-info>label {
+        width: 50%;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    .flex-info>select {
+        width: 50%;
+        height: 30px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 16px;
+    }
+    .form-bill-payment>textarea {
+        height: 80px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    .btn-bill-payment {
+        height: 30px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background-color: #92dc00;
+        color: white;
+        font-size: 16px;
+    }
+    .btn-bill-payment:hover {
+        cursor: pointer;
+        scale: 1.05;
+        opacity: .8;
+    }
+}
