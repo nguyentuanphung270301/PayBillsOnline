@@ -278,6 +278,7 @@ const CabTV = () => {
         }
         else {
             toast.error(res.error.sqlMessage)
+            toast.error('Xoá dữ liệu thất bại');
             handleClose()
         }
     }

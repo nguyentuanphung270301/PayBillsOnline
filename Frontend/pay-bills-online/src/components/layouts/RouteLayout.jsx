@@ -17,6 +17,7 @@ import BillCreate from '../../page/BillCreate';
 import BillApproved from '../../page/BillApproved';
 import BillPaymentForCustomer from '../../page/BillPaymentForCustomer';
 import PrintBill from '../common/PrintBill';
+import PaymentOnline from '../../page/PaymentOnline';
 
 
 const RouteLayout = () => {
@@ -40,6 +41,7 @@ const RouteLayout = () => {
         <Route path='/bill-approved' element={<BillApproved/>} />
         <Route path='/bill-payment-customer' element={<BillPaymentForCustomer/>} />
         <Route path='/print-bill/:id' element={<PrintBill/>} />
+        <Route path='/payment-online' element={<PaymentOnline/>} />
       </Routes>
     </div>
   )

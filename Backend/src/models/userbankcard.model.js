@@ -50,16 +50,16 @@ UserBankCard.getByUserId = function (id, callback) {
                 callback(null, results)
             }
             if (results.length == 0) {
-                callback('Không tìm thấy thẻ với id:'+ id)
+                callback('Không tìm thấy thẻ với id:' + id)
             }
         }
     })
 }
 
 UserBankCard.createCard = function (cardData, callback) {
-    const { card_number,bank_name , expiry_date, holder_name, cvv, balance, user_id } = cardData;
+    const { card_number, bank_name, expiry_date, holder_name, cvv, balance, user_id } = cardData;
     const query = 'INSERT INTO userbankcard (card_number,bank_name ,expiry_date, holder_name, cvv, balance, user_id) VALUES (?,?,?,?,?,?,?)';
-    db.query(query, [card_number,bank_name ,expiry_date, holder_name, cvv, balance, user_id], (err, results) => {
+    db.query(query, [card_number, bank_name, expiry_date, holder_name, cvv, balance, user_id], (err, results) => {
         if (err) {
             callback(err, null);
         }
@@ -71,9 +71,9 @@ UserBankCard.createCard = function (cardData, callback) {
 }
 
 UserBankCard.updateCard = function (id, cardData, callback) {
-    const { card_number, expiry_date, holder_name, cvv, balance, user_id } = cardData;
-    const query = 'UPDATE userbankcard SET card_number =?, expiry_date =?, holder_name =?, cvv =?, balance =?, user_id =? WHERE id =?';
-    db.query(query, [card_number, expiry_date, holder_name, cvv, balance, user_id, id], (err, results) => {
+    const { balance } = cardData;
+    const query = 'UPDATE userbankcard SET balance =? WHERE id =?';
+    db.query(query, [balance, id], (err, results) => {
         if (err) {
             callback(err, null);
         }

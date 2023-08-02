@@ -1,13 +1,17 @@
-import { faEnvelope, faPrint } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faLocationDot, faPhone, faPrint } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebook } from '@fortawesome/free-brands-svg-icons';
-
+import jsPDF from 'jspdf';
 import React, { useEffect, useState } from 'react'
 import '../../style/PrintBill.css'
 import { useParams } from 'react-router-dom';
 import billApis from '../../api/modules/bill.api';
 import { addDays, format } from 'date-fns';
 import userApis from '../../api/modules/user.api';
+import { robotoNormal } from '../../assets/fonts/robotoNormal';
+import { robotoItalic } from '../../assets/fonts/robotoItalic';
+import { robotoBold } from '../../assets/fonts/robotoBold';
+import { robotoBoldItalic } from '../../assets/fonts/robotoBoldItalic';
 
 const PrintBill = () => {
     const [billInfo, setBillInfo] = useState('')
@@ -76,9 +80,38 @@ const PrintBill = () => {
         getBillInfo()
     }, [])
 
+    const handlePrint = () => {
+        const doc = new jsPDF({
+            unit: 'px',
+            format: 'a4'
+        });
+        const element = document.querySelector('.form-print-bill')
+
+        doc.addFileToVFS('Roboto-Regular.tff', robotoNormal);
+        doc.addFont('Roboto-Regular.tff', 'Roboto', 'normal');
+
+        doc.addFileToVFS('Roboto-Italic.ttf', robotoItalic);
+        doc.addFont('Roboto-Italic.ttf', 'Roboto', 'italic');
+
+        doc.addFileToVFS('Roboto-Bold.ttf', robotoBold);
+        doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+
+        doc.addFileToVFS('Roboto-Bolditalic.ttf', robotoBoldItalic);
+        doc.addFont('Roboto-Bolditalic.ttf', 'Roboto', 'bolditalic');
+
+        doc.html(element, {
+            html2canvas: {
+                scale: [0.45],
+            },
+            callback: async (doc) => {
+                await doc.save(billInfo && `${billInfo.bill_id}/${billInfo.firstname}_${billInfo.lastname}`);
+            },
+        });
+    }
+
     return (
         <div className='main-print-bill'>
-            <button className='btn-print-bill'><FontAwesomeIcon icon={faPrint} />Xuất hoá đơn</button>
+            <button className='btn-print-bill' onClick={handlePrint}><FontAwesomeIcon icon={faPrint} />Xuất hoá đơn</button>
             <div className='form-print-bill'>
                 <div className='header-print-bill'>
                     <label>PTIT</label>
@@ -102,10 +135,6 @@ const PrintBill = () => {
                             <div className='flex-group'>
                                 <label>Nhân viên duyệt hoá đơn:</label>
                                 <span>{userApproved && `${userApproved.id} - ${userApproved.firstname} ${userApproved.lastname}`}</span>
-                            </div>
-                            <div className='flex-group'>
-                                <label>Nhân viên thanh toán hoá đơn:</label>
-                                <span>{userPayment && `${userPayment.id} - ${userPayment.firstname} ${userPayment.lastname}`}</span>
                             </div>
                             <div className='flex-group'>
                                 <label>Trạng thái:</label>
@@ -137,37 +166,86 @@ const PrintBill = () => {
                         </div>
                     </div>
                     <div className='body-bottom-print-bill'>
-                    <label>Thông tin dịch vụ</label>
-                        {check && <div className='flex-row'>
-                            <div className='flex-column'>
+                        <label>Thông tin dịch vụ</label>
+                        {check && <div className='flex-row-print-bill'>
+                            <div className='flex-column-print-bill'>
                                 <label>Nhà cung cấp</label>
                                 <span>{billInfo && billInfo.supplier_name}</span>
                             </div>
-                            <div className='flex-column'>
+                            <div className='flex-column-print-bill'>
                                 <label>Dịch vụ</label>
                                 <span>{billInfo && billInfo.service_name}</span>
                             </div>
-                            <div className='flex-column'>
+                            <div className='flex-column-print-bill'>
                                 <label>Chỉ số cũ - Ngày ghi</label>
                                 <span>{billInfo && `${billInfo.meter_reading_old} - ${formatDate(billInfo.meter_date_old)}`}</span>
                             </div>
-                            <div className='flex-column'>
+                            <div className='flex-column-print-bill'>
                                 <label>Chỉ số mới - Ngày ghi</label>
                                 <span>{billInfo && `${billInfo.meter_reading_new} - ${formatDate(billInfo.meter_date_new)}`}</span>
                             </div>
-                            <div className='flex-column'>
+                            <div className='flex-column-print-bill'>
                                 <label>Kỳ thanh toán</label>
                                 <span>{billInfo && `${formatDate(billInfo.meter_date_old)} - ${formatDate(billInfo.meter_date_new)}`}</span>
                             </div>
-                            <div className='flex-column'>
+                            <div className='flex-column-print-bill'>
                                 <label>Tiêu thụ</label>
                                 <span>{billInfo && (billInfo.meter_reading_new - billInfo.meter_reading_old)}</span>
                             </div>
-                            <div className='flex-column'>
+                            <div className='flex-column-print-bill'>
                                 <label>Giá tiền</label>
                                 <span>{billInfo && formattedPrice(billInfo.service_price)} đ</span>
                             </div>
                         </div>}
+                        {!check && <div className='flex-row-print-bill'>
+                            <div className='flex-column-print-bill-cab'>
+                                <label>Nhà cung cấp</label>
+                                <span>{billInfo && billInfo.supplier_name}</span>
+                            </div>
+                            <div className='flex-column-print-bill-cab'>
+                                <label>Dịch vụ</label>
+                                <span>{billInfo && billInfo.service_name}</span>
+                            </div>
+                            <div className='flex-column-print-bill-cab'>
+                                <label>Tên gói</label>
+                                <span>{billInfo && billInfo.package_name}</span>
+                            </div>
+                            <div className='flex-column-print-bill-cab'>
+                                <label>Ngày bắt đầu</label>
+                                <span>{billInfo && formatDate(billInfo.start_date)}</span>
+                            </div>
+                            <div className='flex-column-print-bill-cab'>
+                                <label>Ngày kết thúc</label>
+                                <span>{billInfo && formatDate(billInfo.end_date)}</span>
+                            </div>
+                            <div className='flex-column-print-bill-cab'>
+                                <label>Giá gói</label>
+                                <span>{billInfo && formattedPrice(billInfo.price)} đ</span>
+                            </div>
+                        </div>}
+                        <div className='body-payment-print-bill' >
+                            <label>Thanh toán</label>
+                            <div className='flex-group'>
+                                <label>Nhân viên thanh toán:</label>
+                                <span>{userPayment && `${userPayment.id} - ${userPayment.firstname} ${userPayment.lastname}`}</span>
+                            </div>
+                            <div className='flex-group'>
+                                <label>Ngày thanh toán:</label>
+                                <span>{billInfo && formatDate(billInfo.payment_date)}</span>
+                            </div>
+                            <div className='flex-group'>
+                                <label>Phương thức thanh toán:</label>
+                                <span>{billInfo && billInfo.payment_method}</span>
+                            </div>
+                            <div className='flex-group'>
+                                <label>Mô tả thanh toán:</label>
+                                <span>{billInfo && billInfo.description}</span>
+                            </div>
+                            <div className='flex-group'>
+                                <label>Tổng tiền hoá đơn:</label>
+                                <span className='amount'>{billInfo && formattedPrice(billInfo.amount)} đ</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className='footer-print-bill'>
@@ -175,6 +253,8 @@ const PrintBill = () => {
                         <label>Thông tin liên hệ</label>
                         <a href='https://www.facebook.com/ntp270301/'><FontAwesomeIcon icon={faFacebook} /> Facebook: Nguyễn Tuấn Phụng </a>
                         <label><FontAwesomeIcon icon={faEnvelope} /> Email: nguyentuanphung270301@gmail.com</label>
+                        <label><FontAwesomeIcon icon={faPhone} /> Số điện thoại: 0828532784</label>
+                        <label><FontAwesomeIcon icon={faLocationDot} /> Địa chỉ: 97 Đ. Man Thiện, Hiệp Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh</label>
                     </div>
                     <label>THANK YOU</label>
                 </div>

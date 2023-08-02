@@ -24,6 +24,22 @@ CableTV.getAll = function (callback) {
     })
 }
 
+CableTV.getByUserId = function (id, callback) {
+    db.query(`SELECT * FROM cabletv WHERE user_id = ${id}`, (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            if (results.length > 0) {
+                callback(null, results)
+            }
+            if (results.length == 0) {
+                callback('Không tìm thấy cabletv với id: ' + id)
+            }
+        }
+    })
+}
+
+
 CableTV.getById = function (id, callback) {
     db.query(`SELECT * FROM cabletv WHERE id = ${id}`, (err, results) => {
         if (err) {

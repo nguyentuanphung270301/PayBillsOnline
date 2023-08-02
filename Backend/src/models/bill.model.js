@@ -109,7 +109,7 @@ Bill.getServiceByUserId = function (id, callback) {
       callback(err, null);
     } else {
       if (results.length > 0) {
-        callback(null, results[0])
+        callback(null, results)
       }
       if (results.length == 0) {
         callback('Không tìm thấy cabletv với id: ' + id)
@@ -222,7 +222,7 @@ Bill.getCableByUserId = function (id, callback) {
       callback(err, null);
     } else {
       if (results.length > 0) {
-        callback(null, results[0])
+        callback(null, results)
       }
       if (results.length == 0) {
         callback('Không tìm thấy cabletv với id: ' + id)

@@ -41,6 +41,22 @@ MeterIndex.getById = function (id, callback) {
     })
 }
 
+MeterIndex.getByUserId = function (id, callback) {
+    db.query(`SELECT * FROM meterindex WHERE user_id = ${id}`, (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            if (results.length > 0) {
+                callback(null, results)
+            }
+            if (results.length == 0) {
+                callback(`Không tìm thấy chỉ số với id: ${id}`)
+            }
+        }
+    })
+}
+
+
 MeterIndex.createMeter = function (meterData, callback) {
     const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id } = meterData
     const query = 'INSERT INTO meterindex (meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id) VALUES (?,?,?,?,?,?)'

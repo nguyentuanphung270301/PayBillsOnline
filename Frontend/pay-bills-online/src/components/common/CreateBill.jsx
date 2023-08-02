@@ -20,7 +20,7 @@ const CreateBill = ({ onClose }) => {
 
     const [checkService, setCheckService] = useState('')
     const [userList, setUserList] = useState('')
-    const [serviceList, setServiceList] = useState([])
+    const [serviceList, setServiceList] = useState('')
 
     const formattedPrice = (balance) => {
         const formattedBalance = balance.toLocaleString('vi-VN');
@@ -82,17 +82,14 @@ const CreateBill = ({ onClose }) => {
             if (checkService === 'true' && userId) {
                 const id = parseInt(userId);
                 const res = await billApis.getService(id);
-                if (res.success && res && (!billList.length || !billList.some((bill) => bill.meter_id === res.data.id))) {
-                    console.log(res);
-                    setServiceList((prevArray) => {
-                        if (prevArray.some((item) => item.id === res.data.id)) {
-                            return prevArray;
-                        } else {
-                            return [...prevArray, res.data];
-                        }
+                if (res.success && res) {
+                    const filteredTemp = res.data.filter(item => {
+                        return !billList.some(bill => bill.meter_id === item.id);
                     });
+                    console.log(res);
+                    setServiceList(filteredTemp);
                 } else {
-                    setServiceList([])
+                    setServiceList('')
                     console.log(res);
                     setPrice('')
                     setInfo('')
@@ -101,15 +98,12 @@ const CreateBill = ({ onClose }) => {
             else if (checkService === 'false' && userId) {
                 const id = parseInt(userId);
                 const res = await billApis.getCableByUserId(id);
-                if (res.success && res && (!billList.length || !billList.some((bill) => bill.cab_id === res.data.id))) {
-                    console.log(res);
-                    setServiceList((prevArray) => {
-                        if (prevArray.some((item) => item.id === res.data.id)) {
-                            return prevArray;
-                        } else {
-                            return [...prevArray, res.data];
-                        }
+                if (res.success && res) {
+                    const filteredTemp = res.data.filter(item => {
+                        return !billList.some(bill => bill.cab_id === item.id);
                     });
+                    console.log(res);
+                    setServiceList(filteredTemp);
                 } else {
                     setServiceList([])
                     console.log(res);

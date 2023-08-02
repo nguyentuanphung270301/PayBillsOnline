@@ -18,18 +18,31 @@
 }
 
 .btn-print-bill {
-    width: 200px;
+    width: 150px;
     height: 50px;
     position: absolute;
     right: 50px;
     top: 20px;
+    color: white;
+    background-color: rgb(255, 0, 60);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.btn-print-bill:hover {
+    opacity: 0.8;
+    scale: 1.1;
+    cursor: pointer;
 }
 
 .form-print-bill {
     position: absolute;
-    width: 70%;
-    height: 1000px;
-    top: 100px;
+    width: 1013px;
+    height: 1100px;
     background-color: white;
 }
 
@@ -58,7 +71,7 @@
 
 .body-top-print-bill {
     width: 100%;
-    height: 400px;
+    height: 300px;
     display: flex;
 }
 
@@ -73,10 +86,10 @@
 
 .left-top-print-bill>label,
 .right-top-print-bill>label,
-.body-bottom-print-bill>label {
+.body-bottom-print-bill>label,
+.body-payment-print-bill>label {
     font-size: 25px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .flex-group {
@@ -103,6 +116,16 @@
     justify-content: space-around;
 }
 
+.body-payment-print-bill {
+    height: 250px ;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-left: 20px;
+    margin-top: 20px;
+}
+
 .right-top-print-bill>label,
 .right-top-print-bill>.flex-group>label,
 .body-bottom-print-bill>label {
@@ -113,11 +136,10 @@
 .body-bottom-print-bill {
     width: 100%;
     height: 400px;
-    /* display: flex; */
     margin-top: 40px;
 }
 
-.flex-row {
+.flex-row-print-bill {
     display: flex;
     margin-top: 20px;
     width: 100%;
@@ -125,10 +147,9 @@
     justify-content: space-around;
     border-top: 2px solid #000000;
     border-bottom: 2px solid #000000;
-
 }
 
-.flex-column {
+.flex-column-print-bill {
     display: flex;
     width: 14.3%;
     height: 100%;
@@ -136,8 +157,17 @@
     align-items: center;
     border-left: 1px solid #000000;
 }
+.flex-column-print-bill-cab {
+    display: flex;
+    width: 16.7%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    border-left: 1px solid #000000;
+}
 
-.flex-column>label {
+.flex-column-print-bill>label,
+.flex-column-print-bill-cab>label {
     font-size: 16px;
     font-weight: 600;
     width: 100%;
@@ -148,7 +178,13 @@
     border-bottom: 1px solid #000000;
 }
 
-.flex-column>span {
+.l2 {
+    margin: 40px 0 20px 0;
+    position: absolute;
+}
+
+.flex-column-print-bill>span,
+.flex-column-print-bill-cab>span {
     font-size: 16px;
     width: 100%;
     display: flex;
@@ -157,13 +193,19 @@
     height: 50px;
 }
 
+.body-payment-print-bill>.flex-group>.amount {
+    font-weight: 700 ;
+    font-size: 20px;
+}
+
+
 
 
 .footer-print-bill {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 100px;
+    height: 150px;
     background-color: rgb(0, 0, 93);
     display: flex;
     align-items: center;

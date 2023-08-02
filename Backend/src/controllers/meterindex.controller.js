@@ -23,6 +23,18 @@ exports.getById = (req, res) => {
     })
 }
 
+exports.getByUserId = (req, res) => {
+    const indexId = req.params.id
+    MeterIndex.getByUserId(indexId, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        }
+        else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
 exports.createMeter = (req, res) => {
     const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id } = req.body
     const newMeter = {

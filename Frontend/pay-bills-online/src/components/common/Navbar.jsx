@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../../style/Navbar.css'
 import { Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv, faShieldHalved, faUsers, faUnlockKeyhole, faFileMedical, faFileCircleCheck, faCashRegister } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv, faShieldHalved, faUsers, faUnlockKeyhole, faFileMedical, faFileCircleCheck, faCashRegister, faCreditCard, faListCheck } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import userApis from '../../api/modules/user.api';
@@ -22,6 +22,7 @@ const Navbar = () => {
     const [isOpenWrite, setIsOpenWrite] = useState(false)
     const [isOpenAuth, setIsOpenAuth] = useState(false)
     const [isOpenBill, setIsOpenBill] = useState(false)
+    const [isOpenPaymentBill, setIsOpenPaymentBill] = useState(false)
 
 
     const handleLogout = () => {
@@ -69,6 +70,7 @@ const Navbar = () => {
             setIsOpenWrite(false)
             setIsOpenAuth(false)
             setIsOpenBill(false)
+            setIsOpenPaymentBill(false)
         }
     }
 
@@ -250,7 +252,7 @@ const Navbar = () => {
                             <div>
                                 <div onClick={() => setIsOpenBill(!isOpenBill)}>
                                     <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
-                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
+                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Quản lý hoá đơn</span> : <span></span>}
                                 </div>
                                 {!openMenu && <ul className={`${isOpenBill ? 'open' : ''}`}>
                                     {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill') || listRoleUsers.includes('Bill_Create')) && <Link to='/mainpage/bill-create' style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -269,6 +271,28 @@ const Navbar = () => {
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faCashRegister} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Thanh toán hoá đơn khách hàng</span>
+                                        </li>
+                                    </Link>}
+                                </ul>}
+                            </div>
+                        </li>}
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenPaymentBill ? 'open' : ''}`}`}>
+                            <div>
+                                <div onClick={() => setIsOpenPaymentBill(!isOpenPaymentBill)}>
+                                    <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
+                                    {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
+                                </div>
+                                {!openMenu && <ul className={`${isOpenPaymentBill ? 'open' : ''}`}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Payment_Bill') || listRoleUsers.includes('Bill_Create')) && <Link to='/mainpage/payment-online' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faCreditCard} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Thanh toán hoá đơn</span>
+                                        </li>
+                                    </Link>}
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Bill_List') || listRoleUsers.includes('Bill_Approved')) && <Link to='/mainpage/bill-approved' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faListCheck} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Hoá đơn của tôi</span>
                                         </li>
                                     </Link>}
                                 </ul>}

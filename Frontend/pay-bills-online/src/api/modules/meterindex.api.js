@@ -4,6 +4,7 @@ const meterEndpoints = {
     getAll: '/meterindex/all',
     deleteMeter: (id) => `/meterindex/delete/${id}`,
     getById: (id) => `/meterindex/${id}`,
+    getByUserId: (userId) => `/meterindex/getuserid/${userId}`,
     createMeter: '/meterindex/create',
     updateMeter: (id) => `/meterindex/update/${id}`
 }
@@ -31,6 +32,15 @@ const meterApis = {
         try {
             const response = await privateClient.get(meterEndpoints.getById(id));
             return response;
+        }
+        catch (error) {
+            return error;
+        }
+    },
+    getByUserId: async (userId) => {
+        try {
+            const response = await privateClient.get(meterEndpoints.getByUserId(userId))
+            return response
         }
         catch (error) {
             return error;

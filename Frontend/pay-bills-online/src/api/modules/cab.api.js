@@ -4,6 +4,7 @@ const cabEndpoints = {
     getAll: '/cabletv/all',
     deleteById: (id) => `/cabletv/delete/${id}`,
     getById: (id) => `/cabletv/${id}`,
+    getByUserId: (userId) => `/cabletv/getuserid/${userId}`,
     createCab: '/cabletv/create',
     updateCab: (id) => `/cabletv/update/${id}`,
 }
@@ -30,6 +31,15 @@ const cabApis = {
     getById: async (id) => {
         try {
             const response = await privateClient.get(cabEndpoints.getById(id))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getByUserId: async (userId) => {
+        try {
+            const response = await privateClient.get(cabEndpoints.getByUserId(userId))
             return response
         }
         catch (error) {

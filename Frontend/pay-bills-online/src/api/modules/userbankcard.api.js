@@ -4,7 +4,8 @@ const userBankCardEndpoint = {
     getByUserId: (userId) => `/userbankcard/userId/${userId}`,
     deleteById: (id) => `/userbankcard/delete/${id}`,
     createBankCard: '/userbankcard/create',
-    getById: (id) => `/userbankcard/${id}`
+    getById: (id) => `/userbankcard/${id}`,
+    updateBankCard: (id) => `/userbankcard/update/${id}`,
 }
 
 const userBankCardApis = {
@@ -38,6 +39,15 @@ const userBankCardApis = {
     getById: async (id) => {
         try {
             const response = await privateClient.get(userBankCardEndpoint.getById(id))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    updateBankCard: async (id, data) => {
+        try {
+            const response = await privateClient.put(userBankCardEndpoint.updateBankCard(id),data)
             return response
         }
         catch (error) {

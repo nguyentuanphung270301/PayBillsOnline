@@ -287,6 +287,7 @@ const MeterIndex = () => {
         else {
             console.log(res);
             toast.error('Xoá dữ liệu thất bại');
+            toast.error(res.error.sqlMessage);
             handleClose();
         }
     }
