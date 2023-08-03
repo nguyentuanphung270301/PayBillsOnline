@@ -223,11 +223,14 @@ const BillApproved = () => {
                     setBillList(res.data)
                     setIsLoading(false)
                 }
-                else if (filterBill === 'true'){
+                else if (filterBill === 'Đã duyệt') {
                     setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
                 }
-                else if(filterBill === 'false'){
+                else if (filterBill === 'Chưa duyệt') {
                     setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
+                }
+                else if (filterBill === 'Đã thanh toán') {
+                    setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
                 }
             }
             else {
@@ -283,9 +286,10 @@ const BillApproved = () => {
             <div className='filter-bill'>
                 <label>Lọc</label>
                 <select onChange={(e) => setFilterBill(e.target.value)}>
-                    <option value=''>----Chọn---</option>
-                    <option value='true' >Đã duyệt</option>
-                    <option value='false'>Chưa duyệt</option>
+                <option value=''>----Chọn---</option>
+                    <option value='Đã duyệt'>Đã duyệt</option>
+                    <option value='Chưa duyệt'>Chưa duyệt</option>
+                    <option value='Đã thanh toán'>Đã thanh toán</option>
                 </select>
             </div>
             <div className='bill-create-table'>

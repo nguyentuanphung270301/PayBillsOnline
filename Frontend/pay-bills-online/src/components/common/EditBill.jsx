@@ -275,7 +275,7 @@ const EditBill = ({ id, onClose }) => {
                                 return <option value={item.id} key={index}>Nhà cung cấp: {item.supplier_name}, Dịch vụ: {item.service_name}, Chỉ số: {item.meter_reading_old} - {item.meter_reading_new}, Giá: {formattedPrice(parseInt(price))} đ</option>
                             })}
                             {serviceList && checkService === 'false' && serviceList.map((item, index) => {
-                                return <option value={item.id} key={index}>Nhà cung cấp: {item.supplier_name}, Dịch vụ: {item.service_name}, Tên gói: {item.package_name}, Giá: {formattedPrice(item.price)} đ</option>
+                                return <option value={item.id} key={index}>Nhà cung cấp: {item.supplier_name}, Dịch vụ: {item.service_name}, Tên gói: {item.package_name}, Giá: {formattedPrice(parseInt(item.price))} đ</option>
                             })}
                         </select>
                     </div>

@@ -12,6 +12,8 @@ import { robotoNormal } from '../../assets/fonts/robotoNormal';
 import { robotoItalic } from '../../assets/fonts/robotoItalic';
 import { robotoBold } from '../../assets/fonts/robotoBold';
 import { robotoBoldItalic } from '../../assets/fonts/robotoBoldItalic';
+import emailApis from '../../api/modules/email.api';
+import { toast } from 'react-toastify';
 
 const PrintBill = () => {
     const [billInfo, setBillInfo] = useState('')
@@ -80,34 +82,63 @@ const PrintBill = () => {
         getBillInfo()
     }, [])
 
-    const handlePrint = () => {
+    const handlePrint = async () => {
         const doc = new jsPDF({
             unit: 'px',
             format: 'a4'
         });
-        const element = document.querySelector('.form-print-bill')
+        const element = document.querySelector('.form-print-bill');
 
-        doc.addFileToVFS('Roboto-Regular.tff', robotoNormal);
-        doc.addFont('Roboto-Regular.tff', 'Roboto', 'normal');
+        // Thêm font và tạo promise cho quá trình tạo và lưu PDF
+        const savePromise = new Promise((resolve) => {
+            doc.addFileToVFS('Roboto-Regular.tff', robotoNormal);
+            doc.addFont('Roboto-Regular.tff', 'Roboto', 'normal');
 
-        doc.addFileToVFS('Roboto-Italic.ttf', robotoItalic);
-        doc.addFont('Roboto-Italic.ttf', 'Roboto', 'italic');
+            doc.addFileToVFS('Roboto-Italic.ttf', robotoItalic);
+            doc.addFont('Roboto-Italic.ttf', 'Roboto', 'italic');
 
-        doc.addFileToVFS('Roboto-Bold.ttf', robotoBold);
-        doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+            doc.addFileToVFS('Roboto-Bold.ttf', robotoBold);
+            doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
 
-        doc.addFileToVFS('Roboto-Bolditalic.ttf', robotoBoldItalic);
-        doc.addFont('Roboto-Bolditalic.ttf', 'Roboto', 'bolditalic');
+            doc.addFileToVFS('Roboto-Bolditalic.ttf', robotoBoldItalic);
+            doc.addFont('Roboto-Bolditalic.ttf', 'Roboto', 'bolditalic');
 
-        doc.html(element, {
-            html2canvas: {
-                scale: [0.45],
-            },
-            callback: async (doc) => {
-                await doc.save(billInfo && `${billInfo.bill_id}/${billInfo.firstname}_${billInfo.lastname}`);
-            },
+            doc.html(element, {
+                html2canvas: {
+                    scale: [0.45],
+                },
+                callback: async (pdf) => {
+                    // Lưu tệp PDF và gọi hàm resolve() khi hoàn thành
+                    const filename = `${billInfo.bill_id}_${billInfo.firstname}_${billInfo.lastname}`;
+                    pdf.save(filename); // Không cần hỏi trước khi tải
+                    resolve();
+                },
+            });
         });
-    }
+
+        try {
+            // Đợi cho tác vụ tạo và lưu PDF hoàn thành
+            await savePromise;
+
+            // Đợi khoảng 10 giây trước khi gửi email
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+
+            const sendBillData = {
+                email: billInfo.email,
+                file_name: `${billInfo.bill_id}_${billInfo.firstname}_${billInfo.lastname}`
+            };
+
+            const res = await emailApis.sendBill(sendBillData);
+            if (res.success) {
+                toast.success('Hoá đơn được gửi đến email của bạn');
+            } else {
+                console.log(res);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
 
     return (
         <div className='main-print-bill'>
@@ -237,6 +268,21 @@ const PrintBill = () => {
                                 <label>Phương thức thanh toán:</label>
                                 <span>{billInfo && billInfo.payment_method}</span>
                             </div>
+                            {billInfo && billInfo.userbankcard_id !== null &&
+                                <div className='flex-group'>
+                                    <label>Ngân hàng:</label>
+                                    <span>{billInfo && billInfo.bank_name}</span>
+                                </div>}
+                            {billInfo && billInfo.userbankcard_id !== null &&
+                                <div className='flex-group'>
+                                    <label>Tên chủ thẻ:</label>
+                                    <span>{billInfo && billInfo.holder_name}</span>
+                                </div>}
+                            {billInfo && billInfo.userbankcard_id !== null &&
+                                <div className='flex-group'>
+                                    <label>Số tài khoản:</label>
+                                    <span>{billInfo && billInfo.card_number}</span>
+                                </div>}
                             <div className='flex-group'>
                                 <label>Mô tả thanh toán:</label>
                                 <span>{billInfo && billInfo.description}</span>
@@ -251,10 +297,10 @@ const PrintBill = () => {
                 <div className='footer-print-bill'>
                     <div>
                         <label>Thông tin liên hệ</label>
-                        <a href='https://www.facebook.com/ntp270301/'><FontAwesomeIcon icon={faFacebook} /> Facebook: Nguyễn Tuấn Phụng </a>
-                        <label><FontAwesomeIcon icon={faEnvelope} /> Email: nguyentuanphung270301@gmail.com</label>
-                        <label><FontAwesomeIcon icon={faPhone} /> Số điện thoại: 0828532784</label>
-                        <label><FontAwesomeIcon icon={faLocationDot} /> Địa chỉ: 97 Đ. Man Thiện, Hiệp Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh</label>
+                        <a href='https://www.facebook.com/ntp270301/'>Facebook: Nguyễn Tuấn Phụng </a>
+                        <label> Email: nguyentuanphung270301@gmail.com</label>
+                        <label>Số điện thoại: 0828532784</label>
+                        <label>Địa chỉ: 97 Đ. Man Thiện, Hiệp Phú, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh</label>
                     </div>
                     <label>THANK YOU</label>
                 </div>

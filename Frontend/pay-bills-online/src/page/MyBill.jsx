@@ -1,15 +1,13 @@
-import { faClipboardCheck, faFileCirclePlus, faPenToSquare, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import '../style/BillCreate.css'
+import '../style/MyBill.css'
 import PropTypes from 'prop-types';
-import billApis from '../api/modules/bill.api'
-import { addDays, format } from 'date-fns'
-import CreateBill from '../components/common/CreateBill'
-import { toast } from 'react-toastify'
-import EditBill from '../components/common/EditBill'
-import userApis from '../api/modules/user.api'
+import { addDays, format } from 'date-fns';
+import billApis from '../api/modules/bill.api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileInvoiceDollar, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
+import userApis from '../api/modules/user.api';
 
 
 function descendingComparator(a, b, orderBy) {
@@ -139,23 +137,28 @@ EnhancedTableHead.propTypes = {
 
 
 
-const BillCreate = () => {
+const MyBill = () => {
     const [billList, setBillList] = useState('')
     const [isLoading, setIsLoading] = useState(true)
-    const [open, setOpen] = useState(false);
-    const [selectedId, setSelectedId] = useState(null);
-    const [isRequest, setIsRequest] = useState(false)
-    const [filterBill, setFilterBill] = useState('')
+    const [userId, setUserId] = useState('')
 
+    const username = localStorage.getItem('username')
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [showCreateBill, setShowCreateBill] = useState(false);
-    const [showEditBill, setShowEditBill] = useState(false);
 
+    useEffect(() => {
+        const getUserInfo = async () => {
+            const res = await userApis.getUserByUsername(username)
+            if (res.success) {
+                setUserId(res.data.id);
+            }
+        }
+        getUserInfo()
+    }, [username])
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -194,38 +197,16 @@ const BillCreate = () => {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - billList.length) : 0;
 
-    const handleClickOpen = (id) => {
-        setSelectedId(id);
-        setOpen(true);
-    };
 
-    const handleClose = () => {
-        setSelectedId(null);
-        setOpen(false);
-    };
-    const handleEidt = (id) => {
-        setSelectedId(id)
-        setShowEditBill(true)
-    }
+
 
     useEffect(() => {
         const getBillList = async () => {
             const res = await billApis.getAll()
-            if (res.success && res) {
-                if (filterBill === '') {
-                    console.log(res)
-                    setBillList(res.data)
-                    setIsLoading(false)
-                }
-                else if (filterBill === 'Đã duyệt') {
-                    setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
-                }
-                else if (filterBill === 'Chưa duyệt') {
-                    setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
-                }
-                else if (filterBill === 'Đã thanh toán') {
-                    setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
-                }
+            if (res.success && res && userId) {
+                console.log(res)
+                setBillList(res.data.filter(bill => (bill.status === 'ĐÃ THANH TOÁN' && bill.user_id === userId)))
+                setIsLoading(false)
             }
             else {
                 console.log(res)
@@ -234,22 +215,9 @@ const BillCreate = () => {
             }
         }
         getBillList()
-    }, [isRequest, showCreateBill, showEditBill, filterBill])
+    }, [userId])
 
 
-    const deleteBill = async (id) => {
-        const res = await billApis.deleteBill(id)
-        if (res.success && res) {
-            toast.success("Xoá hoá đơn thành công")
-            setIsRequest(!isRequest)
-            handleClose()
-        }
-        else {
-            toast.error("Xoá hoá đơn thất bại")
-            console.log(res)
-            handleClose()
-        }
-    }
 
     const formatDate = (date) => {
         const increasedDate = addDays(new Date(date), 0);
@@ -261,27 +229,16 @@ const BillCreate = () => {
 
         return formattedBalance;
     }
-
     return (
-        <div className='main-bill'>
+        <div className='main-my-bill'>
             <Typography sx={{
                 color: '#0057da',
                 margin: '20px',
                 fontSize: '25px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-            }}>Tạo hoá đơn</Typography>
-            <div className='filter-bill'>
-                <label>Lọc</label>
-                <select onChange={(e) => setFilterBill(e.target.value)}>
-                    <option value=''>----Chọn---</option>
-                    <option value='Đã duyệt'>Đã duyệt</option>
-                    <option value='Chưa duyệt'>Chưa duyệt</option>
-                    <option value='Đã thanh toán'>Đã thanh toán</option>
-                </select>
-            </div>
-            <button className='btn-create-bill' onClick={() => setShowCreateBill(true)} ><FontAwesomeIcon icon={faFileCirclePlus} />Tạo hoá đơn</button>
-            <div className='bill-create-table'>
+            }}>Hoá đơn của tôi</Typography>
+            <div className='my-bill-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
                     top: '200px',
@@ -334,7 +291,7 @@ const BillCreate = () => {
                                                             borderRadius: '5px',
                                                             fontweight: '700',
                                                             color: 'white',
-                                                            backgroundColor: row.status === 'CHƯA DUYỆT' ? 'red' : row.status === 'CHỜ THANH TOÁN' ? '#ffa900' : row.status === 'ĐÃ THANH TOÁN' ? '#22dc00' : '',
+                                                            backgroundColor: '#22dc00',
                                                             fontSize: '15px',
                                                         }}>
                                                             {row.status}
@@ -345,58 +302,23 @@ const BillCreate = () => {
                                                         display: 'flex',
                                                         justifyItems: 'center',
                                                     }}>
-                                                        <Button
-                                                            variant='contained'
-                                                            sx={{
-                                                                marginRight: '10px',
-                                                                height: '40px'
-                                                            }}
-                                                            disabled={row.status === 'CHƯA DUYỆT' ? false : true}
-                                                            onClick={() => handleEidt(row.id)}
-                                                        ><FontAwesomeIcon icon={faPenToSquare} /></Button>
                                                         <Box>
-                                                            <Button
-                                                                variant='contained'
-                                                                sx={{
-                                                                    backgroundColor: 'red',
-                                                                    height: '40px',
-                                                                    ":hover": {
-                                                                        backgroundColor: 'red',
-                                                                        opacity: 0.8
-                                                                    }
-                                                                }}
-                                                                disabled={row.status === 'CHƯA DUYỆT' ? false : true}
-                                                                onClick={() => handleClickOpen(row.id)}
-                                                            >
-                                                                <FontAwesomeIcon icon={faTrash} />
-                                                            </Button>
-                                                            <Dialog
-                                                                open={open}
-                                                                onClose={handleClose}
-                                                            >
-                                                                <DialogTitle>Xoá Hoá Đơn</DialogTitle>
-                                                                <DialogContent>
-                                                                    <DialogContentText>
-                                                                        Bạn có muốn xoá hoá đơn này không
-                                                                    </DialogContentText>
-                                                                </DialogContent>
-                                                                <DialogActions>
-                                                                    <Button onClick={handleClose}>Cancel</Button>
-                                                                    <Button
-                                                                        onClick={() => deleteBill(selectedId)}
-                                                                        sx={{
-                                                                            backgroundColor: 'white',
-                                                                            ":hover": {
-                                                                                backgroundColor: 'red',
-                                                                                opacity: 0.8,
-                                                                                color: 'white'
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        Xoá
-                                                                    </Button>
-                                                                </DialogActions>
-                                                            </Dialog>
+                                                            {row.status === 'ĐÃ THANH TOÁN' && <Link to={`/mainpage/print-bill/${row.id}`}>
+                                                                <Button
+                                                                    variant='contained'
+                                                                    sx={{
+                                                                        backgroundColor: '#ff1616',
+                                                                        height: '40px',
+                                                                        width: '100px',
+                                                                        ":hover": {
+                                                                            backgroundColor: '#ff4516',
+                                                                            opacity: 0.8
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <FontAwesomeIcon icon={faPrint} />
+                                                                </Button>
+                                                            </Link>}
                                                         </Box>
                                                     </TableCell>
                                                 </TableRow>
@@ -423,10 +345,8 @@ const BillCreate = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showCreateBill && <CreateBill onClose={() => setShowCreateBill(false)} />}
-            {showEditBill && <EditBill id={selectedId} onClose={() => setShowEditBill(false)} />}
         </div>
     )
 }
 
-export default BillCreate 
+export default MyBill

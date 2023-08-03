@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../../style/Navbar.css'
 import { Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv, faShieldHalved, faUsers, faUnlockKeyhole, faFileMedical, faFileCircleCheck, faCashRegister, faCreditCard, faListCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretLeft, faClipboardUser, faLock, faArrowRightToBracket, faChevronLeft, faChevronRight, faHouse, faMoneyCheckDollar, faFileInvoice, faServer, faWrench, faUser, faBuilding, faMicrochip, faKeyboard, faBolt, faTv, faShieldHalved, faUsers, faUnlockKeyhole, faFileMedical, faFileCircleCheck, faCashRegister, faCreditCard, faListCheck, faChartPie } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import userApis from '../../api/modules/user.api';
@@ -39,18 +39,28 @@ const Navbar = () => {
             if (res.success && res) {
                 console.log(res);
                 const rolecodes = new Set();
-                const screencodes = [];
                 const filteredData = res.data.filter((item) => {
                     if (!rolecodes.has(item.rolecode)) {
                         rolecodes.add(item.rolecode);
-                        screencodes.push(item.screencode);
                         return true;
                     }
                     return false;
                 });
-
-                setListRoleUsers(screencodes)
                 setUserInfo(filteredData);
+
+                // Tạo một mảng để lưu trữ các giá trị screencode
+                const screencodes = [];
+
+                // Lặp qua mỗi đối tượng trong res.data và kiểm tra xem có thêm screencode mới hay không
+                res.data.forEach((item) => {
+                    const { screencode } = item;
+                    if (!screencodes.includes(screencode)) {
+                        screencodes.push(screencode);
+                    }
+                });
+                // Lưu mảng screencodes vào state
+                setListRoleUsers(screencodes);
+
             } else {
                 console.log(res);
             }
@@ -163,7 +173,7 @@ const Navbar = () => {
                             <FontAwesomeIcon icon={faHouse} className={`${openMenu ? '' : 'icon-close'}`} />
                             {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
                         </li>
-                        {listRoleUsers.includes('Full_Admin') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_User') || listRoleUsers.includes('Admin_Supplier') || listRoleUsers.includes('Admin_Service')) && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenAdmin(!isOpenAdmin)}>
                                     <FontAwesomeIcon icon={faServer} className={`${openMenu ? '' : 'icon-close'}`} />
@@ -191,7 +201,7 @@ const Navbar = () => {
                                 </ul>}
                             </div>
                         </li>}
-                        {listRoleUsers.includes('Full_Admin') && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenWrite ? 'open' : ''}`}`}>
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Writing') || listRoleUsers.includes('Writing_Meter') || listRoleUsers.includes('Writing_Cab')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenWrite ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenWrite(!isOpenWrite)}>
                                     <FontAwesomeIcon icon={faKeyboard} className={`${openMenu ? '' : 'icon-close'}`} />
@@ -213,7 +223,7 @@ const Navbar = () => {
                                 </ul>}
                             </div>
                         </li>}
-                        {listRoleUsers.includes('Full_Admin') && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAuth ? 'open' : ''}`}`}>
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_Role') || listRoleUsers.includes('Role_Screen') || listRoleUsers.includes('User_Role')) && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAuth ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenAuth(!isOpenAuth)}>
                                     <FontAwesomeIcon icon={faWrench} className={`${openMenu ? '' : 'icon-close'}`} />
@@ -248,7 +258,7 @@ const Navbar = () => {
                             </li>
                         </Link>}
 
-                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenBill ? 'open' : ''}`}`}>
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill') || listRoleUsers.includes('Bill_Create') || listRoleUsers.includes('Bill_Approved') || listRoleUsers.includes('User_Payment')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenBill ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenBill(!isOpenBill)}>
                                     <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
@@ -276,20 +286,20 @@ const Navbar = () => {
                                 </ul>}
                             </div>
                         </li>}
-                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Full_Bill')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenPaymentBill ? 'open' : ''}`}`}>
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Bill_Customer') || listRoleUsers.includes('Payment_Bill') || listRoleUsers.includes('Bill_List')) && <li className={`write-menu ${openMenu ? 'close' : `ul ${isOpenPaymentBill ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenPaymentBill(!isOpenPaymentBill)}>
                                     <FontAwesomeIcon icon={faFileInvoice} className={`${openMenu ? '' : 'icon-close'}`} />
                                     {!openMenu ? <span style={{ marginLeft: '10px' }}>Hoá đơn</span> : <span></span>}
                                 </div>
                                 {!openMenu && <ul className={`${isOpenPaymentBill ? 'open' : ''}`}>
-                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Payment_Bill') || listRoleUsers.includes('Bill_Create')) && <Link to='/mainpage/payment-online' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Payment_Bill') || listRoleUsers.includes('Bill_Customer')) && <Link to='/mainpage/payment-online' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faCreditCard} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Thanh toán hoá đơn</span>
                                         </li>
                                     </Link>}
-                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Bill_List') || listRoleUsers.includes('Bill_Approved')) && <Link to='/mainpage/bill-approved' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Bill_List') || listRoleUsers.includes('Bill_Customer')) && <Link to='/mainpage/my-bill' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
                                             <FontAwesomeIcon icon={faListCheck} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Hoá đơn của tôi</span>
@@ -298,6 +308,12 @@ const Navbar = () => {
                                 </ul>}
                             </div>
                         </li>}
+                        {listRoleUsers.includes('Full_Admin') && <Link to='/mainpage/' style={{ textDecoration: 'none', color: 'white' }}>
+                            <li className={`li-menu ${openMenu ? 'close' : ''}`}>
+                                <FontAwesomeIcon icon={faChartPie} className={`${openMenu ? '' : 'icon-close'}`} />
+                                {!openMenu ? <span style={{ marginLeft: '10px' }}>Báo cáo & Thống kê</span> : <span></span>}
+                            </li>
+                        </Link>}
                     </ul>
                 </div>
             </div>

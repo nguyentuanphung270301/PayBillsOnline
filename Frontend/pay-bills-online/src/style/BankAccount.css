@@ -165,7 +165,7 @@
         align-items: center;
 
         .right-top-bank-account {
-            width: 96%;
+            width: 98%;
             height: 46%;
             background-color: rgb(255, 255, 255);
             margin-bottom: 20px;
@@ -211,10 +211,20 @@
         }
 
         .right-bottom-bank-account {
-            width: 96%;
-            height: 46%;
-            background-color: rgb(255, 106, 106);
+            width: 98%;
+            height: 60%;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
             border-radius: 10px;
+        }
+        .right-bottom-bank-account>label {
+            margin: 10px 0 0 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .table-transaction {
+            width: 100%;
         }
     }
 

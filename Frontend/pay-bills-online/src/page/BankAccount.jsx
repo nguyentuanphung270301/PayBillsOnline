@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import '../style/BankAccount.css'
-import { Avatar, Typography } from '@mui/material'
+import { Avatar, Box, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TableSortLabel, Typography } from '@mui/material'
 import userApis from '../api/modules/user.api'
 import userBankCardApis from '../api/modules/userbankcard.api'
 import ItemBankAccount from '../components/common/ItemBankAccount'
@@ -9,6 +9,117 @@ import { faPlus, faTrash, faCircleInfo, faBuildingColumns, faCreditCard, faBarco
 import { toast } from 'react-toastify'
 import AddBankCard from '../components/common/AddBankCard'
 import { addDays, format } from 'date-fns'
+import PropTypes from 'prop-types';
+import userBankCardTransactionApis from '../api/modules/userbankcardtransaction.api'
+
+
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
+const headCells = [
+  {
+    id: 'id',
+    numberic: true,
+    disablePadding: true,
+    label: 'Mã Giao Dịch'
+  },
+  {
+    id: 'transaction_type',
+    numberic: false,
+    disablePadding: true,
+    label: 'Loại giao dịch'
+  },
+  {
+    id: 'amount',
+    numberic: false,
+    disablePadding: true,
+    label: 'Số tiền giao dịch'
+  },
+  {
+    id: 'transaction_date',
+    numberic: false,
+    disablePadding: true,
+    label: 'Ngày giao dịch'
+  },
+  {
+    id: 'description',
+    numberic: false,
+    disablePadding: true,
+    label: 'Nội dung giao dịch'
+  }
+]
+
+function EnhancedTableHead(props) {
+  const { order, orderBy, onRequestSort } =
+    props;
+  const createSortHandler = (property) => (event) => {
+    onRequestSort(event, property);
+  };
+
+  return (
+    <TableHead>
+      <TableRow sx={{ backgroundColor: '#54afff'}}>
+        {headCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            sortDirection={orderBy === headCell.id ? order : false}
+            sx={{
+              fontSize: '16px',
+               
+              fontweight: '600'
+            }}
+          >
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box component="span">
+                  {order === 'desc' ? '' : ''}
+                </Box>
+              ) : null}
+            </TableSortLabel>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+}
+
+EnhancedTableHead.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+  onRequestSort: PropTypes.func.isRequired,
+  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  orderBy: PropTypes.string.isRequired,
+  rowCount: PropTypes.number.isRequired,
+};
 
 const BankAccount = () => {
 
@@ -21,6 +132,51 @@ const BankAccount = () => {
   const [isOpenForm, setIsOpenForm] = useState({});
   const [bankInfo, setBankInfo] = useState('')
   const [showBlurOverlay, setShowBlurOverlay] = useState(false);
+  const [transactionList, setTransactionList] = useState('')
+
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('calories');
+  const [selected, setSelected] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+
+  const handleClick = (event, name) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
+    setSelected(newSelected);
+  };
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - transactionList.length) : 0;
 
   useEffect(() => {
     const getListBankCard = async () => {
@@ -44,6 +200,8 @@ const BankAccount = () => {
     getListBankCard()
   }, [username, isLoading, isShowAddCard])
 
+
+
   const handleDelete = async (id) => {
     setSelectedCardId(id);
     setShowDeleteConfirmation(true);
@@ -56,6 +214,14 @@ const BankAccount = () => {
     if (response.success && response) {
       setBankInfo(response.data)
       console.log(response)
+      const transactionRes = await userBankCardTransactionApis.getAll()
+      if (transactionRes.success && transactionRes) {
+        console.log(transactionRes)
+        setTransactionList(transactionRes.data.filter(transaction => transaction.usercardbank_id === id))
+      }
+      else {
+        console.log(transactionRes)
+      }
     }
     else {
       console.log(response)
@@ -66,6 +232,11 @@ const BankAccount = () => {
   const formattedDate = (date) => {
     const increasedDate = addDays(new Date(date), 0);
     const formattedDate = format(increasedDate, 'dd/MM/yyyy');
+    return formattedDate;
+  }
+  const formattedDateTrans = (date) => {
+    const increasedDate = addDays(new Date(date), 0);
+    const formattedDate = format(increasedDate, 'dd-MM-yyyy HH:mm:ss');
     return formattedDate;
   }
   const formattedBalance = (balance) => {
@@ -84,6 +255,7 @@ const BankAccount = () => {
       } else {
         console.log(res);
         toast.error('Xoá thẻ thất bại');
+        toast.error(res.error.sqlMessage);
       }
     }
     setShowDeleteConfirmation(false);
@@ -180,7 +352,70 @@ const BankAccount = () => {
         </div>
 
         <div className='right-bottom-bank-account'>
-
+          <div className='table-transaction'>
+            {isLoading && <CircularProgress sx={{
+              position: 'absolute',
+              top: '200px',
+              right: 'calc(100% / 2)'
+            }} />}
+            {!isLoading && (
+              <>
+                <TableContainer component={Paper} sx={{ height: '300px', }}>
+                  <Table aria-labelledby="tableTitle">
+                    <EnhancedTableHead
+                      numSelected={selected.length}
+                      order={order}
+                      orderBy={orderBy}
+                      onRequestSort={handleRequestSort}
+                      rowCount={transactionList.length}
+                    />
+                    {!transactionList ? <Typography sx={{
+                      position: 'absolute',
+                      top: '200px',
+                      left: '20%',
+                    }} >Không có dữ liệu</Typography> : <TableBody>
+                      {stableSort(transactionList, getComparator(order, orderBy))
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((row, index) => {
+                          return (
+                            <TableRow
+                              hover
+                              onClick={(event) => handleClick(event, row.id)}
+                              tabIndex={-1}
+                              key={row.id}
+                            >
+                              <TableCell
+                              >
+                                {row.id}
+                              </TableCell>
+                              <TableCell >{row.transaction_type}</TableCell>
+                              <TableCell >{formattedBalance(row.amount)} đ</TableCell>
+                              <TableCell >{formattedDateTrans(row.transaction_date)}</TableCell>
+                              <TableCell>{row.description}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      {emptyRows > 0 && (
+                        <TableRow
+                        >
+                          <TableCell colSpan={6} />
+                        </TableRow>
+                      )}
+                    </TableBody>}
+                  </Table>
+                </TableContainer>
+              </>
+            )}
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={transactionList.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </div>
         </div>
       </div>
       {showBlurOverlay && <div className='blur-overlay'></div>}

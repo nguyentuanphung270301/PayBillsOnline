@@ -5,6 +5,7 @@ const cors = require('cors');
 const port = 5000;
 const sendMail = require('./src/services/email.service')
 const sendEmailContacts = require('./src/services/sendEmailContact.service')
+const sendBill = require('./src/services/emailBill.service')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -52,7 +53,7 @@ app.post('/api/sendmailpasswords', async (req, res) => {
     res.status(200).json({ success: true, message: 'Mật khẩu mới đã được gửi đế mail của bạn' })
   }
   catch (error) {
-    res.status(500).json({success: false, error: error})
+    res.status(500).json({ success: false, error: error })
   }
 })
 
@@ -72,6 +73,22 @@ app.post('/api/sendmailcontact', async (req, res) => {
     catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
+  }
+})
+
+app.post('/api/sendbill', async (req, res) => {
+  const { email, file_name } = req.body;
+  try {
+    const send_to = email
+    const send_from = 'nguyentuanphung270301@gmail.com'
+    const subject = 'GỬI HOÁ ĐƠN ĐIỆN TỬ'
+    const filename = file_name
+    await sendBill(subject, send_to, send_from, filename)
+    console.log(res)
+    res.status(200).json({ success: true, message: 'Email Sent' })
+  }
+  catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 })
 

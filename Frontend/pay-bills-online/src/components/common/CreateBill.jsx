@@ -42,7 +42,7 @@ const CreateBill = ({ onClose }) => {
                 setBillList(res.data)
             }
             else {
-                setBillList('');
+                setBillList([]);
                 console.log(res)
             }
         }

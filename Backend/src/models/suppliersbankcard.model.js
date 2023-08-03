@@ -22,12 +22,12 @@ SupplierBankCard.getAll = function (callback) {
 }
 
 SupplierBankCard.getById = function (id, callback) {
-    db.query('SELECT * FROM suppliersbankcards WHERE id =?', [id], (err, results) => {
+    db.query('SELECT * FROM suppliersbankcards WHERE supplier_id =?', [id], (err, results) => {
         if (err) {
             callback(err, null);
         } else {
             if (results.length > 0) {
-                callback(null, results)
+                callback(null, results[0])
             }
             if (results.length == 0) {
                 callback(`Không tìm thấy cards với id: ${id}`)
@@ -36,8 +36,8 @@ SupplierBankCard.getById = function (id, callback) {
     });
 }
 
-SupplierBankCard.createCard = function(cardData, callback) {
-    const {balance, supplier_id} = cardData
+SupplierBankCard.createCard = function (cardData, callback) {
+    const { balance, supplier_id } = cardData
     db.query('INSERT INTO suppliersbankcards (balance, supplier_id) VALUES (?,?)', [balance, supplier_id], (err, results) => {
         if (err) {
             callback(err, null);
@@ -48,19 +48,18 @@ SupplierBankCard.createCard = function(cardData, callback) {
     })
 }
 
-SupplierBankCard.updateCard = function(id, cardData, callback) {
-    const {balance, supplier_id} = cardData
-    db.query('UPDATE suppliersbankcards SET balance =?, supplier_id =? WHERE id =?', [balance, supplier_id, id], (err, results) => {
+SupplierBankCard.updateCard = function (id, cardData, callback) {
+    const { balance } = cardData;
+    db.query('UPDATE suppliersbankcards SET balance = ? WHERE supplier_id = ?', [balance, id], (err, results) => {
         if (err) {
             callback(err, null);
-        }
-        else {
+        } else {
             this.getById(id, callback);
         }
-    })
-}
+    });
+};
 
-SupplierBankCard.deleteCard = function(id, callback) {
+SupplierBankCard.deleteCard = function (id, callback) {
     db.query('DELETE FROM suppliersbankcards WHERE id =?', [id], (err, results) => {
         if (err) {
             callback(err, null);
@@ -71,7 +70,7 @@ SupplierBankCard.deleteCard = function(id, callback) {
     })
 }
 
-SupplierBankCard.deleteCardBySupplierId = function(supplier_id, callback) {
+SupplierBankCard.deleteCardBySupplierId = function (supplier_id, callback) {
     db.query('DELETE FROM suppliersbankcards WHERE supplier_id =?', [supplier_id], (err, results) => {
         if (err) {
             callback(err, null);

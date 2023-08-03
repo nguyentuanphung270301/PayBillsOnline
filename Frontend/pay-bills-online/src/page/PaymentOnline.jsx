@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBarcode, faBuildingColumns, faCalendarXmark, faCreditCard, faDollarSign, faUser } from '@fortawesome/free-solid-svg-icons'
 import paymentApis from '../api/modules/payment.api'
 import userBankCardTransactionApis from '../api/modules/userbankcardtransaction.api'
+import SupplierBankCardApis from '../api/modules/supplierbankcard.api'
 
 const PaymentOnline = () => {
 
@@ -266,6 +267,7 @@ const PaymentOnline = () => {
         var isSubmitSuccessful = false
 
         var newBalance = 0
+
         var amount = 0
         if (check === 'true') {
             amount = selectedInfo.price * (selectedInfo.meter_reading_new - selectedInfo.meter_reading_old)
@@ -295,6 +297,8 @@ const PaymentOnline = () => {
                 status: 'ĐÃ THANH TOÁN'
             }
 
+
+
             const paymentData = {
                 payment_date: currentTime,
                 payment_method: 'Thanh toán online',
@@ -314,33 +318,50 @@ const PaymentOnline = () => {
                 description: description,
                 usercardbank_id: selectedBank.id
             }
-
             const cardRes = await userBankCardApis.updateBankCard(selectedBank.id, bankCardData)
             if (cardRes.success && cardRes) {
                 console.log(cardRes)
-                const transactionRes = await userBankCardTransactionApis.createBankCard(bankCardTransactionData)
-                if (transactionRes.success) {
-                    const paymentRes = await paymentApis.createPayment(paymentData)
-                    if (paymentRes.success && paymentRes) {
-                        const billRes = await billApis.updateStatusBillPayment(billId, billData)
-                        if (billRes.success && billRes) {
-                            toast.success('Thanh toán hoá đơn thành công')
-                            setSelectedInfo('')
-                            setSelectedBank('')
-                            setIsLoading(false)
+                const getSupplierById = await SupplierBankCardApis.getById(selectedInfo.supplier_id)
+                if (getSupplierById.success && getSupplierById) {
+                    const newSupplierBalance = getSupplierById.data.balance + amount
+                    const supplierData = {
+                        balance: newSupplierBalance
+                    }
+                    console.log(supplierData)
+                    const supplierCardRes = await SupplierBankCardApis.updateSupplierBankCard(selectedInfo.supplier_id, supplierData)
+                    if (supplierCardRes.success && supplierCardRes) {
+                        const transactionRes = await userBankCardTransactionApis.createBankCard(bankCardTransactionData)
+                        if (transactionRes.success) {
+                            const paymentRes = await paymentApis.createPayment(paymentData)
+                            if (paymentRes.success && paymentRes) {
+                                const billRes = await billApis.updateStatusBillPayment(billId, billData)
+                                if (billRes.success && billRes) {
+                                    toast.success('Thanh toán hoá đơn thành công')
+                                    setSelectedInfo('')
+                                    setUserId('')
+                                    setSelectedBank('')
+                                    setIsLoading(false)
+                                }
+                                else {
+                                    console.log(billRes)
+                                    toast.error('Thanh toán hoá đơn thất bại')
+                                }
+                            }
+                            else {
+                                console.log(paymentRes)
+                            }
+
                         }
                         else {
-                            console.log(billRes)
-                            toast.error('Thanh toán hoá đơn thất bại')
+                            console.log(transactionRes)
                         }
                     }
                     else {
-                        console.log(paymentRes)
+                        console.log(supplierCardRes)
                     }
-
                 }
                 else {
-                    console.log(transactionRes)
+                    console.log(getSupplierById)
                 }
             }
             else {
@@ -355,7 +376,7 @@ const PaymentOnline = () => {
                 <div className='top-left-payment-online'>
                     <div className='flex-row-group'>
                         <label>Mã khách hàng</label>
-                        <input type='text' placeholder='Nhập mã khách hàng' onChange={(e) => setUserId(e.target.value)} />
+                        <input type='text' placeholder='Nhập mã khách hàng' onChange={(e) => setUserId(e.target.value)} value={userId || ''}/>
                     </div>
                     <div className='flex-row-group'>
                         <label>Loại dịch vụ</label>

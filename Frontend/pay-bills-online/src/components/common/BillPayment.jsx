@@ -8,6 +8,7 @@ import { addDays, format } from 'date-fns'
 import userApis from '../../api/modules/user.api'
 import { toast } from 'react-toastify'
 import paymentApis from '../../api/modules/payment.api'
+import SupplierBankCardApis from '../../api/modules/supplierbankcard.api'
 
 const BillPayment = ({ id, onClose, check }) => {
 
@@ -119,23 +120,38 @@ const BillPayment = ({ id, onClose, check }) => {
             userbankcard_id: null
         }
 
-        const billRes = await billApis.updateStatusBillPayment(id, billData)
-        if (billRes.success && billRes) {
-            const paymentRes = await paymentApis.createPayment(paymentData)
-            if (paymentRes.success && paymentRes) {
-                toast.success('Thanh toán hoá đơn thành công')
-                onClose()
+        const supplierRes = await SupplierBankCardApis.getById(billInfo.supplier_id)
+        if (supplierRes.success) {
+            const newSupplierBalance = supplierRes.data.balance + billInfo.amount
+            const supplierData = {
+                balance: newSupplierBalance
+            }
+            const res = await SupplierBankCardApis.updateSupplierBankCard(billInfo.supplier_id, supplierData)
+            if (res.success) {
+                const billRes = await billApis.updateStatusBillPayment(id, billData)
+                if (billRes.success && billRes) {
+                    const paymentRes = await paymentApis.createPayment(paymentData)
+                    if (paymentRes.success && paymentRes) {
+                        toast.success('Thanh toán hoá đơn thành công')
+                        onClose()
+                    }
+                    else {
+                        toast.error('Thanh toán hoá đơn thất bại')
+                        console.log(paymentRes)
+                        onClose()
+                    }
+                }
+                else {
+                    console.log(billRes)
+                }
             }
             else {
-                toast.error('Thanh toán hoá đơn thất bại')
-                console.log(paymentRes)
-                onClose()
+                console.log(res)
             }
         }
         else {
-            console.log(billRes)
+            console.log(supplierRes)
         }
-
     }
 
     return (

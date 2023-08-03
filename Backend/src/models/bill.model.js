@@ -17,6 +17,7 @@ Bill.getAll = function (callback) {
   const query = `
     SELECT 
     bills.id, 
+    bills.user_id,
     bills.due_date, 
     bills.amount, 
     bills.status,
@@ -25,7 +26,8 @@ Bill.getAll = function (callback) {
     users.firstname, 
     users.lastname,
     services.name as service_name, 
-    suppliers.name as supplier_name
+    suppliers.name as supplier_name,
+    payment.payment_method
   FROM 
     bills
   INNER JOIN 
@@ -38,6 +40,8 @@ Bill.getAll = function (callback) {
     services ON meterindex.service_id = services.id
   INNER JOIN 
     suppliers ON services.supplier_id = suppliers.id
+  LEFT JOIN 
+    payment ON bills.id = payment.bill_id
   WHERE 
     bills.cab_id IS NULL
   
@@ -45,6 +49,7 @@ Bill.getAll = function (callback) {
   
   SELECT 
     bills.id, 
+    bills.user_id,
     bills.due_date, 
     bills.amount, 
     bills.status,
@@ -53,7 +58,8 @@ Bill.getAll = function (callback) {
     users.firstname, 
     users.lastname,
     services.name as service_name, 
-    suppliers.name as supplier_name
+    suppliers.name as supplier_name,
+    payment.payment_method
   FROM 
     bills
   INNER JOIN 
@@ -66,6 +72,8 @@ Bill.getAll = function (callback) {
     services ON cabletv.service_id = services.id
   INNER JOIN 
     suppliers ON services.supplier_id = suppliers.id
+   LEFT JOIN 
+    payment ON bills.id = payment.bill_id
   WHERE 
     bills.meter_id IS NULL;
     `;
@@ -98,7 +106,7 @@ Bill.getAllBill = function (callback) {
 }
 
 Bill.getServiceByUserId = function (id, callback) {
-  db.query(`Select meterindex.* , services.name as service_name, services.price , suppliers.name as supplier_name
+  db.query(`Select meterindex.* , services.name as service_name, services.price , suppliers.name as supplier_name, suppliers.id as supplier_id
   from meterindex
   inner join 
   services on meterindex.service_id = services.id
@@ -140,16 +148,21 @@ Bill.getBillMeterById = function (id, callback) {
   services.name AS service_name,
   services.price AS service_price,
   suppliers.name AS supplier_name,
+  suppliers.id AS supplier_id,
   payment.payment_date,
   payment.payment_method,
   payment.description,
-  payment.userbankcard_id
+  payment.userbankcard_id,
+  userbankcard.bank_name,
+  userbankcard.card_number,
+  userbankcard.holder_name
 FROM bills
 LEFT JOIN users ON bills.user_id = users.id
 LEFT JOIN meterindex ON bills.meter_id = meterindex.id
 LEFT JOIN services ON meterindex.service_id = services.id
 LEFT JOIN suppliers ON services.supplier_id = suppliers.id
 LEFT JOIN payment ON payment.bill_id = bills.id
+LEFT JOIN userbankcard ON userbankcard.id = payment.userbankcard_id
 WHERE bills.meter_id IS NOT NULL AND bills.id = ${id}`, (err, results) => {
     if (err) {
       callback(err, null);
@@ -186,16 +199,21 @@ Bill.getBillCabById = function (id, callback) {
   services.name AS service_name,
   services.price AS service_price,
   suppliers.name AS supplier_name,
+  suppliers.id AS supplier_id,
   payment.payment_date,
   payment.payment_method,
   payment.description,
-  payment.userbankcard_id
+  payment.userbankcard_id,
+  userbankcard.bank_name,
+  userbankcard.card_number,
+  userbankcard.holder_name
 FROM bills
 LEFT JOIN users ON bills.user_id = users.id
 LEFT JOIN cabletv ON bills.cab_id = cabletv.id
 LEFT JOIN services ON cabletv.service_id = services.id
 LEFT JOIN suppliers ON services.supplier_id = suppliers.id
 LEFT JOIN payment ON payment.bill_id = bills.id
+LEFT JOIN userbankcard ON userbankcard.id = payment.userbankcard_id
 WHERE bills.cab_id IS NOT NULL AND bills.id = ${id}`, (err, results) => {
     if (err) {
       callback(err, null);
@@ -211,7 +229,7 @@ WHERE bills.cab_id IS NOT NULL AND bills.id = ${id}`, (err, results) => {
 }
 
 Bill.getCableByUserId = function (id, callback) {
-  db.query(`Select cabletv.* , services.name as service_name , suppliers.name as supplier_name
+  db.query(`Select cabletv.* , services.name as service_name , suppliers.name as supplier_name, suppliers.id as supplier_id
   from cabletv
   inner join 
   services on cabletv.service_id = services.id

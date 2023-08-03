@@ -13,9 +13,9 @@ exports.getAll = (req, res) => {
 exports.getById = (req, res) => {
     SupplierBankCard.getById(req.params.id, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }
@@ -37,15 +37,15 @@ exports.createCard = (req, res) => {
 }
 
 exports.updateCard = (req, res) => {
-    const { balance, supplier_id } = req.body;
-    if (!balance ||!supplier_id) {
-        res.status(400).send({ message: 'Vui lòng điền đầy đủ thông tin.' });
+    const { balance} = req.body;
+    const newCard = {
+        balance: balance
     }
     SupplierBankCard.updateCard(req.params.id, newCard, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({error: err, success: false});
         } else {
-            res.status(200).send(data);
+            res.status(200).send({data: data, success: true});
         }
     })
 }

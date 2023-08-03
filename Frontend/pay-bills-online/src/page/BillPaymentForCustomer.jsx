@@ -147,6 +147,7 @@ const BillPaymentForCustomer = () => {
     const [openBillPayment, setOpenBillPayment] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [isRequest, setIsRequest] = useState(false)
+    const [filterBill, setFilterBill] = useState('')
 
     const [checkBill, setCheckBill] = useState(false)
 
@@ -216,9 +217,17 @@ const BillPaymentForCustomer = () => {
         const getBillList = async () => {
             const res = await billApis.getAll()
             if (res.success && res) {
-                console.log(res)
-                setBillList(res.data.filter(bill => bill.status === 'CHỜ THANH TOÁN' || bill.status === 'ĐÃ THANH TOÁN'))
-                setIsLoading(false)
+                if (filterBill === '') {
+                    console.log(res)
+                    setBillList(res.data.filter(bill => (bill.status === 'CHỜ THANH TOÁN' || bill.status === 'ĐÃ THANH TOÁN')))
+                    setIsLoading(false)
+                }
+                else if (filterBill === 'Đã duyệt') {
+                    setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
+                }
+                else if (filterBill === 'Đã thanh toán') {
+                    setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
+                }
             }
             else {
                 console.log(res)
@@ -227,7 +236,7 @@ const BillPaymentForCustomer = () => {
             }
         }
         getBillList()
-    }, [isRequest, openBillPayment])
+    }, [isRequest, openBillPayment, filterBill])
 
 
 
@@ -251,6 +260,14 @@ const BillPaymentForCustomer = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Thanh toán hoá đơn</Typography>
+            <div className='filter-bill'>
+                <label>Lọc</label>
+                <select onChange={(e) => setFilterBill(e.target.value)}>
+                    <option value=''>----Chọn---</option>
+                    <option value='Đã duyệt'>Đã duyệt</option>
+                    <option value='Đã thanh toán'>Đã thanh toán</option>
+                </select>
+            </div>
             <div className='bill-create-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
