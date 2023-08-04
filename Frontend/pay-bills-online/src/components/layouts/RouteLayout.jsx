@@ -1,6 +1,5 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Redirect, Routes } from 'react-router-dom';
-import HomePage from '../../page/HomePage';
 import Navbar from '../common/Navbar';
 import ChangPassword from '../../page/ChangPassword';
 import UserInfo from '../../page/UserInfo';
@@ -19,6 +18,8 @@ import BillPaymentForCustomer from '../../page/BillPaymentForCustomer';
 import PrintBill from '../common/PrintBill';
 import PaymentOnline from '../../page/PaymentOnline';
 import MyBill from '../../page/MyBill';
+import Report from '../../page/Report';
+import Home from '../../page/Home';
 
 
 const RouteLayout = () => {
@@ -26,7 +27,6 @@ const RouteLayout = () => {
     <div>
       <Navbar />
       <Routes>
-        {/* <Route path='/homepage' element={<HomePage />} /> */}
         <Route path='/changepassword' element={<ChangPassword />} />
         <Route path='/info' element={<UserInfo />} />
         <Route path='/bankaccount' element={<BankAccount/>} />
@@ -44,6 +44,8 @@ const RouteLayout = () => {
         <Route path='/print-bill/:id' element={<PrintBill/>} />
         <Route path='/payment-online' element={<PaymentOnline/>} />
         <Route path='/my-bill' element={<MyBill/>} />
+        <Route path='/report' element={<Report/>} />
+        <Route path='/home' element={<Home/>} />
       </Routes>
     </div>
   )

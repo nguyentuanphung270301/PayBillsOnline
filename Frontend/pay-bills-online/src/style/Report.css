@@ -1,0 +1,70 @@
+:root {
+    --width-menu: 60px
+}
+
+.main-report {
+    position: absolute;
+    height: calc(100vh - 60px);
+    width: calc(100vw - var(--width-menu));
+    bottom: 0;
+    right: 0;
+    background-image: url(../images/main-background.jpg);
+    background-size: cover;
+    transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    align-items: center;
+}
+
+.select-group {
+    width: 50%;
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.select-flex-group {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.select-flex-group>label {
+    width: 30%;
+    margin-left: 80px;
+}
+
+.select-flex-group>input,
+.select-flex-group>select {
+    width: 30%;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.btn-report {
+    margin-left: 250px;
+    height: 40px;
+    width: 20%;
+    font-size: 20px;
+    background-color: rgb(0, 151, 232);
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.btn-report:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.chart-report {
+    position: absolute;
+    top: 380px;
+    width: 90%;
+    background-color: white;
+}

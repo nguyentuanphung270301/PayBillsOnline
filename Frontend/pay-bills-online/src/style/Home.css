@@ -1,0 +1,16 @@
+:root {
+    --width-menu: 60px
+}
+.main-home-page{
+    position: absolute;
+    height: calc(100vh - 60px);
+    width: calc(100vw - var(--width-menu));
+    bottom: 0;
+    right: 0;
+    background-image: url(../images/back-home.jpg);
+    background-size: cover;
+    transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}

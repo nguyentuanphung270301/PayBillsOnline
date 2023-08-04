@@ -5,9 +5,9 @@ const baseURL = 'http://localhost:5000/api/'
 
 const axiosPrivateClient = axios.create({
   baseURL,
-  paramsSerializer: {
-    encode: params => queryString.stringify(params)
-  }
+  // paramsSerializer: {
+  //   encode: params => queryString.stringify(params)
+  // }
 });
 
 axiosPrivateClient.interceptors.request.use(async config => {

@@ -30,3 +30,45 @@ exports.getById = (req, res) => {
         }
     })
 }
+
+
+exports.getReportCab = (req, res) => {
+    const { interval, start_date, end_date, service_id, supplier_id } = req.query
+    const data = {
+        interval: interval,
+        start_date: start_date ? start_date : null,
+        end_date: end_date ? end_date : null,
+        service_id: service_id ? service_id : null,
+        supplier_id: supplier_id
+    }
+    console.log(data)
+    Payment.getReportCab(data, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        }
+        else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}
+
+
+exports.getReportMeter = (req, res) => {
+    const { interval, start_date, end_date, service_id, supplier_id } = req.query
+    const data = {
+        interval: interval,
+        start_date: start_date ? start_date : null,
+        end_date: end_date ? end_date : null,
+        service_id: service_id ? service_id : null,
+        supplier_id: supplier_id
+    }
+    console.log(data)
+    Payment.getReportMeter(data, function (err, data) {
+        if (err) {
+            res.status(500).send({ error: err, success: false });
+        }
+        else {
+            res.status(200).send({ data: data, success: true });
+        }
+    })
+}

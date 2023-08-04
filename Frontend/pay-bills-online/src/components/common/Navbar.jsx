@@ -169,10 +169,12 @@ const Navbar = () => {
                 </div>
                 <div className='list-menu'>
                     <ul className={`${openMenu ? 'close' : ''}`}>
-                        <li className={`li-menu ${openMenu ? 'close' : ''}`}>
-                            <FontAwesomeIcon icon={faHouse} className={`${openMenu ? '' : 'icon-close'}`} />
-                            {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
-                        </li>
+                        <Link to='/mainpage/home' style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <li className={`li-menu ${openMenu ? 'close' : ''}`}>
+                                <FontAwesomeIcon icon={faHouse} className={`${openMenu ? '' : 'icon-close'}`} />
+                                {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
+                            </li>
+                        </Link>
                         {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_User') || listRoleUsers.includes('Admin_Supplier') || listRoleUsers.includes('Admin_Service')) && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenAdmin(!isOpenAdmin)}>
@@ -308,7 +310,7 @@ const Navbar = () => {
                                 </ul>}
                             </div>
                         </li>}
-                        {listRoleUsers.includes('Full_Admin') && <Link to='/mainpage/' style={{ textDecoration: 'none', color: 'white' }}>
+                        {listRoleUsers.includes('Full_Admin') && <Link to='/mainpage/report' style={{ textDecoration: 'none', color: 'white' }}>
                             <li className={`li-menu ${openMenu ? 'close' : ''}`}>
                                 <FontAwesomeIcon icon={faChartPie} className={`${openMenu ? '' : 'icon-close'}`} />
                                 {!openMenu ? <span style={{ marginLeft: '10px' }}>Báo cáo & Thống kê</span> : <span></span>}
