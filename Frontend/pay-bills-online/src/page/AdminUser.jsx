@@ -150,7 +150,8 @@ const AdminUser = () => {
     const [open, setOpen] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [isRequest, setIsRequest] = useState(false)
-    const [listRoleUser,setListRoleUsers] = useState([])
+    const [listRoleUser, setListRoleUsers] = useState([])
+
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
@@ -208,7 +209,7 @@ const AdminUser = () => {
     // useEffect(() => {
     //     const checkRole = async () => {
     //         if(!username) {
-                
+
     //         }
     //     }
     // },[])
@@ -267,24 +268,34 @@ const AdminUser = () => {
     }
 
     const deleteUser = async (userId) => {
-        const res = await userApis.updateStatus(userId)
-        if (res.success && res) {
-            const response = await userAuthApis.updateStatus(userId)
-            if (response.success && response) {
-                console.log(response)
-                toast.success("Xoá người dùng thành công!")
-                setIsRequest(!isRequest)
-                setOpen(false)
-            }
-            else {
-                console.log(response)
-                toast.error("Xoá người dùng thất bại!")
-                setIsRequest(!isRequest)
-                setOpen(false)
-            }
+        const delRes = await userApis.deleteById(userId)
+        if (delRes.success && delRes) {
+            console.log(delRes)
+            toast.success("Xoá người dùng thành công!")
+            setIsRequest(!isRequest)
+            setOpen(false)
         }
         else {
-            console.log(res)
+            console.log(delRes)
+            const res = await userApis.updateStatus(userId)
+            if (res.success && res) {
+                const response = await userAuthApis.updateStatus(userId)
+                if (response.success && response) {
+                    console.log(response)
+                    toast.success("Xoá người dùng thành công!")
+                    setIsRequest(!isRequest)
+                    setOpen(false)
+                }
+                else {
+                    console.log(response)
+                    toast.error("Xoá người dùng thất bại!")
+                    setIsRequest(!isRequest)
+                    setOpen(false)
+                }
+            }
+            else {
+                console.log(res)
+            }
         }
     }
 

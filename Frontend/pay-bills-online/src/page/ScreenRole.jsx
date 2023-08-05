@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import screenApis from '../api/modules/screen.api'
 import AddScreen from '../components/common/AddScreen'
 import { toast } from 'react-toastify'
+import userApis from '../api/modules/user.api'
 
 
 function descendingComparator(a, b, orderBy) {
@@ -136,6 +137,10 @@ const ScreenRole = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showAddScreen, setShowAddScreen] = useState(false);
     const [showEditScreen, setShowEditScreen] = useState(false);
+    const [listRoleUsers, setListRoleUsers] = useState([])
+
+
+    const username = localStorage.getItem('username');
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -155,6 +160,30 @@ const ScreenRole = () => {
         }
         setSelected(newSelected);
     };
+
+    useEffect(() => {
+        const getInfo = async () => {
+            const res = await userApis.getUserAuthByUsername(username);
+            if (res.success && res) {
+                console.log(res);
+                // Tạo một mảng để lưu trữ các giá trị screencode
+                const screencodes = [];
+                // Lặp qua mỗi đối tượng trong res.data và kiểm tra xem có thêm screencode mới hay không
+                res.data.forEach((item) => {
+                    const { screencode } = item;
+                    if (!screencodes.includes(screencode)) {
+                        screencodes.push(screencode);
+                    }
+                });
+                // Lưu mảng screencodes vào state
+                setListRoleUsers(screencodes);
+
+            } else {
+                console.log(res);
+            }
+        };
+        getInfo();
+    }, [username]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -183,10 +212,6 @@ const ScreenRole = () => {
         setSelectedId(null);
         setOpen(false);
     };
-    const handleEidt = (id) => {
-        setSelectedId(id)
-        setShowEditScreen(true)
-    }
 
     useEffect(() => {
         const getScreenList = async () => {
@@ -286,6 +311,7 @@ const ScreenRole = () => {
                                                                     }
                                                                 }}
                                                                 onClick={() => handleClickOpen(row.id)}
+                                                                disabled={listRoleUsers.includes(row.screencode) ? true : false}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </Button>

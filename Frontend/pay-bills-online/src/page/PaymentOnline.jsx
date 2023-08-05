@@ -220,13 +220,14 @@ const PaymentOnline = () => {
                     setBillInfo('')
                 }
             }
-            else if (userId && check === 'false') {
+            else if (userId && check === 'false' && billList) {
                 const res = await billApis.getCableByUserId(userId)
                 if (res.success && res) {
                     const filteredTemp = res.data.filter(item => {
                         return !billList.some(bill => bill.cab_id === item.id);
                     });
                     console.log(res)
+                    console.log(filteredTemp)
                     setBillInfo(filteredTemp)
                     if (filteredTemp.length === 0) {
                         toast.error("Bạn không có hoá đơn nào")

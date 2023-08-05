@@ -153,10 +153,10 @@ exports.deleteUser = (req, res) => {
     const userId = req.params.id
     User.deleteUser(userId, function (err, data) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send({ error: err, success: false });
         }
         else {
-            res.status(200).json({ message: `Xoá user với id ${userId} thành công` });
+            res.status(200).send({ data: data, success: true });
         }
     })
 }

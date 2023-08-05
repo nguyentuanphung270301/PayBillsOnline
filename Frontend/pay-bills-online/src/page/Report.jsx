@@ -148,25 +148,58 @@ const Report = () => {
     }
 
     var data = null
+    var options = null
     if (reportInfo) {
-        const labels = reportInfo.map(item => formatDate(item.date))
-        const datasets = [
-            {
-                label: 'Doanh thu',
-                data: reportInfo.map(item => item.total_revenue),
-                backgroundColor: 'rgba(75,192,192,0.2)',
-                borderColor: 'rgba(75,192,192,1)',
-                borderWidth: 1,
-            },
-        ];
+        // const labels = reportInfo.map(item => formatDate(item.date))
+        // const datasets = [
+        //     {
+        //         label: 'Doanh thu',
+        //         data: reportInfo.map(item => item.total_revenue),
+        //         backgroundColor: 'rgba(75,192,192,0.2)',
+        //         borderColor: 'rgba(75,192,192,1)',
+        //         borderWidth: 1,
+        //     },
+        // ];
 
-        // Tạo biểu đồ sử dụng react-chartjs-2
+        // // Tạo biểu đồ sử dụng react-chartjs-2
+        // data = {
+        //     labels: labels,
+        //     datasets: datasets,
+        // };  
+        reportInfo.sort((a, b) => new Date(a.date) - new Date(b.date));
+        const colors = [
+            'rgba(75,192,192,1)',
+            'rgba(255,99,132,1)',
+            'rgba(54,162,235,1)',
+            // ... thêm các màu sắc khác tùy ý
+        ];
+        const uniqueDates = Array.from(new Set(reportInfo.map(item => formatDate(item.date))));
+        const uniqueServices = Array.from(new Set(reportInfo.map(item => item.service_name)));
+
+        const datasets = uniqueServices.map((service, index) => {
+            const data = uniqueDates.map(date => {
+                const matchingData = reportInfo.find(item => formatDate(item.date) === date && item.service_name === service);
+                return matchingData ? matchingData.total_revenue : 0;
+            });
+
+            const totalRevenue = data.reduce((total, revenue) => total + revenue, 0);
+
+            return {
+                label: `${service} - Total: ${formattedPrice(totalRevenue)} đ`,
+                data: data,
+                backgroundColor: colors[index % colors.length],
+                borderColor: colors[index % colors.length],
+                borderWidth: 1,
+            };
+        });
+
+        const labels = uniqueDates;
+
         data = {
             labels: labels,
             datasets: datasets,
         };
     }
-
     return (
         <div className='main-report'>
             <Typography sx={{

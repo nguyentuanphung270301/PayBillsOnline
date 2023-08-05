@@ -286,6 +286,7 @@ const Role = () => {
                                                                     }
                                                                 }}
                                                                 onClick={() => handleClickOpen(row.id)}
+                                                                disabled={row.rolecode === 'ROLE_CUSTOMER' ? true : false}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </Button>

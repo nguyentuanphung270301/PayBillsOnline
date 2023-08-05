@@ -12,6 +12,7 @@ const userEndpoints = {
     createUser: '/user/create',
     getById: (id) => `/user/${id}`,
     getUserAuthByUsername: (username) => `/user/userauth/${username}`,
+    deleteById: (id) => `user/delete/${id}`
 }
 
 const userApis = {
@@ -99,6 +100,15 @@ const userApis = {
     getUserAuthByUsername: async (username) => {
         try {
             const response = await privateClient.get(userEndpoints.getUserAuthByUsername(username))
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    deleteById: async (id) => {
+        try {
+            const response = await privateClient.delete(userEndpoints.deleteById(id))
             return response
         }
         catch (error) {
