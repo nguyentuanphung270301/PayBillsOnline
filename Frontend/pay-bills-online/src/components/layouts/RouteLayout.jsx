@@ -20,6 +20,7 @@ import PaymentOnline from '../../page/PaymentOnline';
 import MyBill from '../../page/MyBill';
 import Report from '../../page/Report';
 import Home from '../../page/Home';
+import AccountPay from '../../page/AccountPay';
 
 
 const RouteLayout = () => {
@@ -28,7 +29,7 @@ const RouteLayout = () => {
       <Navbar />
       <Routes>
         <Route path='/changepassword' element={<ChangPassword />} />
-        <Route path='/info' element={<UserInfo />} />
+        <Route path='/info' element={<UserInfo/>} />
         <Route path='/bankaccount' element={<BankAccount/>} />
         <Route path='/admin/user' element={<AdminUser/>} />
         <Route path='/admin/supplier' element={<AdminSupplier/>} />
@@ -46,6 +47,7 @@ const RouteLayout = () => {
         <Route path='/my-bill' element={<MyBill/>} />
         <Route path='/report' element={<Report/>} />
         <Route path='/home' element={<Home/>} />
+        <Route path='admin/accountpay' element={<AccountPay/>} />
       </Routes>
     </div>
   )

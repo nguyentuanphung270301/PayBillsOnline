@@ -6,9 +6,19 @@ const userBankCardEndpoint = {
     createBankCard: '/userbankcard/create',
     getById: (id) => `/userbankcard/${id}`,
     updateBankCard: (id) => `/userbankcard/update/${id}`,
+    getAll: '/userbankcard/all',
 }
 
 const userBankCardApis = {
+    getAll: async () => {
+        try {
+            const response = await privateClient.get(userBankCardEndpoint.getAll)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
     getByUserId: async (userId) => {
         try {
             const response = await privateClient.get(userBankCardEndpoint.getByUserId(userId))

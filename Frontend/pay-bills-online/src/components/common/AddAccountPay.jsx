@@ -7,50 +7,26 @@ import userApis from '../../api/modules/user.api'
 import userBankCardApis from '../../api/modules/userbankcard.api';
 import { format } from 'date-fns';
 
-const AddBankCard = ({ onClose }) => {
+const AddAccountPay = ({ onClose, bankList }) => {
     const [cardNumber, setCardNumber] = useState("")
-    const [cardHolderName, setCardHolderName] = useState("")
+    const [expriyDate, setExpireDate] = useState("")
     const [userId, setUserId] = useState("")
-    const username = localStorage.getItem("username")
-    const [listBank, setListBank] = useState(null)
-    const [currentTime,setCurrentTime] = useState("")
+    const [userList, setUserList] = useState('')
+
 
     useEffect(() => {
-        const getUserId = async () => {
-            const response = await userApis.getUserByUsername(username)
-            if (response.success && response) {
-                setUserId(response.data.id)
-                setCardHolderName(response.data.firstname + ' ' + response.data.lastname)
-                const responseBank = await userBankCardApis.getByUserId(response.data.id)
-                if (responseBank.success && responseBank) {
-                    setListBank(responseBank.data)
-                }
-                else {
-                    console.log(responseBank)
-                }
+        const getListUsers = async () => {
+            const res = await userApis.getAll()
+            if(res.success) {
+                setUserList(res.data)
             }
             else {
-                console.log(response)
+                console.log(res)
             }
         }
-        getUserId()
-    }, [username])
+        getListUsers()
+    })
 
-    useEffect(() => {
-        const updateCurrentTime = () => {
-            const now = new Date();
-            const formattedTime = format(now, 'yyyy-MM-dd');
-            setCurrentTime(formattedTime);
-        };
-
-        // Gọi hàm updateCurrentTime mỗi giây
-        const intervalId = setInterval(updateCurrentTime, 1000);
-
-        // Hủy interval khi component unmount
-        return () => clearInterval(intervalId);
-
-        // Chỉ gọi lại useEffect khi giá trị của currentTime thay đổi
-    }, [currentTime]);
 
     const handleValidation = () => {
         let isValid = true;
@@ -60,35 +36,56 @@ const AddBankCard = ({ onClose }) => {
             toast.error("Số thẻ không hợp lệ (Số thẻ từ 9 đến 14 chữ số)")
             isValid = false;
         }
+
+
+
         return isValid;
     }
+
+    useEffect(() => {
+        const updateCurrentTime = () => {
+            const now = new Date();
+            const formattedTime = format(now, 'yyyy-MM-dd');
+            setExpireDate(formattedTime);
+        };
+
+        // Gọi hàm updateCurrentTime mỗi giây
+        const intervalId = setInterval(updateCurrentTime, 1000);
+
+        // Hủy interval khi component unmount
+        return () => clearInterval(intervalId);
+
+        // Chỉ gọi lại useEffect khi giá trị của currentTime thay đổi
+    }, []);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (handleValidation()) {
 
-            const existingBankCard = listBank && listBank.find(
+            const existingBankCard = bankList && bankList.find(
                 (account) =>
                     account.card_number === cardNumber
             );
             if (existingBankCard) {
                 toast.error('Tài khoản thanh toán đã tồn tại');
             } else {
+                const name = userList.filter( item => item.id === parseInt(userId) );
                 const data = {
                     card_number: cardNumber.trim(),
-                    create_date: currentTime,
-                    holder_name: cardHolderName.trim().toUpperCase(),
+                    create_date: expriyDate,
+                    holder_name: (name[0].firstname + ' ' + name[0].lastname).toUpperCase(),
                     balance: 0,
-                    user_id: userId,
+                    user_id: parseInt(userId),
                 }
                 console.log(data)
                 const response = await userBankCardApis.createBankCard(data)
                 if (response.success && response) {
-                    toast.success("Thêm thẻ thành công")
+                    toast.success("Thêm tài khoản thành công")
                     onClose()
                 } else {
-                    toast.error("Thêm thẻ thất bại");
+                    toast.error("Thêm tài khoản thất bại");
                     console.log(response)
                 }
             }
@@ -106,12 +103,18 @@ const AddBankCard = ({ onClose }) => {
                         <div className='left-add-bank'>
                             <span>Số tài khoản</span>
                             <span>Ngày tạo tài khoản</span>
-                            <span>Tên chủ tài khoản</span>
+                            <span>Khách hàng</span>
                         </div>
                         <div className='right-add-bank'>
                             <input type="text" placeholder="Nhập số tài khoản" onChange={(e) => setCardNumber(e.target.value)} />
-                            <input type="date" value={currentTime} disabled={true} />
-                            <input type="text" disabled={true} onChange={(e) => setCardHolderName(e.target.value)} value={cardHolderName.toUpperCase()}/>
+                            <input type="date" value={expriyDate} disabled={true} />
+                            <select onChange={(e) => {setUserId(e.target.value)
+                            }}>
+                                <option>---Chọn---</option>
+                                {userList && userList.map((item, index)=> {
+                                    return <option value={item.id} key={index}>{item.id} - {item.firstname} {item.lastname}</option>
+                                })}
+                            </select>
                         </div>
                     </div>
                     <div className='footer-add-bank'>
@@ -123,4 +126,4 @@ const AddBankCard = ({ onClose }) => {
     )
 }
 
-export default AddBankCard
+export default AddAccountPay

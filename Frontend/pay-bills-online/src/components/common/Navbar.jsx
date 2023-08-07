@@ -200,6 +200,11 @@ const Navbar = () => {
                                             <span>Quản trị dịch vụ</span>
                                         </li>
                                     </Link>}
+                                    <Link to='/mainpage/admin/accountpay' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <li className='admin-li'>
+                                            <FontAwesomeIcon icon={faUser} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <span>Quản trị tài khoản thanh toán người dùng</span>
+                                        </li></Link>
                                 </ul>}
                             </div>
                         </li>}
@@ -256,7 +261,7 @@ const Navbar = () => {
                         {listRoleUsers.includes('BankCard') && <Link to='/mainpage/bankaccount' style={{ textDecoration: 'none', color: 'white' }}>
                             <li className={`li-menu ${openMenu ? 'close' : ''}`}>
                                 <FontAwesomeIcon icon={faMoneyCheckDollar} className={`${openMenu ? '' : 'icon-close'}`} />
-                                {!openMenu ? <span style={{ marginLeft: '10px' }}>Tài khoản ngân hàng</span> : <span></span>}
+                                {!openMenu ? <span style={{ marginLeft: '10px' }}>Tài khoản thanh toán</span> : <span></span>}
                             </li>
                         </Link>}
 

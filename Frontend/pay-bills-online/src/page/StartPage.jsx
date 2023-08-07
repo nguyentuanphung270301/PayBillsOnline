@@ -99,7 +99,7 @@ const StartPage = () => {
 
   const handleStart = () => {
     if (checkUser) {
-      navigate('/mainpage/homepage')
+      navigate('/mainpage/home')
     }
     else {
       toast.error('Vui lòng đăng nhập để vào trang web')

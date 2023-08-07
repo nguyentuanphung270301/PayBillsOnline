@@ -153,7 +153,6 @@ Bill.getBillMeterById = function (id, callback) {
   payment.payment_method,
   payment.description,
   payment.userbankcard_id,
-  userbankcard.bank_name,
   userbankcard.card_number,
   userbankcard.holder_name
 FROM bills
@@ -204,7 +203,6 @@ Bill.getBillCabById = function (id, callback) {
   payment.payment_method,
   payment.description,
   payment.userbankcard_id,
-  userbankcard.bank_name,
   userbankcard.card_number,
   userbankcard.holder_name
 FROM bills

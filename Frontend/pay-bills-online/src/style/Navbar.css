@@ -79,7 +79,7 @@
         transition: width 0.3s ease;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: auto;
 
         .menu-logo {
             height: 60px;

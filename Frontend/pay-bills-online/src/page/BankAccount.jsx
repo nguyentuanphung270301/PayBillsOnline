@@ -187,10 +187,12 @@ const BankAccount = () => {
         if (res.success && res) {
           console.log(res)
           setListAccounts(res.data)
+          setIsLoading(false)
         }
         else {
           console.log(res)
-          setListAccounts('')
+          setListAccounts('') 
+          setIsLoading(false)
         }
       }
       else {
@@ -206,6 +208,7 @@ const BankAccount = () => {
     setSelectedCardId(id);
     setShowDeleteConfirmation(true);
     setShowBlurOverlay(true);
+    setBankInfo('')
   };
 
 
@@ -291,7 +294,7 @@ const BankAccount = () => {
               <div className='item-table-account' key={item.id} onClick={() => setIsOpenForm({ ...isOpenForm, [item.id]: !isOpenForm[item.id] })}>
                 <ItemBankAccount data={item} />
                 {isOpenForm[item.id] && <div className='form-delete-show'>
-                  <button className='btn-delete-bank' onClick={() => handleDelete(item.id)}><FontAwesomeIcon icon={faTrash} /> Xoá thẻ</button>
+                  <button className='btn-delete-bank' onClick={() => handleDelete(item.id)}><FontAwesomeIcon icon={faTrash} /> Xoá tài khoản</button>
                   <button className='btn-detail-bank' onClick={() => showDetailBank(item.id)} ><FontAwesomeIcon icon={faCircleInfo} /> Chi tiết</button>
                 </div>}
               </div>
@@ -307,12 +310,7 @@ const BankAccount = () => {
                 fontWeight: '600',
                 margin: '10px 0px 30px 20px'
               }}
-              >Thông tin thẻ</Typography>
-              <div>
-                <FontAwesomeIcon icon={faBuildingColumns} />
-                <span>Ngân hàng</span>
-                <span className='span-data'>{bankInfo.bank_name}</span>
-              </div>
+              >Thông tin tài khoản</Typography>
               <div>
                 <FontAwesomeIcon icon={faUser} />
                 <span>Tên chủ thẻ</span>
@@ -324,14 +322,9 @@ const BankAccount = () => {
                 <span className='span-data'>{bankInfo.card_number}</span>
               </div>
               <div>
-                <FontAwesomeIcon icon={faBarcode} />
-                <span>CVV</span>
-                <span className='span-data'>{bankInfo.cvv}</span>
-              </div>
-              <div>
                 <FontAwesomeIcon icon={faCalendarXmark} />
-                <span>Expiry date</span>
-                <span className='span-data'>{formattedDate(bankInfo.expiry_date)}</span>
+                <span>Ngày tạo</span>
+                <span className='span-data'>{formattedDate(bankInfo.create_date)}</span>
               </div>
             </div>
             <div className='right-detail-bank'>
@@ -371,8 +364,8 @@ const BankAccount = () => {
                     />
                     {!transactionList ? <Typography sx={{
                       position: 'absolute',
-                      top: '200px',
-                      left: '20%',
+                      top: '450px',
+                      left: '72%',
                     }} >Không có dữ liệu</Typography> : <TableBody>
                       {stableSort(transactionList, getComparator(order, orderBy))
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -389,7 +382,12 @@ const BankAccount = () => {
                                 {row.id}
                               </TableCell>
                               <TableCell >{row.transaction_type}</TableCell>
-                              <TableCell >{formattedBalance(row.amount)} đ</TableCell>
+                              {(row.transaction_type === 'Ghi có (Credit)') ? <TableCell style={{
+                                color:'green'
+                              }} >+ {formattedBalance(row.amount)} đ</TableCell> :
+                              <TableCell style={{
+                                color:'red'
+                              }} >- {formattedBalance(row.amount)} đ</TableCell>}
                               <TableCell >{formattedDateTrans(row.transaction_date)}</TableCell>
                               <TableCell>{row.description}</TableCell>
                             </TableRow>

@@ -3,16 +3,16 @@ const db = require('../configs/connect');
 const UserBankCard = function (userbankcard) {
     this.id = userbankcard.id;
     this.card_number = userbankcard.card_number;
-    this.bank_name = userbankcard.bank_name;
-    this.expiry_date = userbankcard.expiry_date;
+    this.create_date = userbankcard.expiry_date;
     this.holder_name = userbankcard.holder_name;
-    this.cvv = userbankcard.cvv;
     this.balance = userbankcard.balance;
     this.user_id = userbankcard.user_id;
 }
 
 UserBankCard.getAll = function (callback) {
-    db.query('SELECT * FROM userbankcard', (err, results) => {
+    db.query(`Select userbankcard.* , users.firstname, users.lastname 
+    from userbankcard
+    inner join users on users.id = userbankcard.user_id`, (err, results) => {
         if (err) {
             callback(err, null);
         } else {
@@ -57,9 +57,9 @@ UserBankCard.getByUserId = function (id, callback) {
 }
 
 UserBankCard.createCard = function (cardData, callback) {
-    const { card_number, bank_name, expiry_date, holder_name, cvv, balance, user_id } = cardData;
-    const query = 'INSERT INTO userbankcard (card_number,bank_name ,expiry_date, holder_name, cvv, balance, user_id) VALUES (?,?,?,?,?,?,?)';
-    db.query(query, [card_number, bank_name, expiry_date, holder_name, cvv, balance, user_id], (err, results) => {
+    const { card_number, create_date, holder_name, balance, user_id } = cardData;
+    const query = 'INSERT INTO userbankcard (card_number ,create_date, holder_name, balance, user_id) VALUES (?,?,?,?,?)';
+    db.query(query, [card_number, create_date, holder_name, balance, user_id], (err, results) => {
         if (err) {
             callback(err, null);
         }

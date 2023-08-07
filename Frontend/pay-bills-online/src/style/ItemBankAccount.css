@@ -14,61 +14,25 @@
     background-color: #f5f5f5;
   }
 .main-item-bank {
-    width: 350px;
-    height: 200px;
+    width: 60%;
+    height: 100px;
     position: relative;
-    background-color: white;
+    background-color: #b335ec;
     margin-bottom: 20px;
     border-radius: 20px;
-
- 
-
-
-    .item-bank-header {
-
-        background: linear-gradient(to bottom, #99dff5, #7945e9) ;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        height: 140px;
-        .item-bank-header-1 {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-
-            .logo-header {
-                width: 40px;
-                height: 40px;
-                margin: 15px 15px 0 15px;
-            }
-        }
-
-        .item-bank-header-2 {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-    }
-    .item-bank-footer {
-        height: 60px;
-        background-color: #503396;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-        width: 100%;
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .logo-visa {
-            width: 50px;
-            height: 50px;
-            margin: 10px 20px 0 0;
-        }
-    }
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    color: white;
 }
-
+.main-item-bank>div {
+    display: flex;
+    flex-direction: column;
+}
+.main-item-bank>div>label {
+    font-size: 16px;
+    font-weight: 600;
+}
 .main-item-bank:hover {
     cursor: pointer;
 }

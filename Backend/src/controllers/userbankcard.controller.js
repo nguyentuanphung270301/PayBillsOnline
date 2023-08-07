@@ -33,13 +33,11 @@ exports.getByUserId = function (req, res) {
 }
 
 exports.createCard = function (req, res) {
-    const { card_number, bank_name,expiry_date, holder_name, cvv, balance, user_id } = req.body;
-    const newCard = {
+    const { card_number, create_date, holder_name, balance, user_id } = req.body;
+    const newCard = {   
         card_number: card_number,
-        bank_name: bank_name,
-        expiry_date: expiry_date,
+        create_date: create_date,
         holder_name: holder_name,
-        cvv: cvv,
         balance: balance,
         user_id: user_id
     }
