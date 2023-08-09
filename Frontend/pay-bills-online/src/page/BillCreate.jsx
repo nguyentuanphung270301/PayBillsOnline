@@ -156,6 +156,7 @@ const BillCreate = () => {
     const [showCreateBill, setShowCreateBill] = useState(false);
     const [showEditBill, setShowEditBill] = useState(false);
 
+    const [search, setSearch] = useState('');
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -212,19 +213,31 @@ const BillCreate = () => {
         const getBillList = async () => {
             const res = await billApis.getAll()
             if (res.success && res) {
-                if (filterBill === '') {
-                    console.log(res)
-                    setBillList(res.data)
+                console.log(res)
+               
+                if (!search) {
+                    if (filterBill === '') {
+                        setBillList(res.data)
+                        setIsLoading(false)
+                    }
+                    else if (filterBill === 'Đã duyệt') {
+                        setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
+                    }
+                    else if (filterBill === 'Chưa duyệt') {
+                        setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
+                    }
+                    else if (filterBill === 'Đã thanh toán') {
+                        setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
+                    }
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter(user => {
+                        const fullName =  user.id + ' ' + user.customer_name.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setBillList(filteredUser)
                     setIsLoading(false)
-                }
-                else if (filterBill === 'Đã duyệt') {
-                    setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
-                }
-                else if (filterBill === 'Chưa duyệt') {
-                    setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
-                }
-                else if (filterBill === 'Đã thanh toán') {
-                    setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
                 }
             }
             else {
@@ -234,7 +247,7 @@ const BillCreate = () => {
             }
         }
         getBillList()
-    }, [isRequest, showCreateBill, showEditBill, filterBill])
+    }, [isRequest, showCreateBill, showEditBill, filterBill, search])
 
 
     const deleteBill = async (id) => {
@@ -271,14 +284,17 @@ const BillCreate = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Tạo hoá đơn</Typography>
-            <div className='filter-bill'>
-                <label>Lọc</label>
-                <select onChange={(e) => setFilterBill(e.target.value)}>
-                    <option value=''>----Chọn---</option>
-                    <option value='Đã duyệt'>Đã duyệt</option>
-                    <option value='Chưa duyệt'>Chưa duyệt</option>
-                    <option value='Đã thanh toán'>Đã thanh toán</option>
-                </select>
+            <div className='search-group'>
+                <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
+                <div className='filter-bill'>
+                    <label>Lọc</label>
+                    <select onChange={(e) => setFilterBill(e.target.value)}>
+                        <option value=''>----Chọn---</option>
+                        <option value='Đã duyệt'>Đã duyệt</option>
+                        <option value='Chưa duyệt'>Chưa duyệt</option>
+                        <option value='Đã thanh toán'>Đã thanh toán</option>
+                    </select>
+                </div>
             </div>
             <button className='btn-create-bill' onClick={() => setShowCreateBill(true)} ><FontAwesomeIcon icon={faFileCirclePlus} />Tạo hoá đơn</button>
             <div className='bill-create-table'>

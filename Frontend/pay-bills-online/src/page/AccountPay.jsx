@@ -146,6 +146,9 @@ const AccountPay = () => {
     const [showAddService, setShowAddService] = useState(false);
     const [showEditService, setShowEditService] = useState(false);
 
+    const [search, setSearch] = useState('')
+
+
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
@@ -197,41 +200,25 @@ const AccountPay = () => {
         setShowEditService(true)
     }
 
-    // useEffect(() => {
-    //     const getServiceList = async () => {
-    //         const res = await serviceApis.getAll()
-    //         if (res.success && res) {
-    //             console.log(res)
-    //             setServiceList(res.data)
-    //             setIsLoading(false)
-    //         }
-    //         else {
-    //             console.log(res)
-    //             setIsLoading(false)
-    //         }
-    //     }
-    //     getServiceList()
-    // }, [isRequest, showEditService, showAddService]);
-
-    // const getSupplierNameById = async (id) => {
-    //     try {
-    //         const res = await supplierApis.getById(id);
-    //         if (res.success && res.data) {
-    //             return res.data.name;
-    //         }
-    //         return null;
-    //     } catch (error) {
-    //         console.log(error);
-    //         return null;
-    //     }
-    // };
 
     useEffect(() => {
         const fetchData = async () => {
             const res = await userBankCardApis.getAll()
             if (res.success) {
-                setServiceList(res.data)
-                setIsLoading(false)
+                console.log(res)
+                if (!search) {
+                    setServiceList(res.data)
+                    setIsLoading(false)
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter(user => {
+                        const fullName =  user.firstname.toLowerCase() + ' ' + user.lastname.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setServiceList(filteredUser)
+                    setIsLoading(false)
+                }
             }
             else {
                 setServiceList('')
@@ -239,7 +226,7 @@ const AccountPay = () => {
             }
         };
         fetchData();
-    }, [isRequest, showEditService, showAddService]);
+    }, [isRequest, showEditService, showAddService, search]);
 
     const deleteBank = async (id) => {
         const res = await userBankCardApis.deleteById(id);
@@ -276,6 +263,7 @@ const AccountPay = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Quản trị tài khoản khách hàng</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-admin-add' onClick={() => setShowAddService(true)} ><FontAwesomeIcon icon={faPlus} />Thêm tài khoản</button>
             <div className='admin-account-table'>
                 {isLoading && <CircularProgress sx={{
@@ -403,7 +391,7 @@ const AccountPay = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showAddService && <AddAccountPay onClose={() => setShowAddService(false)} bankList={serviceList}/>}
+            {showAddService && <AddAccountPay onClose={() => setShowAddService(false)} bankList={serviceList} />}
             {showEditService && <TransAccount onClose={() => setShowEditService(false)} id={selectedId} />}
         </div>
     )

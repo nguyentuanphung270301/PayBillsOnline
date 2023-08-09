@@ -137,7 +137,7 @@ const UserAuth = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showAddAuth, setShowAddAuth] = useState(false);
     const [showEditAuth, setShowEditAuth] = useState(false);
-
+    const [search, setSearch] = useState();
     const username = localStorage.getItem('username');
 
     const handleClick = (event, name) => {
@@ -195,8 +195,20 @@ const UserAuth = () => {
         const getAuthList = async () => {
             const res = await userAuthApis.getAllAuth()
             if (res.success && res) {
-                setAuthList(res.data)
-                setIsLoading(false)
+console.log(res)
+                if (!search) {
+                    setAuthList(res.data)
+                    setIsLoading(false)
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter(user => {
+                        const fullName = user.firstname.toLowerCase() + ' ' + user.lastname.toLowerCase() + ' ' + user.username.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setAuthList(filteredUser)
+                    setIsLoading(false)
+                }
             }
             else {
                 setAuthList('')
@@ -204,16 +216,16 @@ const UserAuth = () => {
             }
         }
         getAuthList()
-    }, [isRequest, showAddAuth, showEditAuth])
+    }, [isRequest, search, showAddAuth, showEditAuth])
 
     const deleteAuth = async (id) => {
         const res = await userAuthApis.deleteAuth(id)
-        if(res.success && res) {
+        if (res.success && res) {
             toast.success('Xoá quyền tài khoản thành công')
             setIsRequest(!isRequest)
             handleClose()
         }
-        else{
+        else {
             toast.error('Xoá quyền tài khoản thất bại')
             handleClose()
         }
@@ -228,6 +240,7 @@ const UserAuth = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Cấp role cho tài khoản</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo tên đăng nhập, tên người dùng ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-user-auth' onClick={() => setShowAddAuth(true)} ><FontAwesomeIcon icon={faPlus} />Phân quyền</button>
             <div className='user-auth-table'>
                 {isLoading && <CircularProgress sx={{
@@ -366,7 +379,7 @@ const UserAuth = () => {
                 />
             </div>
             {showAddAuth && <AddAuth onClose={() => setShowAddAuth(false)} />}
-            {showEditAuth && <EditUserAuth id={selectedId} onClose={() => setShowEditAuth(false)}/>}
+            {showEditAuth && <EditUserAuth id={selectedId} onClose={() => setShowEditAuth(false)} />}
         </div>
     )
 }

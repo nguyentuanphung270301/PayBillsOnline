@@ -153,6 +153,8 @@ const CabTV = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [showAddCab, setShowAddCab] = useState(false);
     const [showEditCab, setShowEditCab] = useState(false);
+    const [search, setSearch] = useState('')
+
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -254,8 +256,19 @@ const CabTV = () => {
                             };
                         })
                     );
-                    setCabList(updatedCabList);
+                    if (!search) {
+                        setCabList(updatedCabList);
                     setIsLoading(false);
+                    }
+                    else {
+                        const searchText = search.toLowerCase()
+                        const filteredUser = updatedCabList.filter(user => {
+                            const fullName = user.customer_code.toLowerCase() + ' ' + user.customer_name.toLowerCase();
+                            return fullName.includes(searchText)
+                        })
+                        setCabList(filteredUser)
+                        setIsLoading(false)
+                    }
                 } else {
                     console.log(cabRes);
                     setCabList('');
@@ -267,7 +280,7 @@ const CabTV = () => {
             }
         };
         fetchData();
-    }, [isRequest, showEditCab, showAddCab]);
+    }, [isRequest, showEditCab, showAddCab, search]);
 
     const deleteCab = async (id) => {
         const res = await cabApis.deleteCab(id)
@@ -302,6 +315,7 @@ const CabTV = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Nhập liệu truyền hình cáp</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo mã, tên khách hàng ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-add-cab' onClick={() => setShowAddCab(true)}><FontAwesomeIcon icon={faPlus} />Thêm</button>
             <div className='admin-cab-table'>
                 {isLoading && <CircularProgress sx={{

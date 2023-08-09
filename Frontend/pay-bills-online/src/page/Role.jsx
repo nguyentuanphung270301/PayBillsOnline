@@ -131,6 +131,9 @@ const Role = () => {
     const [showAddRole, setShowAddRole] = useState(false);
     const [showEditRole, setShowEditRole] = useState(false);
 
+    const [search, setSearch] = useState('')
+
+
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
@@ -186,8 +189,21 @@ const Role = () => {
         const getRoleList = async () => {
             const res = await roleApis.getAll()
             if (res.success && res) {
-                setRoleList(res.data)
-                setIsLoading(false)
+                console.log(res)
+
+                if (!search) {
+                    setRoleList(res.data)
+                    setIsLoading(false)
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter(user => {
+                        const fullName = user.name.toLowerCase() + ' ' + user.rolecode.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setRoleList(filteredUser)
+                    setIsLoading(false)
+                }
             }
             else {
                 setRoleList('')
@@ -195,11 +211,11 @@ const Role = () => {
             }
         }
         getRoleList()
-    }, [isRequest, showAddRole, showEditRole])
+    }, [isRequest, search, showAddRole, showEditRole])
 
     const deleteRole = async (id) => {
         const res = await roleApis.deleteRole(id)
-        if(res.success && res) {
+        if (res.success && res) {
             toast.success('Xoá vai trò thành công')
             setIsRequest(!isRequest)
             handleClose()
@@ -221,6 +237,7 @@ const Role = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Quản lý vai trò</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo mã, tên vai trò ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-add-role' onClick={() => setShowAddRole(true)} ><FontAwesomeIcon icon={faPlus} />Thêm</button>
             <div className='admin-role-table'>
                 {isLoading && <CircularProgress sx={{
@@ -343,8 +360,8 @@ const Role = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </div>
-            {showAddRole && <AddRole onClose={() => setShowAddRole(false)}/>}
-            {showEditRole && <EditRole id={selectedId} onClose={() => setShowEditRole(false)}/>}
+            {showAddRole && <AddRole onClose={() => setShowAddRole(false)} />}
+            {showEditRole && <EditRole id={selectedId} onClose={() => setShowEditRole(false)} />}
         </div>
     )
 }

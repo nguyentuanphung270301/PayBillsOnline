@@ -15,13 +15,25 @@
     flex-direction: column;
     overflow: hidden;
 
+    .input-search { 
+        width: 20%;
+        height: 40px;
+        position: absolute;
+        top: 60px;
+        margin-left: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
     .filter-bill{
         position: absolute;
-        top: 50px;
-        left: 50px;
+        top: 65px;
+        left: 350px;
         display: flex;
-        flex-direction: column;
-        width: 150px;
+        width: 180px;
+        align-items: center;
+        justify-content: space-around;
     }
     .filter-bill>label {
         font-size: 18px;

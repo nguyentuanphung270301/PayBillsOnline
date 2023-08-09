@@ -175,7 +175,7 @@ const Navbar = () => {
                                 {!openMenu ? <span style={{ marginLeft: '10px' }}>Trang chủ</span> : <span></span>}
                             </li>
                         </Link>
-                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_User') || listRoleUsers.includes('Admin_Supplier') || listRoleUsers.includes('Admin_Service')) && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
+                        {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_User') || listRoleUsers.includes('Admin_Supplier') || listRoleUsers.includes('Admin_Service') || listRoleUsers.includes('Admin_PaymentAcc')) && <li className={`admin-menu ${openMenu ? 'close' : `ul ${isOpenAdmin ? 'open' : ''}`}`}>
                             <div>
                                 <div onClick={() => setIsOpenAdmin(!isOpenAdmin)}>
                                     <FontAwesomeIcon icon={faServer} className={`${openMenu ? '' : 'icon-close'}`} />
@@ -200,11 +200,12 @@ const Navbar = () => {
                                             <span>Quản trị dịch vụ</span>
                                         </li>
                                     </Link>}
-                                    <Link to='/mainpage/admin/accountpay' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    {(listRoleUsers.includes('Full_Admin') || listRoleUsers.includes('Admin_PaymentAcc')) && <Link to='/mainpage/admin/accountpay' style={{ textDecoration: 'none', color: 'inherit' }}>
                                         <li className='admin-li'>
-                                            <FontAwesomeIcon icon={faUser} style={{ margin: '0px 20px 0px 50px' }} />
+                                            <FontAwesomeIcon icon={faCreditCard} style={{ margin: '0px 20px 0px 50px' }} />
                                             <span>Quản trị tài khoản thanh toán người dùng</span>
-                                        </li></Link>
+                                        </li>
+                                    </Link>}
                                 </ul>}
                             </div>
                         </li>}

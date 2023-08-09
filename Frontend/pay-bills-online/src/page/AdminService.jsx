@@ -134,6 +134,9 @@ const AdminService = () => {
     const [showAddService, setShowAddService] = useState(false);
     const [showEditService, setShowEditService] = useState(false);
 
+    const [search, setSearch] = useState('')
+
+
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
@@ -185,21 +188,7 @@ const AdminService = () => {
         setShowEditService(true)
     }
 
-    // useEffect(() => {
-    //     const getServiceList = async () => {
-    //         const res = await serviceApis.getAll()
-    //         if (res.success && res) {
-    //             console.log(res)
-    //             setServiceList(res.data)
-    //             setIsLoading(false)
-    //         }
-    //         else {
-    //             console.log(res)
-    //             setIsLoading(false)
-    //         }
-    //     }
-    //     getServiceList()
-    // }, [isRequest, showEditService, showAddService]);
+
 
     const getSupplierNameById = async (id) => {
         try {
@@ -228,8 +217,19 @@ const AdminService = () => {
                             };
                         })
                     );
-                    setServiceList(updatedServiceList);
-                    setIsLoading(false);
+                    if (!search) {
+                        setServiceList(updatedServiceList);
+                        setIsLoading(false);
+                    }
+                    else {
+                        const searchText = search.toLowerCase()
+                        const filteredUser = updatedServiceList.filter(user => {
+                            const serName = user.name.toLowerCase();
+                            return serName.includes(searchText)
+                        })
+                        setServiceList(filteredUser)
+                        setIsLoading(false)
+                    }
                 } else {
                     console.log(serviceRes);
                     setServiceList('');
@@ -241,7 +241,7 @@ const AdminService = () => {
             }
         };
         fetchData();
-    }, [isRequest, showEditService, showAddService]);
+    }, [isRequest, showEditService, showAddService, search]);
 
     const deleteService = async (id) => {
         const res = await serviceApis.deleteService(id);
@@ -273,6 +273,7 @@ const AdminService = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Quản trị dịch vụ</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-admin-add' onClick={() => setShowAddService(true)} ><FontAwesomeIcon icon={faPlus} />Thêm dịch vụ</button>
             <div className='admin-service-table'>
                 {isLoading && <CircularProgress sx={{
@@ -395,7 +396,7 @@ const AdminService = () => {
                 />
             </div>
             {showAddService && <AddService onClose={() => setShowAddService(false)} />}
-            {showEditService && <EditService onClose={() => setShowEditService(false)} id={selectedId}/>}
+            {showEditService && <EditService onClose={() => setShowEditService(false)} id={selectedId} />}
         </div>
     )
 }

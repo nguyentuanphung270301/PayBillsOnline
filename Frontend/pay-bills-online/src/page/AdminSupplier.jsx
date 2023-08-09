@@ -133,6 +133,9 @@ const AdminSupplier = () => {
     const [showAddSupplier, setShowAddSupplier] = useState(false);
     const [showEditSupplier, setShowEditSupplier] = useState(false);
 
+    const [search, setSearch] = useState('')
+
+
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
@@ -189,8 +192,19 @@ const AdminSupplier = () => {
             const res = await supplierApis.getAll()
             if (res.success && res) {
                 console.log(res)
-                setSupplierList(res.data)
-                setIsLoading(false)
+                if (!search) {
+                    setSupplierList(res.data)
+                    setIsLoading(false)
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter( user => {
+                        const supplierName = user.name.toLowerCase();
+                        return supplierName.includes(searchText)
+                    })
+                    setSupplierList(filteredUser)
+                    setIsLoading(false)
+                }
             }
             else {
                 console.log(res)
@@ -199,7 +213,7 @@ const AdminSupplier = () => {
             }
         }
         getSupplierList()
-    }, [isRequest, showAddSupplier, showEditSupplier])
+    }, [isRequest, search, showAddSupplier, showEditSupplier])
 
     const deleteSupplier = async (id) => {
         const response = await SupplierBankCardApis.deleteSupplierBankCardBySupplierId(id)
@@ -232,6 +246,7 @@ const AdminSupplier = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Quản trị nhà cung cấp</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-admin-add' onClick={() => setShowAddSupplier(true)}><FontAwesomeIcon icon={faPlus} />Thêm nhà cung cấp</button>
             <div className='admin-supplier-table'>
                 {isLoading && <CircularProgress sx={{

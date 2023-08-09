@@ -1,6 +1,7 @@
 :root {
     --width-menu: 60px
 }
+
 .main-admin-service {
     position: absolute;
     height: calc(100vh - 60px);
@@ -14,6 +15,16 @@
     flex-direction: column;
     overflow: hidden;
 
+    .input-search {
+        width: 40%;
+        height: 40px;
+        position: absolute;
+        top: 60px;
+        margin-left: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 16px;
+    }
 
     .btn-admin-add {
         top: 50px;
@@ -37,7 +48,7 @@
         opacity: 0.9;
     }
 
-    
+
     .admin-service-table {
         position: absolute;
         width: 95%;

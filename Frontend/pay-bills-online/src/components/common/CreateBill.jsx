@@ -144,6 +144,10 @@ const CreateBill = ({ onClose }) => {
                 const textArea = `Ngày bắt đầu: ${formatDate(result.start_date)}\nNgày kết thúc: ${formatDate(result.end_date)}\n`
                 setPrice(result.price)
                 setInfo(textArea)
+                setCusName(result.customer_name)
+                setCusAddress(result.customer_address)
+                setCusPhone(result.customer_phone)
+                setCusCode(result.customer_code)
             }
             else {
                 setPrice('')

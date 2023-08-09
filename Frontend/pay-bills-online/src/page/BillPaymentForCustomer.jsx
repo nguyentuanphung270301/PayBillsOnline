@@ -150,6 +150,7 @@ const BillPaymentForCustomer = () => {
     const [filterBill, setFilterBill] = useState('')
 
     const [checkBill, setCheckBill] = useState(false)
+    const [search, setSearch] = useState('')
 
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('calories');
@@ -217,16 +218,27 @@ const BillPaymentForCustomer = () => {
         const getBillList = async () => {
             const res = await billApis.getAll()
             if (res.success && res) {
-                if (filterBill === '') {
-                    console.log(res)
-                    setBillList(res.data.filter(bill => (bill.status === 'CHỜ THANH TOÁN' || bill.status === 'ĐÃ THANH TOÁN')))
+                const filteredData = res.data.filter(item => item.status === 'CHỜ THANH TOÁN' || item.status === 'ĐÃ THANH TOÁN')
+                if (!search) {
+                    if (filterBill === '') {
+                        setBillList(filteredData)
+                        setIsLoading(false)
+                    }
+                    else if (filterBill === 'Đã duyệt') {
+                        setBillList(filteredData.filter(item => item.status === 'CHỜ THANH TOÁN'))
+                    }
+                    else if (filterBill === 'Đã thanh toán') {
+                        setBillList(filteredData.filter(item => item.status === 'ĐÃ THANH TOÁN'))
+                    }
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = filteredData.filter(user => {
+                        const fullName = user.id + ' ' + user.customer_name.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setBillList(filteredUser)
                     setIsLoading(false)
-                }
-                else if (filterBill === 'Đã duyệt') {
-                    setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
-                }
-                else if (filterBill === 'Đã thanh toán') {
-                    setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
                 }
             }
             else {
@@ -236,7 +248,7 @@ const BillPaymentForCustomer = () => {
             }
         }
         getBillList()
-    }, [isRequest, openBillPayment, filterBill])
+    }, [isRequest, openBillPayment, filterBill, search])
 
 
 
@@ -260,13 +272,16 @@ const BillPaymentForCustomer = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Thanh toán hoá đơn</Typography>
-            <div className='filter-bill'>
-                <label>Lọc</label>
-                <select onChange={(e) => setFilterBill(e.target.value)}>
-                    <option value=''>----Chọn---</option>
-                    <option value='Đã duyệt'>Đã duyệt</option>
-                    <option value='Đã thanh toán'>Đã thanh toán</option>
-                </select>
+            <div className='search-group'>
+                <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
+                <div className='filter-bill'>
+                    <label>Lọc</label>
+                    <select onChange={(e) => setFilterBill(e.target.value)}>
+                        <option value=''>----Chọn---</option>
+                        <option value='Đã duyệt'>Đã duyệt</option>
+                        <option value='Đã thanh toán'>Đã thanh toán</option>
+                    </select>
+                </div>
             </div>
             <div className='bill-create-table'>
                 {isLoading && <CircularProgress sx={{

@@ -155,6 +155,9 @@ const MeterIndex = () => {
     const [showAddMeter, setShowAddMeter] = useState(false);
     const [showEditMeter, setShowEditMeter] = useState(false);
 
+    const [search, setSearch] = useState('')
+
+
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
@@ -240,9 +243,21 @@ const MeterIndex = () => {
                             };
                         })
                     );
-                    setMeterList(updatedMeterList);
                     console.log(updatedMeterList);
-                    setIsLoading(false);
+                    if (!search) {
+                        setMeterList(updatedMeterList);
+                        setIsLoading(false);
+                    }
+                    else {
+                        const searchText = search.toLowerCase()
+                        const filteredUser = updatedMeterList.filter(user => {
+                            const fullName = user.customer_code.toLowerCase() + ' ' + user.customer_name.toLowerCase();
+                            return fullName.includes(searchText)
+                        })
+                        setMeterList(filteredUser)
+                        setIsLoading(false)
+                    }
+
                 } else {
                     console.log(meterRes);
                     setMeterList('');
@@ -254,7 +269,7 @@ const MeterIndex = () => {
             }
         };
         fetchData();
-    }, [isRequest, showEditMeter, showAddMeter]);
+    }, [isRequest, showEditMeter, showAddMeter, search]);
 
     const formatDate = (date) => {
         const increasedDate = addDays(new Date(date), 0);
@@ -287,6 +302,7 @@ const MeterIndex = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Nhập liệu điện nước</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo mã, tên khách hàng ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-add-meter' onClick={() => setShowAddMeter(true)}><FontAwesomeIcon icon={faPlus} />Thêm</button>
             <div className='meter-table'>
                 {isLoading && <CircularProgress sx={{

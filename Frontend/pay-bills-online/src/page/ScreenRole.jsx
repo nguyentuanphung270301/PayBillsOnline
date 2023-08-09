@@ -138,6 +138,7 @@ const ScreenRole = () => {
     const [showAddScreen, setShowAddScreen] = useState(false);
     const [showEditScreen, setShowEditScreen] = useState(false);
     const [listRoleUsers, setListRoleUsers] = useState([])
+    const [search, setSearch] = useState('')
 
 
     const username = localStorage.getItem('username');
@@ -218,8 +219,19 @@ const ScreenRole = () => {
             const res = await screenApis.getAll()
             if (res.success && res) {
                 console.log(res)
-                setScreenList(res.data)
-                setIsLoading(false)
+                if (!search) {
+                    setScreenList(res.data)
+                    setIsLoading(false)
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter(user => {
+                        const fullName = user.name.toLowerCase() + ' ' + user.rolecode.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setScreenList(filteredUser)
+                    setIsLoading(false)
+                }
             }
             else {
                 console.log(res)
@@ -228,7 +240,7 @@ const ScreenRole = () => {
             }
         }
         getScreenList()
-    }, [isRequest, showAddScreen, showEditScreen])
+    }, [isRequest, search, showAddScreen, showEditScreen])
 
     const deleteScreen = async (id) => {
         const res = await screenApis.deleteScreen(id)
@@ -253,6 +265,7 @@ const ScreenRole = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Cấp quyền cho role</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo mã, tên vai trò ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-add-screen' onClick={() => setShowAddScreen(true)}><FontAwesomeIcon icon={faPlus} />Thêm</button>
             <div className='admin-screen-table'>
                 {isLoading && <CircularProgress sx={{

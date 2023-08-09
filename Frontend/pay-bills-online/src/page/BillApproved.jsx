@@ -154,6 +154,8 @@ const BillApproved = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
+    const [search, setSearch] = useState('')
+
     const username = localStorage.getItem('username');
 
     const handleClick = (event, name) => {
@@ -206,31 +208,41 @@ const BillApproved = () => {
     useEffect(() => {
         const getUserId = async () => {
             const res = await userApis.getUserByUsername(username);
-            if(res.success && res ){
+            if (res.success && res) {
                 setUserId(res.data.id);
             }
         }
         getUserId()
-    },[username])
+    }, [username])
 
 
     useEffect(() => {
         const getBillList = async () => {
             const res = await billApis.getAll()
             if (res.success && res) {
-                if (filterBill === '') {
-                    console.log(res)
-                    setBillList(res.data)
+                if (!search) {
+                    if (filterBill === '') {
+                        setBillList(res.data)
+                        setIsLoading(false)
+                    }
+                    else if (filterBill === 'Đã duyệt') {
+                        setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
+                    }
+                    else if (filterBill === 'Chưa duyệt') {
+                        setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
+                    }
+                    else if (filterBill === 'Đã thanh toán') {
+                        setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
+                    }
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter(user => {
+                        const fullName =  user.id + ' ' + user.customer_name.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setBillList(filteredUser)
                     setIsLoading(false)
-                }
-                else if (filterBill === 'Đã duyệt') {
-                    setBillList(res.data.filter(item => item.status === 'CHỜ THANH TOÁN'))
-                }
-                else if (filterBill === 'Chưa duyệt') {
-                    setBillList(res.data.filter(item => item.status === 'CHƯA DUYỆT'))
-                }
-                else if (filterBill === 'Đã thanh toán') {
-                    setBillList(res.data.filter(item => item.status === 'ĐÃ THANH TOÁN'))
                 }
             }
             else {
@@ -240,7 +252,7 @@ const BillApproved = () => {
             }
         }
         getBillList()
-    }, [isRequest, filterBill])
+    }, [isRequest, filterBill, search])
 
 
     const approvedBill = async (id) => {
@@ -283,14 +295,17 @@ const BillApproved = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Duyệt hoá đơn</Typography>
-            <div className='filter-bill'>
-                <label>Lọc</label>
-                <select onChange={(e) => setFilterBill(e.target.value)}>
-                <option value=''>----Chọn---</option>
-                    <option value='Đã duyệt'>Đã duyệt</option>
-                    <option value='Chưa duyệt'>Chưa duyệt</option>
-                    <option value='Đã thanh toán'>Đã thanh toán</option>
-                </select>
+            <div className='search-group'>
+                <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
+                <div className='filter-bill'>
+                    <label>Lọc</label>
+                    <select onChange={(e) => setFilterBill(e.target.value)}>
+                        <option value=''>----Chọn---</option>
+                        <option value='Đã duyệt'>Đã duyệt</option>
+                        <option value='Chưa duyệt'>Chưa duyệt</option>
+                        <option value='Đã thanh toán'>Đã thanh toán</option>
+                    </select>
+                </div>
             </div>
             <div className='bill-create-table'>
                 {isLoading && <CircularProgress sx={{

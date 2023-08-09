@@ -162,6 +162,7 @@ const AdminUser = () => {
     const [showEditUser, setShowEditUser] = useState(false);
 
     const username = localStorage.getItem('username');
+    const [search, setSearch] = useState('')
 
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
@@ -250,16 +251,28 @@ const AdminUser = () => {
             const res = await userApis.getAll()
             if (res.success && res) {
                 console.log(res)
-                setUserList(res.data)
-                setIsLoading(false)
+                if (!search) {
+                    setUserList(res.data)
+                    setIsLoading(false)
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = res.data.filter(user => {
+                        const fullName =  user.firstname.toLowerCase() + ' ' + user.lastname.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setUserList(filteredUser)
+                    setIsLoading(false)
+                }
             }
             else {
                 console.log(res)
+                setUserList('')
                 setIsLoading(false)
             }
         }
         getAllUser()
-    }, [isRequest, showAddUser, showEditUser])
+    }, [isRequest, search, showAddUser, showEditUser])
 
     const formatDate = (date) => {
         const increasedDate = addDays(new Date(date), 0);
@@ -308,6 +321,7 @@ const AdminUser = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Quản trị người dùng</Typography>
+            <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
             <button className='btn-admin-add' onClick={() => setShowAddUser(true)}><FontAwesomeIcon icon={faPlus} />Thêm người dùng</button>
             <div className='admin-user-table'>
                 {isLoading && <CircularProgress sx={{

@@ -150,6 +150,8 @@ const MyBill = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
+    const [search, setSearch] = useState('')
+
     useEffect(() => {
         const getUserInfo = async () => {
             const res = await userApis.getUserByUsername(username)
@@ -205,8 +207,20 @@ const MyBill = () => {
             const res = await billApis.getAll()
             if (res.success && res && userId) {
                 console.log(res)
-                setBillList(res.data.filter(bill => (bill.status === 'ĐÃ THANH TOÁN' && bill.done_id === userId)))
-                setIsLoading(false)
+                const filtered = res.data.filter(bill => (bill.status === 'ĐÃ THANH TOÁN' && bill.done_id === userId))
+                if (!search) {
+                    setBillList(filtered)
+                    setIsLoading(false)
+                }
+                else {
+                    const searchText = search.toLowerCase()
+                    const filteredUser = filtered.filter(user => {
+                        const fullName =  user.id + ' ' + user.customer_name.toLowerCase();
+                        return fullName.includes(searchText)
+                    })
+                    setBillList(filteredUser)
+                    setIsLoading(false)
+                }
             }
             else {
                 console.log(res)
@@ -215,7 +229,7 @@ const MyBill = () => {
             }
         }
         getBillList()
-    }, [userId])
+    }, [search, userId])
 
 
 
@@ -238,6 +252,7 @@ const MyBill = () => {
                 fontWeight: 'bold',
                 textAlign: 'center',
             }}>Hoá đơn của tôi</Typography>
+                <input className='input-search' placeholder='Tìm kiếm theo tên ....' onChange={(e) => setSearch(e.target.value)} />
             <div className='my-bill-table'>
                 {isLoading && <CircularProgress sx={{
                     position: 'absolute',
@@ -277,7 +292,7 @@ const MyBill = () => {
                                                     </TableCell>
                                                     <TableCell >{row.service_name}</TableCell>
                                                     <TableCell >{row.supplier_name}</TableCell>
-                                                    <TableCell >{row.firstname} {row.lastname}</TableCell>
+                                                    <TableCell >{row.customer_name}</TableCell>
                                                     <TableCell >{formattedPrice(row.amount)} đ</TableCell>
                                                     <TableCell >{formatDate(row.due_date)}</TableCell>
                                                     <TableCell >
