@@ -5,12 +5,18 @@ const CableTV = function (cabletv) {
     this.start_date = cabletv.start_date;
     this.end_date = cabletv.end_date;
     this.price = cabletv.price;
+    this.customer_name = cabletv.customer_name;
+    this.customer_address = cabletv.customer_address;
+    this.customer_phone = cabletv.customer_phone;
+    this.customer_code = cabletv.customer_code;
     this.service_id = cabletv.service_id;
-    this.user_id = cabletv.user_id;
 }
 
 CableTV.getAll = function (callback) {
-    db.query("SELECT * FROM cabletv", (err, results) => {
+    db.query(`SELECT cabletv.* , services.name as service_name , suppliers.name as supplier_name, suppliers.id as supplier_id
+    FROM cabletv
+    INNER JOIN services on cabletv.service_id = services.id
+    INNER JOIN suppliers on services.supplier_id = suppliers.id`, (err, results) => {
         if (err) {
             callback(err, null);
         } else {
@@ -24,8 +30,8 @@ CableTV.getAll = function (callback) {
     })
 }
 
-CableTV.getByUserId = function (id, callback) {
-    db.query(`SELECT * FROM cabletv WHERE user_id = ${id}`, (err, results) => {
+CableTV.getByServiceId = function (id, callback) {
+    db.query(`SELECT * FROM cabletv WHERE service_id = ${id}`, (err, results) => {
         if (err) {
             callback(err, null);
         } else {
@@ -56,10 +62,10 @@ CableTV.getById = function (id, callback) {
 }
 
 CableTV.createCab = function (cabData, callback) {
-    const {package_name, start_date, end_date, price, service_id, user_id} = cabData;
-    const query = 'INSERT INTO cabletv (package_name, start_date, end_date, price, service_id, user_id) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(query, [package_name, start_date, end_date, price, service_id, user_id], (err, results) => {
-        if(err) {
+    const { package_name, start_date, end_date, price, customer_name, customer_phone, customer_address, customer_code, service_id } = cabData;
+    const query = 'INSERT INTO cabletv (package_name, start_date, end_date, price, customer_name, customer_phone, customer_address, customer_code, service_id) VALUES (?, ?, ?, ?, ?, ?,? ,?,?)';
+    db.query(query, [package_name, start_date, end_date, price, customer_name, customer_phone, customer_address, customer_code, service_id], (err, results) => {
+        if (err) {
             callback(err, null);
         }
         else {
@@ -70,10 +76,10 @@ CableTV.createCab = function (cabData, callback) {
 }
 
 CableTV.updateCab = function (id, cabData, callback) {
-    const {package_name, start_date, end_date, price, service_id, user_id} = cabData;
-    const query = 'UPDATE cabletv SET package_name =?, start_date =?, end_date =?, price =?, service_id =?, user_id =? WHERE id =?';
-    db.query(query, [package_name, start_date, end_date, price, service_id, user_id, id], (err, results) => {
-        if(err) {
+    const { package_name, start_date, end_date, price, customer_name, customer_phone, customer_address, customer_code, service_id} = cabData;
+    const query = 'UPDATE cabletv SET package_name =?, start_date =?, end_date =?, price =?, customer_name = ?, customer_phone=?, customer_address = ?, customer_code = ? , service_id =? WHERE id =?';
+    db.query(query, [package_name, start_date, end_date, price,customer_name, customer_phone, customer_address, customer_code, service_id, id], (err, results) => {
+        if (err) {
             callback(err, null);
         }
         else {
@@ -82,10 +88,10 @@ CableTV.updateCab = function (id, cabData, callback) {
     })
 }
 
-CableTV.deleteCab = function(id, callback) {
+CableTV.deleteCab = function (id, callback) {
     const query = 'DELETE FROM cabletv WHERE id =?';
     db.query(query, [id], (err, results) => {
-        if(err) {
+        if (err) {
             callback(err, null);
         }
         else {

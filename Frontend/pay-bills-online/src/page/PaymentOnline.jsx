@@ -21,12 +21,11 @@ const PaymentOnline = () => {
     const [billInfo, setBillInfo] = useState('')
     const [billList, setBillList] = useState('')
     const [selectedInfo, setSelectedInfo] = useState('')
-    const [userInfo, setUserInfo] = useState('')
     const [userBankList, setUserBankList] = useState('')
     const [checkBill, setCheckBill] = useState(false)
     const [selectedBank, setSelectedBank] = useState('')
     const [currentTime, setCurrentTime] = useState('')
-    // const [billId, setBillId] = useState('')
+    const [cusCode, setCusCode] = useState('')
     const [description, setDescription] = useState('')
 
     const [isLoading, setIsLoading] = useState(false)
@@ -42,6 +41,7 @@ const PaymentOnline = () => {
             const res = await userApis.getUserByUsername(username)
             if (res.success && res) {
                 setCurrentUserId(res.data.id)
+                setUserId(res.data.id)
             }
         }
         getCurrentUSer()
@@ -68,15 +68,11 @@ const PaymentOnline = () => {
     }
     const formattedPrice = (balance) => {
         const formattedBalance = balance.toLocaleString('vi-VN');
-
         return formattedBalance;
     }
 
     const handleSelect = (id) => {
-        const filteredTemp = billInfo.filter(item => {
-            // Check if item.id is not in billInfo
-            return !billInfo.some(bill => bill.meter_id === item.id);
-        })
+        const filteredTemp = billInfo.filter(filter => filter.id === parseInt(id));
         setSelectedInfo(filteredTemp[0]);
     }
 
@@ -91,6 +87,7 @@ const PaymentOnline = () => {
     }
 
     const handleChangeOptions = (value) => {
+        setBillInfo('')
         setSelectedInfo('')
         setSelectedBank('')
         setCheck(value)
@@ -115,7 +112,6 @@ const PaymentOnline = () => {
                 due_date: formattedDate,
                 amount: amount,
                 status: 'CHỜ THANH TOÁN',
-                user_id: parseInt(userId),
                 create_id: parseInt(userId),
                 approved_id: parseInt(userId),
                 meter_id: selectedInfo.id,
@@ -143,7 +139,6 @@ const PaymentOnline = () => {
                 due_date: formattedDate,
                 amount: selectedInfo.price,
                 status: 'CHỜ THANH TOÁN',
-                user_id: parseInt(userId),
                 create_id: parseInt(userId),
                 approved_id: parseInt(userId),
                 meter_id: null,
@@ -167,22 +162,6 @@ const PaymentOnline = () => {
     }
 
     useEffect(() => {
-        const getUserInfo = async () => {
-            if (userId) {
-                const res = await userApis.getById(userId)
-                if (res.success && res) {
-                    setUserInfo(res.data)
-                }
-                else {
-                    console.log(res)
-                    setUserInfo('')
-                }
-            }
-        }
-        getUserInfo()
-    }, [userId]);
-
-    useEffect(() => {
         const getBillList = async () => {
             const res = await billApis.getAllBill()
             if (res.success && res) {
@@ -201,18 +180,14 @@ const PaymentOnline = () => {
 
     useEffect(() => {
         const getBillInfo = async () => {
-            if (userId && check === 'true' && billList) {
-                console.log(userId)
-                const res = await billApis.getService(userId)
+            if (check === 'true' && billList && cusCode) {
+                const res = await meterApis.getAll()
                 if (res.success && res) {
                     const filteredTemp = res.data.filter(item => {
-                        return !billList.some(bill => bill.meter_id === item.id);
+                        return billList.some(bill => bill.meter_id !== item.id && item.customer_code === cusCode.toUpperCase());
                     });
                     console.log(res)
-                    setBillInfo(filteredTemp)
-                    if (filteredTemp.length === 0) {
-                        toast.error("Bạn không có hoá đơn nào")
-                    }
+                    setBillInfo(filteredTemp)   
                 }
                 else {
                     console.log(res)
@@ -220,18 +195,15 @@ const PaymentOnline = () => {
                     setBillInfo('')
                 }
             }
-            else if (userId && check === 'false' && billList) {
-                const res = await billApis.getCableByUserId(userId)
+            else if (check === 'false' && billList && cusCode) {
+                const res = await cabApis.getAll()
                 if (res.success && res) {
                     const filteredTemp = res.data.filter(item => {
-                        return !billList.some(bill => bill.cab_id === item.id);
+                        return billList.some(bill => bill.cab_id !== item.id && item.customer_code === cusCode.toUpperCase());
                     });
                     console.log(res)
                     console.log(filteredTemp)
                     setBillInfo(filteredTemp)
-                    if (filteredTemp.length === 0) {
-                        toast.error("Bạn không có hoá đơn nào")
-                    }
                 }
                 else {
                     toast.error("Bạn không có hoá đơn nào")
@@ -244,7 +216,7 @@ const PaymentOnline = () => {
             }
         }
         getBillInfo()
-    }, [billList, check, userId]);
+    }, [billList, check, cusCode, userId]);
 
     useEffect(() => {
         const updateCurrentTime = () => {
@@ -340,6 +312,8 @@ const PaymentOnline = () => {
                                     toast.success('Thanh toán hoá đơn thành công')
                                     setSelectedInfo('')
                                     setUserId('')
+                                    setCheck('')
+                                    setCusCode('')
                                     setSelectedBank('')
                                     setIsLoading(false)
                                 }
@@ -376,11 +350,7 @@ const PaymentOnline = () => {
             <div className='left-payment-online'>
                 <div className='top-left-payment-online'>
                     <div className='flex-row-group'>
-                        <label>Mã khách hàng</label>
-                        <input type='text' placeholder='Nhập mã khách hàng' onChange={(e) => setUserId(e.target.value)} value={userId || ''}/>
-                    </div>
-                    <div className='flex-row-group'>
-                        <label>Loại dịch vụ</label>
+                        <label>Dịch vụ</label>
                         <select onChange={(e) => handleChangeOptions(e.target.value)} value={check || ''}>
                             <option value=''>---Chọn---</option>
                             <option value='true'>Điện, nước</option>
@@ -388,12 +358,16 @@ const PaymentOnline = () => {
                         </select>
                     </div>
                     <div className='flex-row-group'>
-                        <label>Các dịch vụ đang dùng</label>
+                        <label>Mã khách hàng</label>
+                        <input type='text' placeholder='Nhập mã khách hàng' onChange={(e) => setCusCode(e.target.value)} value={cusCode || ''}/>
+                    </div>
+                    <div className='flex-row-group'>
+                        <label>Hoá đơn của bạn</label>
                         <select onChange={(e) => handleSelect(e.target.value)} >
                             <option value=''>---Chọn---</option>
                             {billInfo.length > 0 && check === 'true' && billInfo.map((item, index) => {
                                 const price = `${(item.meter_reading_new - item.meter_reading_old) * item.price}`
-                                return <option value={item.id} key={index}>Nhà cung cấp: {item.supplier_name}, Dịch vụ: {item.service_name}, Chỉ số: {item.meter_reading_old} - {item.meter_reading_new}, Giá: {formattedPrice(parseInt(price))} đ</option>
+                                return <option value={item.id} key={index}>Nhà cung cấp: {item.supplier_name}, Dịch vụ: {item.service_name}, Chỉ số: {item.meter_reading_old} - {item.meter_reading_new}, Kỳ thanh toán: {item.payment_period}, Giá: {formattedPrice(parseInt(price))} đ</option>
                             })}
                             {billInfo.length > 0 && check === 'false' && billInfo.map((item, index) => {
                                 return <option value={item.id} key={index}>Nhà cung cấp: {item.supplier_name}, Dịch vụ: {item.service_name}, Tên gói: {item.package_name}, Giá: {formattedPrice(item.price)} đ</option>
@@ -405,7 +379,7 @@ const PaymentOnline = () => {
                     <form className='form-payment-online'>
                         {selectedInfo && check === 'true' && <><div className='flex-group-payment-online'>
                             <label>Tên khách hàng:</label>
-                            <span>{userInfo && `${userInfo.firstname} ${userInfo.lastname}`}</span>
+                            <span>{selectedInfo && selectedInfo.customer_name}</span>
                         </div>
                             <div className='flex-group-payment-online'>
                                 <label>Nhà cung cấp:</label>
@@ -425,7 +399,7 @@ const PaymentOnline = () => {
                             </div>
                             <div className='flex-group-payment-online'>
                                 <label>Kỳ thanh toán:</label>
-                                <span>{selectedInfo && `${formatDate(selectedInfo.meter_date_old)} - ${formatDate(selectedInfo.meter_date_new)}`}</span>
+                                <span>{selectedInfo && selectedInfo.payment_period}</span>
                             </div>
                             <div className='flex-group-payment-online'>
                                 <label>Tiêu thụ:</label>
@@ -442,7 +416,7 @@ const PaymentOnline = () => {
 
                         {selectedInfo && check === 'false' && <><div className='flex-group-payment-online'>
                             <label>Tên khách hàng:</label>
-                            <span>{userInfo && `${userInfo.firstname} ${userInfo.lastname}`}</span>
+                            <span>{selectedInfo && selectedInfo.customer_name}</span>
                         </div>
                             <div className='flex-group-payment-online'>
                                 <label>Nhà cung cấp:</label>
@@ -483,7 +457,7 @@ const PaymentOnline = () => {
                         <select onChange={(e) => handChangeBankCard(e.target.value)} disabled={selectedInfo ? false : true} >
                             <option value=''>---Chọn---</option>
                             {userBankList && userBankList.map((item, index) => {
-                                return <option value={item.id} key={index}>{item.bank_name} - {item.card_number}</option>;
+                                return <option value={item.id} key={index}>Số tài khoản: {item.card_number}</option>;
                             })}
                         </select>
                     </div>
@@ -507,7 +481,7 @@ const PaymentOnline = () => {
                         </div>
                         <div>
                             <label>Hình thức thanh toán: </label>
-                            <select disabled={true}>
+                            <select disabled={true}>    
                                 <option>Thanh toán online</option>
                             </select>
                         </div>
@@ -527,4 +501,4 @@ const PaymentOnline = () => {
     )
 }
 
-export default PaymentOnline
+export default PaymentOnline    

@@ -12,10 +12,10 @@
 
 .main-add-meter {
     width: 500px;
-    height: 380px;
+    height: 540px;
     background-color: #e8f4ff;
     position: relative;
-    top: 100px;
+    top: 80px;
     left: 500px;
     border-radius: 10px;
     z-index: 9999;
@@ -80,6 +80,7 @@
         border-radius: 10px;
         border: 1px solid #ccc;
     }
+
     .btn-save-meter {
         margin-top: 10px;
         height: 40px;

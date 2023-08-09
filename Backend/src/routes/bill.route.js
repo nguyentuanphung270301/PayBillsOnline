@@ -12,8 +12,8 @@ router.put('/updatestatus/:id', authMiddleware.authenticateToken, billController
 router.put('/updatestatuspayment/:id', authMiddleware.authenticateToken, billController.updateStatusBillPayment)
 
 router.delete('/delete/:id', authMiddleware.authenticateToken, billController.deleteBill);
-router.get('/getByUserId/:id', authMiddleware.authenticateToken, billController.getServiceByUserId)
-router.get('/getCableByUserId/:id', authMiddleware.authenticateToken,billController.getCableByUserId)
+router.get('/get/meter', authMiddleware.authenticateToken, billController.getServiceByUserId)
+router.get('/get/cable', authMiddleware.authenticateToken,billController.getCableByUserId)
 router.get('/getBillMeterById/:id', authMiddleware.authenticateToken,billController.getBillMeterById)
 router.get('/getBillCabById/:id', authMiddleware.authenticateToken,billController.getBillCabById)
 

@@ -109,7 +109,7 @@ const PrintBill = () => {
                 },
                 callback: async (pdf) => {
                     // Lưu tệp PDF và gọi hàm resolve() khi hoàn thành
-                    const filename = `${billInfo.bill_id}_${billInfo.firstname}_${billInfo.lastname}`;
+                    const filename = `${billInfo.bill_id}_${billInfo.customer_name}`;
                     pdf.save(filename); // Không cần hỏi trước khi tải
                     resolve();
                 },
@@ -124,8 +124,8 @@ const PrintBill = () => {
             await new Promise((resolve) => setTimeout(resolve, 10000));
 
             const sendBillData = {
-                email: billInfo.email,
-                file_name: `${billInfo.bill_id}_${billInfo.firstname}_${billInfo.lastname}`
+                email: userPayment.email,
+                file_name: `${billInfo.bill_id}_${billInfo.customer_name}`
             };
 
             const res = await emailApis.sendBill(sendBillData);
@@ -176,23 +176,19 @@ const PrintBill = () => {
                             <label>Thông tin khách hàng</label>
                             <div className='flex-group'>
                                 <label>Mã khách hàng:</label>
-                                <span>{billInfo && billInfo.user_id}</span>
+                                <span>{billInfo && billInfo.customer_code}</span>
                             </div>
                             <div className='flex-group'>
                                 <label>Họ tên khách hàng:</label>
-                                <span>{billInfo && `${billInfo.firstname} ${billInfo.lastname}`}</span>
+                                <span>{billInfo && `${billInfo.customer_name}`}</span>
                             </div>
                             <div className='flex-group'>
                                 <label>Số điện thoại:</label>
-                                <span>{billInfo && billInfo.phone}</span>
-                            </div>
-                            <div className='flex-group'>
-                                <label>Email:</label>
-                                <span>{billInfo && billInfo.email}</span>
+                                <span>{billInfo && billInfo.customer_phone}</span>
                             </div>
                             <div className='flex-group'>
                                 <label>Địa chỉ:</label>
-                                <span>{billInfo && billInfo.address}</span>
+                                <span>{billInfo && billInfo.customer_address}</span>
                             </div>
                         </div>
                     </div>
@@ -217,7 +213,7 @@ const PrintBill = () => {
                             </div>
                             <div className='flex-column-print-bill'>
                                 <label>Kỳ thanh toán</label>
-                                <span>{billInfo && `${formatDate(billInfo.meter_date_old)} - ${formatDate(billInfo.meter_date_new)}`}</span>
+                                <span>{billInfo && billInfo.payment_period}</span>
                             </div>
                             <div className='flex-column-print-bill'>
                                 <label>Tiêu thụ</label>
@@ -270,12 +266,7 @@ const PrintBill = () => {
                             </div>
                             {billInfo && billInfo.userbankcard_id !== null &&
                                 <div className='flex-group'>
-                                    <label>Ngân hàng:</label>
-                                    <span>{billInfo && billInfo.bank_name}</span>
-                                </div>}
-                            {billInfo && billInfo.userbankcard_id !== null &&
-                                <div className='flex-group'>
-                                    <label>Tên chủ thẻ:</label>
+                                    <label>Tên chủ tài khoản:</label>
                                     <span>{billInfo && billInfo.holder_name}</span>
                                 </div>}
                             {billInfo && billInfo.userbankcard_id !== null &&

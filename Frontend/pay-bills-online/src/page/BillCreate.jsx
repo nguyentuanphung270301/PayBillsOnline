@@ -320,7 +320,7 @@ const BillCreate = () => {
                                                     </TableCell>
                                                     <TableCell >{row.service_name}</TableCell>
                                                     <TableCell >{row.supplier_name}</TableCell>
-                                                    <TableCell >{row.firstname} {row.lastname}</TableCell>
+                                                    <TableCell >{row.customer_name}</TableCell>
                                                     <TableCell >{formattedPrice(row.amount)} đ</TableCell>
                                                     <TableCell >{formatDate(row.due_date)}</TableCell>
                                                     <TableCell >

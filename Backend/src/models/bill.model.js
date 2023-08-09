@@ -15,67 +15,61 @@ const Bill = function (bill) {
 
 Bill.getAll = function (callback) {
   const query = `
-    SELECT 
-    bills.id, 
-    bills.user_id,
-    bills.due_date, 
-    bills.amount, 
-    bills.status,
-    bills.cab_id,
-    bills.meter_id,
-    users.firstname, 
-    users.lastname,
-    services.name as service_name, 
-    suppliers.name as supplier_name,
-    payment.payment_method
-  FROM 
-    bills
-  INNER JOIN 
-    users ON bills.user_id = users.id 
-  INNER JOIN 
-    meterindex ON bills.meter_id = meterindex.id
-  LEFT JOIN 
-    cabletv ON bills.cab_id = cabletv.id
-  INNER JOIN 
-    services ON meterindex.service_id = services.id
-  INNER JOIN 
-    suppliers ON services.supplier_id = suppliers.id
-  LEFT JOIN 
-    payment ON bills.id = payment.bill_id
-  WHERE 
-    bills.cab_id IS NULL
-  
-  UNION ALL
-  
   SELECT 
-    bills.id, 
-    bills.user_id,
-    bills.due_date, 
-    bills.amount, 
-    bills.status,
-    bills.cab_id,
-    bills.meter_id,
-    users.firstname, 
-    users.lastname,
-    services.name as service_name, 
-    suppliers.name as supplier_name,
-    payment.payment_method
-  FROM 
-    bills
-  INNER JOIN 
-    users ON bills.user_id = users.id 
-  LEFT JOIN 
-    meterindex ON bills.meter_id = meterindex.id
-  INNER JOIN 
-    cabletv ON bills.cab_id = cabletv.id
-  INNER JOIN 
-    services ON cabletv.service_id = services.id
-  INNER JOIN 
-    suppliers ON services.supplier_id = suppliers.id
-   LEFT JOIN 
-    payment ON bills.id = payment.bill_id
-  WHERE 
-    bills.meter_id IS NULL;
+  bills.id, 
+  bills.due_date, 
+  bills.amount, 
+  bills.status,
+  bills.cab_id,
+  bills.meter_id,
+  bills.done_id,
+  meterindex.customer_name,	
+  services.name as service_name, 
+  suppliers.name as supplier_name,
+  payment.payment_method
+FROM 
+  bills
+INNER JOIN 
+  meterindex ON bills.meter_id = meterindex.id
+LEFT JOIN 
+  cabletv ON bills.cab_id = cabletv.id
+INNER JOIN 
+  services ON meterindex.service_id = services.id
+INNER JOIN 
+  suppliers ON services.supplier_id = suppliers.id
+LEFT JOIN 
+  payment ON bills.id = payment.bill_id
+WHERE 
+  bills.cab_id IS NULL
+
+UNION ALL
+
+SELECT 
+  bills.id, 
+  bills.due_date, 
+  bills.amount, 
+  bills.status,
+  bills.cab_id,
+  bills.meter_id,
+  bills.done_id,
+cabletv.customer_name,	
+  services.name as service_name, 
+  suppliers.name as supplier_name,
+  payment.payment_method
+FROM 
+  bills
+LEFT JOIN 
+  meterindex ON bills.meter_id = meterindex.id
+INNER JOIN 
+  cabletv ON bills.cab_id = cabletv.id
+INNER JOIN 
+  services ON cabletv.service_id = services.id
+INNER JOIN 
+  suppliers ON services.supplier_id = suppliers.id
+ LEFT JOIN 
+  payment ON bills.id = payment.bill_id
+WHERE 
+  bills.meter_id IS NULL;
     `;
 
   db.query(query, (err, results) => {
@@ -105,14 +99,13 @@ Bill.getAllBill = function (callback) {
   })
 }
 
-Bill.getServiceByUserId = function (id, callback) {
+Bill.getServiceByUserId = function (callback) {
   db.query(`Select meterindex.* , services.name as service_name, services.price , suppliers.name as supplier_name, suppliers.id as supplier_id
   from meterindex
   inner join 
   services on meterindex.service_id = services.id
   inner join
-  suppliers on services.supplier_id = suppliers.id
-  WHERE meterindex.user_id = ${id}`, (err, results) => {
+  suppliers on services.supplier_id = suppliers.id`, (err, results) => {
     if (err) {
       callback(err, null);
     } else {
@@ -135,16 +128,15 @@ Bill.getBillMeterById = function (id, callback) {
   bills.create_id,
   bills.approved_id,
   bills.done_id,
-  bills.user_id,
-  users.firstname,
-  users.lastname,
-  users.email,
-  users.phone,
-  users.address,
   meterindex.meter_reading_new,
   meterindex.meter_date_new,
   meterindex.meter_reading_old,
   meterindex.meter_date_old,
+  meterindex.payment_period,
+  meterindex.customer_code,
+  meterindex.customer_name,
+  meterindex.customer_address,
+  meterindex.customer_phone,
   services.name AS service_name,
   services.price AS service_price,
   suppliers.name AS supplier_name,
@@ -156,7 +148,6 @@ Bill.getBillMeterById = function (id, callback) {
   userbankcard.card_number,
   userbankcard.holder_name
 FROM bills
-LEFT JOIN users ON bills.user_id = users.id
 LEFT JOIN meterindex ON bills.meter_id = meterindex.id
 LEFT JOIN services ON meterindex.service_id = services.id
 LEFT JOIN suppliers ON services.supplier_id = suppliers.id
@@ -185,16 +176,14 @@ Bill.getBillCabById = function (id, callback) {
   bills.create_id,
   bills.approved_id,
   bills.done_id,
-  bills.user_id,
-  users.firstname,
-  users.lastname,
-  users.email,
-  users.phone,
-  users.address,
   cabletv.package_name,
   cabletv.start_date,
   cabletv.end_date,
   cabletv.price,
+ cabletv.customer_code,
+ cabletv.customer_name,
+ cabletv.customer_address,
+ cabletv.customer_phone,
   services.name AS service_name,
   services.price AS service_price,
   suppliers.name AS supplier_name,
@@ -206,7 +195,6 @@ Bill.getBillCabById = function (id, callback) {
   userbankcard.card_number,
   userbankcard.holder_name
 FROM bills
-LEFT JOIN users ON bills.user_id = users.id
 LEFT JOIN cabletv ON bills.cab_id = cabletv.id
 LEFT JOIN services ON cabletv.service_id = services.id
 LEFT JOIN suppliers ON services.supplier_id = suppliers.id
@@ -226,14 +214,13 @@ WHERE bills.cab_id IS NOT NULL AND bills.id = ${id}`, (err, results) => {
   })
 }
 
-Bill.getCableByUserId = function (id, callback) {
+Bill.getCableByUserId = function ( callback) {
   db.query(`Select cabletv.* , services.name as service_name , suppliers.name as supplier_name, suppliers.id as supplier_id
   from cabletv
   inner join 
   services on cabletv.service_id = services.id
   inner join
-  suppliers on services.supplier_id = suppliers.id
-  WHERE cabletv.user_id = ${id}`, (err, results) => {
+  suppliers on services.supplier_id = suppliers.id`, (err, results) => {
     if (err) {
       callback(err, null);
     } else {
@@ -263,9 +250,9 @@ Bill.getById = function (id, callback) {
 }
 
 Bill.createBill = function (billData, callback) {
-  const { due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info } = billData
-  const query = "INSERT INTO bills (due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info) VALUES(?,?,?,?,?,?,?,?,?) ";
-  db.query(query, [due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info], (err, results) => {
+  const { due_date, amount, status, create_id, approved_id, meter_id, cab_id, info } = billData
+  const query = "INSERT INTO bills (due_date, amount, status,  create_id, approved_id, meter_id, cab_id, info) VALUES(?,?,?,?,?,?,?,?) ";
+  db.query(query, [due_date, amount, status,create_id, approved_id, meter_id, cab_id, info], (err, results) => {
     if (err) {
       callback(err, null);
     }
@@ -277,9 +264,9 @@ Bill.createBill = function (billData, callback) {
 }
 
 Bill.updateBill = function (id, billData, callback) {
-  const { due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info } = billData
-  const query = "UPDATE bills SET  due_date = ?, amount = ?, status = ?, user_id = ?, create_id = ?, approved_id = ?, meter_id = ?, cab_id = ?, info = ? WHERE id = ?"
-  db.query(query, [due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info, id], (err, results) => {
+  const { due_date, amount, status, create_id, approved_id, meter_id, cab_id, info } = billData
+  const query = "UPDATE bills SET  due_date = ?, amount = ?, status = ?, create_id = ?, approved_id = ?, meter_id = ?, cab_id = ?, info = ? WHERE id = ?"
+  db.query(query, [due_date, amount, status, create_id, approved_id, meter_id, cab_id, info, id], (err, results) => {
     if (err) {
       callback(err, null);
     }

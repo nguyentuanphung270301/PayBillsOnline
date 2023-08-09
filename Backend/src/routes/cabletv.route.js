@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/auth.middleware')
 
 router.get('/all', authMiddleware.authenticateToken, cableTVController.getAllCableTV);
 router.get('/:id', authMiddleware.authenticateToken, cableTVController.getCableTVById);
-router.get('/getuserid/:id', authMiddleware.authenticateToken, cableTVController.getCableTVByUserId);
+router.get('/getserviceid/:id', authMiddleware.authenticateToken, cableTVController.getCableTVByServiceId);
 router.post('/create', authMiddleware.authenticateToken, cableTVController.createCableTV);
 router.put('/update/:id', authMiddleware.authenticateToken, cableTVController.updateCab);
 router.delete('/delete/:id', authMiddleware.authenticateToken, cableTVController.deleteCab);

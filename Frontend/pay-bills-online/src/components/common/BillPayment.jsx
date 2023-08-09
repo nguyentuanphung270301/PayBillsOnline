@@ -184,23 +184,19 @@ const BillPayment = ({ id, onClose, check }) => {
                     <div className='bill-payment-customer'>
                         <div className='flex-info'>
                             <label>Mã khách hàng: </label>
-                            <label className='label-info'>{billInfo && billInfo.user_id}</label>
+                            <label className='label-info'>{billInfo && billInfo.customer_code}</label>
                         </div>
                         <div className='flex-info'>
                             <label>Tên khách hàng: </label>
-                            <label className='label-info'>{billInfo && `${billInfo.firstname} ${billInfo.lastname}`}</label>
+                            <label className='label-info'>{billInfo && `${billInfo.customer_name}`}</label>
                         </div>
                         <div className='flex-info'>
                             <label>Số điện thoại: </label>
-                            <label className='label-info'>{billInfo && billInfo.phone}</label>
-                        </div>
-                        <div className='flex-info'>
-                            <label>Email: </label>
-                            <label className='label-info'>{billInfo && billInfo.email}</label>
+                            <label className='label-info'>{billInfo && billInfo.customer_phone}</label>
                         </div>
                         <div className='flex-info'>
                             <label>Địa chỉ: </label>
-                            <label className='label-info'>{billInfo && billInfo.address}</label>
+                            <label className='label-info'>{billInfo && billInfo.customer_address}</label>
                         </div>
                     </div>
                     <div className='bill-payment-service'>
@@ -226,7 +222,7 @@ const BillPayment = ({ id, onClose, check }) => {
                             </div>
                             <div className='flex-info'>
                                 <label>Kỳ thanh toán: </label>
-                                <label className='label-info'>{billInfo && `${formatDate(billInfo.meter_date_old)} - ${formatDate(billInfo.meter_date_new)}`}</label>
+                                <label className='label-info'>{billInfo && billInfo.payment_period}</label>
                             </div></>}
                         {!check && <>
                             <div className='flex-info'>

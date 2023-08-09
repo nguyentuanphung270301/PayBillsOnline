@@ -32,8 +32,7 @@ exports.getById = (req, res) => {
 }
 
 exports.getServiceByUserId = (req, res) => {
-    const userId = req.params.id
-    Bill.getServiceByUserId(userId, function (err, data) {
+    Bill.getServiceByUserId(function (err, data) {
         if (err) {
             res.status(500).send({ error: err, success: false });
         } else {
@@ -65,8 +64,7 @@ exports.getBillCabById = (req, res) => {
 }
 
 exports.getCableByUserId = (req, res) => {
-    const userId = req.params.id
-    Bill.getCableByUserId(userId, function (err, data) {
+    Bill.getCableByUserId(function (err, data) {
         if (err) {
             res.status(500).send({ error: err, success: false });
         } else {
@@ -77,12 +75,11 @@ exports.getCableByUserId = (req, res) => {
 
 
 exports.createBill = (req, res) => {
-    const { due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info } = req.body
+    const { due_date, amount, status, create_id, approved_id, meter_id, cab_id, info } = req.body
     const newBill = {
         due_date: due_date,
         amount: amount,
         status: status,
-        user_id: user_id,
         create_id: create_id,
         approved_id: approved_id,
         meter_id: meter_id,
@@ -100,12 +97,11 @@ exports.createBill = (req, res) => {
 
 exports.updateBill = (req, res) => {
     const billId = req.params.id
-    const { due_date, amount, status, user_id, create_id, approved_id, meter_id, cab_id, info } = req.body
+    const { due_date, amount, status, create_id, approved_id, meter_id, cab_id, info } = req.body
     const newBill = {
         due_date: due_date,
         amount: amount,
         status: status,
-        user_id: user_id,
         create_id: create_id,
         approved_id: approved_id,
         meter_id: meter_id,

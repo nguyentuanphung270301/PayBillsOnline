@@ -345,7 +345,7 @@ const CabTV = () => {
                                                     <TableCell >{formatDate(row.end_date)}</TableCell>
                                                     <TableCell >{formattedPrice(row.price)} đ</TableCell>
                                                     <TableCell >{row.serviceName}</TableCell>
-                                                    <TableCell >{row.user_id} - {row.nameUser}</TableCell>
+                                                    <TableCell >{row.customer_code} - {row.customer_name}</TableCell>
 
                                                     <TableCell sx={{
                                                         display: 'flex',

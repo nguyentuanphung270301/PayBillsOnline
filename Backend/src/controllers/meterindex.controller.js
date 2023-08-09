@@ -23,9 +23,9 @@ exports.getById = (req, res) => {
     })
 }
 
-exports.getByUserId = (req, res) => {
+exports.getByServiceId = (req, res) => {
     const indexId = req.params.id
-    MeterIndex.getByUserId(indexId, function (err, data) {
+    MeterIndex.getByServiceId(indexId, function (err, data) {
         if (err) {
             res.status(500).send({ error: err, success: false });
         }
@@ -36,14 +36,18 @@ exports.getByUserId = (req, res) => {
 }
 
 exports.createMeter = (req, res) => {
-    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id } = req.body
+    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, payment_period, customer_name, customer_phone, customer_address, customer_code, service_id } = req.body
     const newMeter = {
         meter_reading_new: meter_reading_new,
         meter_date_new: meter_date_new,
         meter_reading_old: meter_reading_old,
         meter_date_old: meter_date_old,
+        payment_period: payment_period,
+        customer_name: customer_name,
+        customer_phone: customer_phone,
+        customer_address: customer_address,
+        customer_code: customer_code,
         service_id: service_id,
-        user_id: user_id
     }
     MeterIndex.createMeter(newMeter, function (err, data) {
         if (err) {
@@ -57,15 +61,19 @@ exports.createMeter = (req, res) => {
 
 exports.updateMeter = (req, res) => {
     const id = req.params.id
-    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, service_id, user_id } = req.body
+    const { meter_reading_new, meter_date_new, meter_reading_old, meter_date_old, payment_period, customer_name, customer_phone, customer_address, customer_code, service_id } = req.body
 
     const newMeter = {
         meter_reading_new: meter_reading_new,
         meter_date_new: meter_date_new,
         meter_reading_old: meter_reading_old,
         meter_date_old: meter_date_old,
+        payment_period: payment_period,
+        customer_name: customer_name,
+        customer_phone: customer_phone,
+        customer_address: customer_address,
+        customer_code: customer_code,
         service_id: service_id,
-        user_id: user_id
     }
     MeterIndex.updateMeter(id, newMeter, function (err, data) {
         if (err) {

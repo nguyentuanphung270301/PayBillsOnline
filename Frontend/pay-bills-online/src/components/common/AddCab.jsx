@@ -15,7 +15,10 @@ const AddCab = ({ onClose }) => {
     const [endDate, setEndDate] = useState('')
     const [price, setPrice] = useState(0)
     const [serviceId, setServiceId] = useState(0)
-    const [userId, setUserId] = useState(0)
+    const [cusName, setCusName] = useState('')
+    const [cusPhone, setCusPhone] = useState('')
+    const [cusAddress, setCusAddress] = useState('')
+    const [cusCode, setCusCode] = useState('')
 
     const [serviceList, setServiceList] = useState('')
     const [userList, setUserList] = useState('')
@@ -29,6 +32,37 @@ const AddCab = ({ onClose }) => {
             return null
         }
     }
+    useEffect(() => {
+        const getUserList = async () => {
+            const res = await cabApis.getAll()
+            if (res.success && serviceId) {
+                const uniqueData = [];
+                const user = res.data.filter(user => user.service_id === parseInt(serviceId));
+                if (user.length > 0) {
+                    user.forEach(item => {
+                        const existingItem = uniqueData.find(
+                            entry =>
+                                entry.service_id === item.service_id &&
+                                entry.customer_name === item.customer_name &&
+                                entry.customer_code === item.customer_code
+                        );
+                        if (!existingItem) {
+                            uniqueData.push(item);
+                            setUserList(uniqueData);
+                        }
+                    });
+                }
+                else {
+                    setUserList('')
+                }
+
+            }
+            else {
+                console.log(res)
+            }
+        }
+        getUserList()
+    }, [serviceId])
 
     useEffect(() => {
         const getServiceList = async () => {
@@ -53,6 +87,7 @@ const AddCab = ({ onClose }) => {
             }
             catch (error) {
                 console.log(error);
+                setServiceList('');
             }
         }
         getServiceList()
@@ -75,7 +110,7 @@ const AddCab = ({ onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         // Kiểm tra rỗng và các giá trị
-        if (!packageName || !startDate || !price || !serviceId || !userId) {
+        if (!packageName || !startDate || !price || !serviceId || !cusName || !cusCode || !cusAddress || !cusPhone) {
             toast.error('Vui lòng điền đầy đủ thông tin.');
             return;
         }
@@ -96,30 +131,65 @@ const AddCab = ({ onClose }) => {
             return;
         }
 
+        
+        if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(cusPhone)) {
+            toast.error('Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam hợp lệ.');
+            return;
+        }
+
+
         const data = {
             package_name: packageName,
             start_date: startDate,
             end_date: endDate,
             price: parseFloat(price),
+            customer_name: cusName.trim(),
+            customer_phone: cusPhone.trim(),
+            customer_address: cusAddress.trim(),
+            customer_code: cusCode.trim().toUpperCase(),
             service_id: parseInt(serviceId),
-            user_id: parseInt(userId)
         }
         const res = await cabApis.createCab(data)
         if (res.success && res) {
             toast.success('Thêm dữ liệu thành công')
             onClose()
         }
-        else{
+        else {
             console.log(res)
             toast.error(res.error.sqlMessage)
         }
     }
+
+    const handleSelectCus = (id) => {
+        if(id) {
+         const filteredTemp = userList.filter(item =>  item.id === parseInt(id))
+         setCusName(filteredTemp[0].customer_name)
+         setCusAddress(filteredTemp[0].customer_address)
+         setCusCode(filteredTemp[0].customer_code)
+         setCusPhone(filteredTemp[0].customer_phone)
+        }
+        else {
+         setCusName('')
+         setCusAddress('')
+         setCusCode('')
+         setCusPhone('')
+        }
+     }
 
     return (
         <div className='overlay'>
             <div className='main-add-cab'>
                 <FontAwesomeIcon icon={faXmark} onClick={onClose} className='icon-close-add-cab' />
                 <form className='form-add-cab' onSubmit={handleSubmit}>
+                    <div className='form-flex-column-cab'>
+                        <label>Dịch vụ - Nhà cung cấp</label>
+                        <select onChange={(e) => setServiceId(e.target.value)}>
+                            <option value=''>---Chọn---</option>
+                            {serviceList && serviceList.map((item, index) => {
+                                return <option value={item.id} key={index}>{item.name} - {item.supplierName}</option>;
+                            })}
+                        </select>
+                    </div>
                     <div className='form-flex-column-cab'>
                         <label>Tên gói</label>
                         <input
@@ -153,22 +223,53 @@ const AddCab = ({ onClose }) => {
                         />
                     </div>
                     <div className='form-flex-column-cab'>
-                        <label>Dịch vụ - Nhà cung cấp</label>
-                        <select onChange={(e) => setServiceId(e.target.value)}>
+                        <label>Khách hàng đã có trong hệ thống</label>
+                        <select onChange={(e) => handleSelectCus(e.target.value)}>
                             <option value=''>---Chọn---</option>
-                            {serviceList && serviceList.map((item, index) => {
-                                return <option value={item.id} key={index}>{item.name} - {item.supplierName}</option>;
+                            {userList && userList.map((item, i) => {
+                                return <option value={item.id} key={i}>{item.customer_code} - {item.customer_name}</option>
                             })}
                         </select>
                     </div>
+                    <div className='form-flex-cab'>
+                        <div className='form-flex-column-cab'>
+                            <label>Mã khách hàng</label>
+                            <input
+                                type='text'
+                                placeholder='Mã khách hàng'
+                                value={ cusCode || ''}
+                                onChange={(e) => setCusCode(e.target.value)}
+                            />
+                        </div>
+                        <div className='form-flex-column-cab'>
+                            <label>Tên khách hàng</label>
+                            <input
+                                type='text'
+                                placeholder='Tên khách hàng'
+                                value={ cusName || ''}
+                                onChange={(e) => setCusName(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className='form-flex-cab'>
                     <div className='form-flex-column-cab'>
-                        <label>Mã khách hàng - Tên khách hàng</label>
-                        <select onChange={(e) => setUserId(e.target.value)}>
-                            <option value=''>---Chọn---</option>
-                            {userList && userList.map((item, index) => {
-                                return <option value={item.id} key={index}>{item.id} - {item.firstname} {item.lastname}</option>;
-                            })}
-                        </select>
+                            <label>Số điện thoại khách hàng</label>
+                            <input
+                                type='text'
+                                placeholder='Số điện thoại khách hàng'
+                                value={ cusPhone || ''}
+                                onChange={(e) => setCusPhone(e.target.value)}
+                            />
+                        </div>
+                        <div className='form-flex-column-cab'>
+                            <label>Địa chỉ khách hàng</label>
+                            <input
+                                type='text'
+                                placeholder='Địa chỉ khách hàng'
+                                value={ cusAddress || ''}
+                                onChange={(e) => setCusAddress(e.target.value)}
+                            />
+                        </div>
                     </div>
                     <button className='btn-save-cab' type='submit'>Lưu</button>
                 </form>

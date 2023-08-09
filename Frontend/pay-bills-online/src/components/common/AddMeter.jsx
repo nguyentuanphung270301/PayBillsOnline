@@ -3,21 +3,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useState } from 'react'
 import '../../style/AddMeter.css'
 import serviceApis from '../../api/modules/service.api'
-import userApis from '../../api/modules/user.api'
 import { toast } from 'react-toastify'
 import meterApis from '../../api/modules/meterindex.api'
 import supplierApis from '../../api/modules/supplier.api'
+import { addDays, format, set } from 'date-fns'
 
 const AddMeter = ({ onClose }) => {
     const [oldMeter, setOldMeter] = useState(0)
     const [newMeter, setNewMeter] = useState(0)
     const [oldDate, setOldDate] = useState('')
     const [newDate, setNewDate] = useState('')
+    const [cusName, setCusName] = useState('')
+    const [cusPhone, setCusPhone] = useState('')
+    const [cusAddress, setCusAddress] = useState('')
+    const [cusCode, setCusCode] = useState('')
     const [serviceId, setServiceId] = useState(0)
-    const [userId, setUserId] = useState(0)
+    const [userList, setUserList] = useState('')
 
     const [serviceList, setServiceList] = useState('')
-    const [userList, setUserList] = useState('')
 
     const getSupplierInfoById = async (id) => {
         const res = await supplierApis.getById(id)
@@ -28,6 +31,38 @@ const AddMeter = ({ onClose }) => {
             return null
         }
     }
+
+    useEffect(() => {
+        const getUserList = async () => {
+            const res = await meterApis.getAll()
+            if (res.success && serviceId) {
+                const uniqueData = [];
+                const user = res.data.filter(user => user.service_id === parseInt(serviceId));
+                if (user.length > 0) {
+                    user.forEach(item => {
+                        const existingItem = uniqueData.find(
+                            entry =>
+                                entry.service_id === item.service_id &&
+                                entry.customer_name === item.customer_name &&
+                                entry.customer_code === item.customer_code
+                        );
+                        if (!existingItem) {
+                            uniqueData.push(item);
+                            setUserList(uniqueData);
+                        }
+                    });
+                }
+                else {
+                    setUserList('')
+                }
+
+            }
+            else {
+                console.log(res)
+            }
+        }
+        getUserList()
+    }, [serviceId])
 
     useEffect(() => {
         const getServiceList = async () => {
@@ -57,24 +92,12 @@ const AddMeter = ({ onClose }) => {
         getServiceList()
     }, [])
 
-    useEffect(() => {
-        const getUserList = async () => {
-            const res = await userApis.getAll()
-            if (res.success && res) {
-                setUserList(res.data)
-            }
-            else {
-                setUserList('')
-                console.log(res)
-            }
-        }
-        getUserList()
-    }, [])
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         // Kiểm tra rỗng
-        if (!oldMeter || !newMeter || !oldDate || !newDate || !serviceId || !userId) {
+        if (!oldMeter || !newMeter || !oldDate || !newDate || !serviceId || !cusName || !cusCode || !cusAddress || !cusPhone) {
             toast.error('Vui lòng điền đầy đủ thông tin.');
             return;
         }
@@ -93,6 +116,15 @@ const AddMeter = ({ onClose }) => {
             return;
         }
 
+        // Convert oldDate and newDate to Date objects
+        const oldDateCheck = new Date(oldDate);
+        const newDateCheck = new Date(newDate);
+
+        // Check if oldDate is the first day of the month and newDate is the last day of the same month
+        if (oldDateCheck.getDate() !== 1 || newDateCheck.getDate() !== new Date(newDateCheck.getFullYear(), newDateCheck.getMonth() + 1, 0).getDate()) {
+            toast.error('Ngày ghi số cũ phải là ngày đầu tháng và ngày ghi số mới phải là ngày cuối tháng trong cùng một tháng.');
+            return;
+        }
         // Kiểm tra ngày ghi số mới không lớn hơn thời gian hiện tại
         const currentDate = new Date();
         const newDateObj = new Date(newDate);
@@ -101,23 +133,28 @@ const AddMeter = ({ onClose }) => {
             return;
         }
 
-        // Kiểm tra ngày ghi số mới đủ 30 ngày kể từ ngày ghi số cũ
-        const oldDateObj = new Date(oldDate);
-        const thirtyDaysAfterOldDate = new Date(oldDateObj.getTime());
-        thirtyDaysAfterOldDate.setDate(thirtyDaysAfterOldDate.getDate() + 30);
-        if (newDateObj < thirtyDaysAfterOldDate || newDateObj > thirtyDaysAfterOldDate) {
-            toast.error('Ngày ghi số mới phải đủ 30 ngày kể từ ngày ghi số cũ.');
+
+        if (!/((09|03|07|08|05)+([0-9]{8})\b)/g.test(cusPhone)) {
+            toast.error('Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam hợp lệ.');
             return;
         }
 
+        const newMonth = newDateObj.getMonth() + 1;
+        const newYear = newDateObj.getFullYear();
+        const paymentPeriod = `Kỳ ${newMonth}/${newYear}`
         const data = {
             meter_reading_new: parseInt(newMeter),
             meter_date_new: newDate,
             meter_reading_old: parseInt(oldMeter),
             meter_date_old: oldDate,
+            payment_period: paymentPeriod,
+            customer_name: cusName.trim(),
+            customer_phone: cusPhone.trim(),
+            customer_address: cusAddress.trim(),
+            customer_code: cusCode.trim().toUpperCase(),
             service_id: parseInt(serviceId),
-            user_id: parseInt(userId),
         }
+        console.log(data)
         const res = await meterApis.createMeter(data)
         if (res.success && res) {
             toast.success('Thêm dữ liệu thành công');
@@ -129,11 +166,41 @@ const AddMeter = ({ onClose }) => {
         }
     }
 
+
+
+    const handleSelectCus = (id) => {
+       if(id) {
+        const filteredTemp = userList.filter(item =>  item.id === parseInt(id))
+        setCusName(filteredTemp[0].customer_name)
+        setCusAddress(filteredTemp[0].customer_address)
+        setCusCode(filteredTemp[0].customer_code)
+        setCusPhone(filteredTemp[0].customer_phone)
+       }
+       else {
+        setCusName('')
+        setCusAddress('')
+        setCusCode('')
+        setCusPhone('')
+       }
+    }
+
+
     return (
         <div className='overlay'>
             <div className='main-add-meter'>
                 <FontAwesomeIcon icon={faXmark} onClick={onClose} className='icon-close-add-meter' />
                 <form className='form-add-meter' onSubmit={handleSubmit}>
+                    <div className='form-flex-column'>
+                        <label>Dịch vụ - Nhà cung cấp</label>
+                        <select onChange={(e) => setServiceId(e.target.value)}>
+                            <option value=''>---Chọn---</option>
+                            {serviceList && serviceList.map((item, index) => {
+                                return <option key={index} value={item.id}>{item.name} - {item.supplierName}</option>
+                            })}
+                        </select>
+                    </div>
+
+
                     <div className='form-flex'>
                         <div className='form-flex-column'>
                             <label>Chỉ số cũ</label>
@@ -174,23 +241,37 @@ const AddMeter = ({ onClose }) => {
                             />
                         </div>
                     </div>
+
+
                     <div className='form-flex-column'>
-                        <label>Dịch vụ - Nhà cung cấp</label>
-                        <select onChange={(e) => setServiceId(e.target.value)}>
+                        <label>Khách hàng có trong hệ thống</label>
+                        <select onChange={(e) => handleSelectCus(e.target.value)} >
                             <option value=''>---Chọn---</option>
-                            {serviceList && serviceList.map((item, index) => {
-                                return <option key={index} value={item.id}>{item.name} - {item.supplierName}</option>
+                            {userList && userList.map((item, i) => {
+                                return <option value={item.id} key={i}>{item.customer_code} - {item.customer_name}</option>
                             })}
                         </select>
                     </div>
-                    <div className='form-flex-column'>
-                        <label>Mã khách hàng - Tên Khách hàng</label>
-                        <select onChange={(e) => setUserId(e.target.value)}>
-                            <option value=''>---Chọn---</option>
-                            {userList && userList.map((item, index) => {
-                                return <option key={index} value={item.id}>{item.id} - {item.firstname} {item.lastname}</option>
-                            })}
-                        </select>
+
+                    <div className='form-flex'>
+                        <div className='form-flex-column'>
+                            <label>Mã khách hàng</label>
+                            <input placeholder='Mã khách hàng' onChange={(e) => setCusCode(e.target.value)} value={cusCode || ''} />
+                        </div>
+                        <div className='form-flex-column'>
+                            <label>Tên khách hàng</label>
+                            <input placeholder='Tên khách hàng' onChange={(e) => setCusName(e.target.value)} value={cusName || ''} />
+                        </div>
+                    </div>
+                    <div className='form-flex'>
+                        <div className='form-flex-column'>
+                            <label >Địa chỉ khách hàng</label>
+                            <input placeholder='Địa chỉ khách hàng' onChange={(e) => setCusAddress(e.target.value)} value={cusAddress || ''} />
+                        </div>
+                        <div className='form-flex-column'>
+                            <label >Số điện thoại khách hàng</label>
+                            <input placeholder='Số điện thoại khách hàng' onChange={(e) => setCusPhone(e.target.value)} value={cusPhone || ''} />
+                        </div>
                     </div>
                     <button className='btn-save-meter' type='submit'>Lưu</button>
                 </form>

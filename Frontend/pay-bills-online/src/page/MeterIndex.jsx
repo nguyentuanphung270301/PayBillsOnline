@@ -225,19 +225,6 @@ const MeterIndex = () => {
         }
     };
 
-    const getNameUserById = async (id) => {
-        try {
-            const res = await userApis.getById(id);
-            if (res.success && res.data) {
-                return res.data.firstname + ' ' + res.data.lastname;
-            }
-            return null;
-        }
-        catch (error) {
-            console.log(error);
-            return null;
-        }
-    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -247,15 +234,14 @@ const MeterIndex = () => {
                     const updatedMeterList = await Promise.all(
                         meterRes.data.map(async (service) => {
                             const serviceName = await getServiceNameById(service.service_id);
-                            const nameUser = await getNameUserById(service.user_id);
                             return {
                                 ...service,
                                 serviceName: serviceName || 'N/A',
-                                nameUser: nameUser || 'N/A'
                             };
                         })
                     );
                     setMeterList(updatedMeterList);
+                    console.log(updatedMeterList);
                     setIsLoading(false);
                 } else {
                     console.log(meterRes);
@@ -344,7 +330,7 @@ const MeterIndex = () => {
                                                     <TableCell >{row.meter_reading_new}</TableCell>
                                                     <TableCell >{formatDate(row.meter_date_new)}</TableCell>
                                                     <TableCell >{row.serviceName}</TableCell>
-                                                    <TableCell >{row.user_id} - {row.nameUser}</TableCell>
+                                                    <TableCell >{row.customer_code} - {row.customer_name}</TableCell>
 
                                                     <TableCell sx={{
                                                         display: 'flex',

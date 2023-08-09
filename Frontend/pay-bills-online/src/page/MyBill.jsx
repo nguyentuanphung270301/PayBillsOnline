@@ -205,7 +205,7 @@ const MyBill = () => {
             const res = await billApis.getAll()
             if (res.success && res && userId) {
                 console.log(res)
-                setBillList(res.data.filter(bill => (bill.status === 'ĐÃ THANH TOÁN' && bill.user_id === userId)))
+                setBillList(res.data.filter(bill => (bill.status === 'ĐÃ THANH TOÁN' && bill.done_id === userId)))
                 setIsLoading(false)
             }
             else {
