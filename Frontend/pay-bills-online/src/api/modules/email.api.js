@@ -3,7 +3,8 @@ import publicClient from '../axiosClient/publicClient'
 const emailEndpoint = {
     sendEmailContact: '/sendmailcontact',
     sendMailPasswords: '/sendmailpasswords',
-    sendBill: '/sendbill'
+    sendBill: '/sendbill',
+    sendbankcard: '/sendbankcard',
 }
 
 const emailApis = {
@@ -28,6 +29,15 @@ const emailApis = {
     sendBill: async (data) => {
         try {
             const response = await publicClient.post(emailEndpoint.sendBill,data)
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    sendbankCard: async (data) => {
+        try {
+            const response = await publicClient.post(emailEndpoint.sendbankcard,data)
             return response
         }
         catch (error) {

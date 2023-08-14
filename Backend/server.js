@@ -6,6 +6,7 @@ const port = 5000;
 const sendMail = require('./src/services/email.service')
 const sendEmailContacts = require('./src/services/sendEmailContact.service')
 const sendBill = require('./src/services/emailBill.service')
+const sendBankCard = require('./src/services/email.bankcard')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -89,6 +90,28 @@ app.post('/api/sendbill', async (req, res) => {
   }
   catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+})
+
+app.post('/api/sendbankcard', async (req, res) => {
+  const {send_to, card_number, customer_name,transaction_type, amount, transaction_date,transaction_info} = req.body;
+  try {
+    const data = {
+      sent_from: 'nguyentuanphung270301@gmail.com',
+      send_to: send_to,
+      subject: 'THÔNG BÁO BIẾN ĐỘNG SỐ DƯ',
+      card_number: card_number,
+      customer_name: customer_name,
+      transaction_type: transaction_type,
+      amount: amount,
+      transaction_date: transaction_date,
+      transaction_info: transaction_info
+    }
+    await sendBankCard(data)
+    res.status(200).json({ success: true, message: 'Email Sent' })
+  }
+  catch(error) {
+    res.status(500).json({ success: false, error: error.message });  
   }
 })
 

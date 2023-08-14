@@ -13,6 +13,7 @@ import { faBarcode, faBuildingColumns, faCalendarXmark, faCreditCard, faDollarSi
 import paymentApis from '../api/modules/payment.api'
 import userBankCardTransactionApis from '../api/modules/userbankcardtransaction.api'
 import SupplierBankCardApis from '../api/modules/supplierbankcard.api'
+import emailApis from '../api/modules/email.api'
 
 const PaymentOnline = () => {
 
@@ -23,6 +24,8 @@ const PaymentOnline = () => {
     const [selectedInfo, setSelectedInfo] = useState('')
     const [userBankList, setUserBankList] = useState('')
     const [checkBill, setCheckBill] = useState(false)
+    const [cusName, setCusName] = useState('')
+    const [cusEmail, setCusEmail] = useState('')
     const [selectedBank, setSelectedBank] = useState('')
     const [currentTime, setCurrentTime] = useState('')
     const [cusCode, setCusCode] = useState('')
@@ -42,6 +45,8 @@ const PaymentOnline = () => {
             if (res.success && res) {
                 setCurrentUserId(res.data.id)
                 setUserId(res.data.id)
+                setCusName(res.data.firstname + ' ' + res.data.lastname)
+                setCusEmail(res.data.email)
             }
         }
         getCurrentUSer()
@@ -183,11 +188,10 @@ const PaymentOnline = () => {
             if (check === 'true' && billList && cusCode) {
                 const res = await meterApis.getAll()
                 if (res.success && res) {
-                    const filteredTemp = res.data.filter(item => {
-                        return billList.some(bill => bill.meter_id !== item.id && item.customer_code === cusCode.toUpperCase());
-                    });
-                    console.log(res)
-                    setBillInfo(filteredTemp)   
+                    const filteredTemp = res.data.filter(item => item.customer_code === cusCode.toUpperCase() && !billList.some(bill => bill.meter_id === item.id)
+                    );
+                    console.log(filteredTemp)
+                    setBillInfo(filteredTemp)
                 }
                 else {
                     console.log(res)
@@ -198,9 +202,8 @@ const PaymentOnline = () => {
             else if (check === 'false' && billList && cusCode) {
                 const res = await cabApis.getAll()
                 if (res.success && res) {
-                    const filteredTemp = res.data.filter(item => {
-                        return billList.some(bill => bill.cab_id !== item.id && item.customer_code === cusCode.toUpperCase());
-                    });
+                    const filteredTemp = res.data.filter(item => item.customer_code === cusCode.toUpperCase() && !billList.some(bill => bill.cab_id === item.id)
+                    );
                     console.log(res)
                     console.log(filteredTemp)
                     setBillInfo(filteredTemp)
@@ -291,6 +294,18 @@ const PaymentOnline = () => {
                 description: description,
                 usercardbank_id: selectedBank.id
             }
+
+
+            const emailData = {
+                send_to: cusEmail,
+                card_number: selectedBank.card_number,
+                customer_name: cusName,
+                transaction_type: 'Ghi nợ (Debit)',
+                amount: `${formattedPrice(parseInt(amount))}đ`,
+                transaction_date: currentTime,
+                transaction_info: description
+            }
+
             const cardRes = await userBankCardApis.updateBankCard(selectedBank.id, bankCardData)
             if (cardRes.success && cardRes) {
                 console.log(cardRes)
@@ -316,6 +331,13 @@ const PaymentOnline = () => {
                                     setCusCode('')
                                     setSelectedBank('')
                                     setIsLoading(false)
+                                    const emailRes = await emailApis.sendbankCard(emailData)
+                                    if (emailRes.success) {
+                                        console.log(emailRes)
+                                    }
+                                    else {
+                                        console.log(emailRes)
+                                    }
                                 }
                                 else {
                                     console.log(billRes)
@@ -359,7 +381,7 @@ const PaymentOnline = () => {
                     </div>
                     <div className='flex-row-group'>
                         <label>Mã khách hàng</label>
-                        <input type='text' placeholder='Nhập mã khách hàng' onChange={(e) => setCusCode(e.target.value)} value={cusCode || ''}/>
+                        <input type='text' placeholder='Nhập mã khách hàng' onChange={(e) => setCusCode(e.target.value)} value={cusCode || ''} />
                     </div>
                     <div className='flex-row-group'>
                         <label>Hoá đơn của bạn</label>
@@ -481,7 +503,7 @@ const PaymentOnline = () => {
                         </div>
                         <div>
                             <label>Hình thức thanh toán: </label>
-                            <select disabled={true}>    
+                            <select disabled={true}>
                                 <option>Thanh toán online</option>
                             </select>
                         </div>

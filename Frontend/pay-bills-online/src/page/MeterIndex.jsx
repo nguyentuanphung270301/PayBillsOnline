@@ -12,6 +12,7 @@ import { toast } from 'react-toastify'
 import AddMeter from '../components/common/AddMeter'
 import EditMeter from '../components/common/EditMeter'
 import supplierApis from '../api/modules/supplier.api'
+import billApis from '../api/modules/bill.api'
 
 
 function descendingComparator(a, b, orderBy) {
@@ -156,6 +157,7 @@ const MeterIndex = () => {
     const [showEditMeter, setShowEditMeter] = useState(false);
 
     const [search, setSearch] = useState('')
+    const [billList, setBillList] = useState('')
 
 
     const handleClick = (event, name) => {
@@ -293,6 +295,21 @@ const MeterIndex = () => {
         }
     }
 
+    useEffect(() => {
+        const getBillList = async () => {
+            const res = await billApis.getAll()
+            if (res.success && res) {
+                setBillList(res.data)
+            }
+        }
+        getBillList();
+    }, [])
+
+    const isMeterInBillList = (meterId) => {
+        return billList.some(bill => bill.meter_id === meterId);
+    }
+
+
     return (
         <div className='main-meter'>
             <Typography sx={{
@@ -322,7 +339,7 @@ const MeterIndex = () => {
                                     onRequestSort={handleRequestSort}
                                     rowCount={meterList.length}
                                 />
-                                {!meterList ? <Typography sx={{
+                                {(!meterList || !billList) ? <Typography sx={{
                                     position: 'absolute',
                                     top: '200px',
                                     right: 'calc(100% / 2)',
@@ -330,6 +347,7 @@ const MeterIndex = () => {
                                     {stableSort(meterList, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
+                                            const isDisabled = isMeterInBillList(row.id)
                                             return (
                                                 <TableRow
                                                     hover
@@ -359,6 +377,7 @@ const MeterIndex = () => {
                                                                 height: '40px'
                                                             }}
                                                             onClick={() => handleEidt(row.id)}
+                                                            disabled={isDisabled}
                                                         ><FontAwesomeIcon icon={faPenToSquare} /></Button>
                                                         <Box>
                                                             <Button
@@ -372,6 +391,7 @@ const MeterIndex = () => {
                                                                     }
                                                                 }}
                                                                 onClick={() => handleClickOpen(row.id)}
+                                                                disabled={isDisabled}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </Button>

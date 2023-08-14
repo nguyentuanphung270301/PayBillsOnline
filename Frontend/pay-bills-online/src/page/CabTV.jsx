@@ -12,6 +12,7 @@ import supplierApis from '../api/modules/supplier.api';
 import { toast } from 'react-toastify';
 import AddCab from '../components/common/AddCab';
 import EditCab from '../components/common/EditCab';
+import billApis from '../api/modules/bill.api';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -154,6 +155,21 @@ const CabTV = () => {
     const [showAddCab, setShowAddCab] = useState(false);
     const [showEditCab, setShowEditCab] = useState(false);
     const [search, setSearch] = useState('')
+    const [billList, setBillList] = useState('')
+
+    useEffect(() => {
+        const getBillList = async () => {
+            const res = await billApis.getAll()
+            if (res.success && res) {
+                setBillList(res.data)
+            }
+        }
+        getBillList();
+    }, [])
+
+    const isMeterInBillList = (meterId) => {
+        return billList.some(bill => bill.cab_id === meterId);
+    }
 
 
     const handleClick = (event, name) => {
@@ -335,7 +351,7 @@ const CabTV = () => {
                                     onRequestSort={handleRequestSort}
                                     rowCount={cabList.length}
                                 />
-                                {!cabList ? <Typography sx={{
+                                {(!cabList || !billList) ? <Typography sx={{
                                     position: 'absolute',
                                     top: '200px',
                                     right: 'calc(100% / 2)',
@@ -343,6 +359,7 @@ const CabTV = () => {
                                     {stableSort(cabList, getComparator(order, orderBy))
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row, index) => {
+                                            const isDisabled = isMeterInBillList(row.id)
                                             return (
                                                 <TableRow
                                                     hover
@@ -372,6 +389,7 @@ const CabTV = () => {
                                                                 height: '40px'
                                                             }}
                                                             onClick={() => handleEidt(row.id)}
+                                                            disabled={isDisabled}
                                                         ><FontAwesomeIcon icon={faPenToSquare} /></Button>
                                                         <Box>
                                                             <Button
@@ -385,6 +403,7 @@ const CabTV = () => {
                                                                     }
                                                                 }}
                                                                 onClick={() => handleClickOpen(row.id)}
+                                                                disabled={isDisabled}
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </Button>
