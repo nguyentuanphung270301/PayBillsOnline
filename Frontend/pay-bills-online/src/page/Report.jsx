@@ -4,7 +4,7 @@ import '../style/Report.css'
 import supplierApis from '../api/modules/supplier.api'
 import serviceApis from '../api/modules/service.api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlassChart } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlassChart, faTable } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 import paymentApis from '../api/modules/payment.api'
 
@@ -42,6 +42,7 @@ const Report = () => {
 
     const [reportData, setReportData] = useState('')
     const [reportInfo, setReportInfo] = useState('')
+    const XLSX = require('xlsx');
 
     useEffect(() => {
         const getSupplierList = async () => {
@@ -110,6 +111,73 @@ const Report = () => {
         getReport()
     }, [endDate, serviceId, startDate, supplierId])
 
+    const handleExcel = async () => {
+        if (!supplierId) {
+            toast.error('Vui lòng chọn nhà cung cấp')
+            return;
+        }
+
+        if (!(startDate || endDate)) {
+            toast.error('Vui lòng chọn ngày bắt đầu , ngày kết thúc')
+            return;
+        }
+        if ((startDate > endDate)) {
+            toast.error('Ngày bắt đầu phải nhỏ hơn ngày kết thúc')
+            return;
+        }
+
+        var excelData = null
+
+        if (reportData) {
+            const meterRes = await paymentApis.getExcelMeter(reportData);
+            if (meterRes.success && meterRes) {
+                console.log(meterRes)
+                excelData = meterRes.data.map(item => {
+                    return {
+                        'Tên nhà cung cấp': item.supplier_name,
+                        'Dịch vụ': item.service_name,
+                        'Ngày': formatDate(item.date),
+                        'Loại giao dịch': item.payment_method,
+                        'Doanh thu': `${formattedPrice(item.amount)} đ`
+                    }
+                })
+            }
+            else {
+                const cabRes = await paymentApis.getExcelCab(reportData)
+                if (cabRes.success && cabRes) {
+                    console.log(cabRes)
+                    excelData = cabRes.data.map(item => {
+                        return {
+                            'Tên nhà cung cấp': item.supplier_name,
+                            'Dịch vụ': item.service_name,
+                            'Ngày': formatDate(item.date),
+                            'Loại giao dịch': item.payment_method,
+                            'Doanh thu': `${formattedPrice(item.amount)} đ`
+                        }
+                    })
+                }
+                else {
+                    console.log(cabRes)
+                    toast.error("Không tìm thấy dữ liệu")
+                }
+                console.log(meterRes)
+            }
+        }
+
+        if (excelData !== null) {
+            // Tạo một workbook và một worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(excelData);
+
+            // Thêm worksheet vào workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Revenue Data');
+
+            // Ghi workbook ra file Excel
+            const excelFilePath = 'revenue_data.xlsx';
+            XLSX.writeFile(wb, excelFilePath);
+        }
+    }
+
     const handleSubmit = async () => {
 
         if (!supplierId) {
@@ -125,6 +193,7 @@ const Report = () => {
             toast.error('Ngày bắt đầu phải nhỏ hơn ngày kết thúc')
             return;
         }
+
 
         if (reportData) {
             const meterRes = await paymentApis.getReportMeter(reportData);
@@ -150,22 +219,6 @@ const Report = () => {
     var data = null
     var options = null
     if (reportInfo) {
-        // const labels = reportInfo.map(item => formatDate(item.date))
-        // const datasets = [
-        //     {
-        //         label: 'Doanh thu',
-        //         data: reportInfo.map(item => item.total_revenue),
-        //         backgroundColor: 'rgba(75,192,192,0.2)',
-        //         borderColor: 'rgba(75,192,192,1)',
-        //         borderWidth: 1,
-        //     },
-        // ];
-
-        // // Tạo biểu đồ sử dụng react-chartjs-2
-        // data = {
-        //     labels: labels,
-        //     datasets: datasets,
-        // };  
         reportInfo.sort((a, b) => new Date(a.date) - new Date(b.date));
         const colors = [
             'rgba(75,192,192,1)',
@@ -236,7 +289,10 @@ const Report = () => {
                     <label>Chọn thời gian kết thúc</label>
                     <input type='date' onChange={(e) => setEndDate(e.target.value)} />
                 </div>
-                <button className='btn-report' onClick={handleSubmit}><FontAwesomeIcon icon={faMagnifyingGlassChart} /></button>
+                <div className='div-flex'>
+                    <button className='btn-report' onClick={handleSubmit}><FontAwesomeIcon icon={faMagnifyingGlassChart} /></button>
+                    <button className='btn-excel' onClick={handleExcel}><FontAwesomeIcon icon={faTable} /></button>
+                </div>
             </div>
             <div className='chart-report'>
                 {data !== null && <Chart type='line' data={data} />}

@@ -9,5 +9,9 @@ router.post('/create', authMiddleware.authenticateToken, paymentController.creat
 router.get('/getReport/Cab', authMiddleware.authenticateToken , paymentController.getReportCab)
 router.get('/getReport/Meter', authMiddleware.authenticateToken , paymentController.getReportMeter)
 
+router.get('/getExcel/Meter', authMiddleware.authenticateToken , paymentController.getExcelMeter)
+router.get('/getExcel/Cab', authMiddleware.authenticateToken , paymentController.getExcelCab)
+
+
 
 module.exports = router;

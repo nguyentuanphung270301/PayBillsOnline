@@ -47,7 +47,7 @@
 }
 
 .btn-report {
-    margin-left: 250px;
+    margin-left: 200px;
     height: 40px;
     width: 20%;
     font-size: 20px;
@@ -57,9 +57,25 @@
     border-radius: 10px;
 }
 
-.btn-report:hover {
+.btn-report:hover, .btn-excel:hover {
     cursor: pointer;
     opacity: 0.8;
+}
+
+.div-flex {
+    display: flex;
+    position: relative;
+}
+
+.btn-excel {
+    margin-left: 20px;
+    height: 40px;
+    width: 20%;
+    font-size: 20px;
+    background-color: rgb(0, 232, 143);
+    color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
 }
 
 .chart-report {

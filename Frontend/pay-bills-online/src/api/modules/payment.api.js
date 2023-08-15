@@ -4,6 +4,8 @@ const paymentEndpoints = {
     createPayment: '/payment/create',
     getReportCab: '/payment/getReport/Cab',
     getReportMeter: '/payment/getReport/Meter',
+    getExcelMeters: '/payment/getExcel/Meter',
+    getExcelCab: '/payment/getExcel/Cab',
 }
 
 const paymentApis = {
@@ -35,6 +37,24 @@ const paymentApis = {
             return error
         }
     },
+    getExcelMeter: async (data) => {
+        try {
+            const response = await privateClient.get(paymentEndpoints.getExcelMeters, { params: data })
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    },
+    getExcelCab: async (data) => {
+        try {
+            const response = await privateClient.get(paymentEndpoints.getExcelCab, { params: data })
+            return response
+        }
+        catch (error) {
+            return error
+        }
+    }
 }
 
 export default paymentApis
